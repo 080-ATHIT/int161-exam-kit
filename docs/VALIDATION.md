@@ -1,11 +1,12 @@
 # ผลตรวจ Template
 
-รุ่น2.0.1 ตรวจบนmacOS, Node26.5.1 และMySQL9.7.1ในเครื่อง
+รุ่น2.1.0 ตรวจบนmacOS, Node26.5.1 และMySQL9.7.1ในเครื่อง
 
 - npm test: 25/25 รวมguardโหมดexamและการปฏิเสธdb:initในโหมดexam
 - สำเนาteacher template: shared API contractsผ่าน9/9 และเปิดnpm startจริงในสำเนาได้HTTP200ทั้งstudent-info/products
 - เปิดsrc/server.jsจริงทั้งpractice/examได้HTTP200 โดยใช้ฐานตัวอย่างเดียวกันเพื่อตรวจstartup (ยังไม่ใช่การตรวจschemaข้อสอบอื่น)
 
+- QUESTIONS-AND-ANSWERS.mdรวม6หน้าคำถาม/วิธีคิด/วิธีทำ/เฉลยJSและSQL ใช้sourceเดียวกับtemplate ไม่เพิ่มโจทย์ฝึกใหม่
 - srcเป็นโครงAPIที่เปิดได้ด้วยnpm start; controllers/service/repository/mapperแยกชัดเจน
 - Regression: POST/PUTจาก.httpและPostmanผ่านตารางชั่วคราวที่บังคับram_gb/storage_gb/color NOT NULL; missing/nullได้400แทน500; request curlส่งfieldsครบ
 - Regression: verify-templateปฏิเสธserver.jsที่พัง แม้app factoryผ่าน

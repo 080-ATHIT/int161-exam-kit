@@ -1,4 +1,48 @@
-# วิธีปรับ template: 01-create-product
+# เพิ่มสินค้า — คำถาม เฉลย และวิธีทำ
+
+คำถามย่อจากงานWeek08ที่templateทำไว้แล้ว ส่วนเฉลยเป็นโค้ดของโครงนี้ ไม่ใช่โจทย์ใหม่ให้ทำเพิ่ม ลำดับ6ส่วนจัดเพื่อค้นหาโค้ด ไม่ใช่การยืนยันข้อสอบกลางภาค
+
+## คำถาม
+
+`POST /products` ภายใต้basepathคงที่ `/api/รหัสของตัวเอง`
+
+พัฒนา API เพิ่มสินค้า รับ JSON ที่มี sku, name, brand_id, category, price, ram_gb, storage_gb, color และฟิลด์อื่นตาม schema บันทึกลง MySQL สำเร็จตอบ201 หาก SKU ซ้ำตอบ409 ส่งข้อมูลกลับตาม response contract
+
+## วิธีคิดก่อนเขียน
+
+- ต้องบันทึกจริง จึงต้องมีINSERT ไม่ใช่ส่งbodyเดิมกลับอย่างเดียว
+- brand_idอ้างอิงbrands; ถ้าปลายทางไม่มีต้องจัดการFKerror
+- skuห้ามซ้ำ ใช้precheckเพื่อข้อความอ่านง่ายและDB UNIQUEเพื่อกันการชนพร้อมกัน
+- ไม่ให้clientกำหนดidหรือinternal_cost จึงเลือกฟิลด์ก่อนส่งSQL
+- สร้างแล้วต้องอ่านกลับด้วยinsertId จึงได้ค่าที่DBกำหนดและbrandNameจากJOINสำหรับdetailDTO
+
+## วิธีทำทีละขั้น
+
+1. อ่านbodyที่controller แล้วส่งให้service.createProduct
+2. productInputตรวจ8ฟิลด์บังคับ ชนิดnumber/stringและNOT NULL ให้ตรงschema
+3. findBySkuตรวจซ้ำ แล้วcreateProductในrepository INSERT objectที่ผ่านallowlistแล้ว
+4. ใช้insertIdอ่านfindProductพร้อมJOIN แปลงdetailDTO
+5. controllerตอบ201; duplicateหรือFKerrorส่งเข้าmiddlewareกลาง
+
+## เฉลย JavaScript: จุดรับ request และตอบ response
+
+โค้ดนี้ใช้จริงในtemplate โดยservice/repository/mapperที่ต้องใช้ร่วมกันอยู่ครบตามลิงก์ถัดไป ไม่ใช่handlerเดี่ยวที่รันได้โดยไม่มีlayerอื่น
+
+```js
+// ADAPT: controller ที่ใช้ได้แล้ว เปลี่ยนparams/body/statusตามโจทย์ และแก้service/repo/mapperที่เกี่ยวข้อง
+// Create: validate/allowlist → INSERT → SELECT detail DTO → 201
+import {success} from '../mappers-$id/api-response.js';
+
+export function createProductHandler(service) {
+  return async function (req, res) {
+    return success(res, await service.createProduct(req.body), 201);
+  };
+}
+```
+
+## เช็กว่าคำตอบถูกอย่างไร
+
+ลองใช้bodyในหัวข้อด้านล่าง เก็บdata.idที่POSTคืน แล้วGETตามidนั้น ต้องพบข้อมูลจริง ส่งSKUเดิมซ้ำต้อง409 และตัดram_gbออกต้อง400 ไม่ใช่500
 
 ## ไฟล์ที่ใช้ร่วมกัน
 
@@ -11,7 +55,7 @@
 
 ไฟล์ handler ไม่ใช่คำตอบทั้งหมดเพียงไฟล์เดียว ต้องอ่าน service/repository/mapper ที่ลิงก์ไว้ด้วย ทุกไฟล์เป็น .js ปกติ แยกชั้นเหมือน teacher template ไม่มีตัวสร้างโค้ดหรือ framework เพิ่ม
 
-## แก้ตามโจทย์ที่ได้รับ
+## จุดปรับเมื่อนำไปใช้กับข้อสอบ
 
 1. รับ body เป็น snake_case จากโจทย์ เช่น sku/name/brand_id/category/price รวมรายละเอียดสเปกโทรศัพท์
 2. service.productInput ตรวจชนิดและเลือกฟิลด์ที่อนุญาต ไม่ส่ง req.body ทั้งก้อนลงฐาน
@@ -19,7 +63,7 @@
 4. SELECT ใหม่พร้อม JOIN brands เพื่อคืน detail DTO แล้วตอบ201
 5. UNIQUE ใน DB ยังต้องมี เพราะการเช็กก่อน INSERT อย่างเดียวกัน request พร้อมกันไม่ได้
 
-## SQL หลัก
+## เฉลยส่วน SQL
 
 ```sql
 INSERT INTO products SET ?;
