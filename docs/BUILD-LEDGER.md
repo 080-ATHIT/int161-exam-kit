@@ -8,3 +8,6 @@ Task 1: unit tests RED (5 failures) then GREEN (5 passes); dependency lock insta
 Task 3: API suite RED against 501 stub. Ruling: detail DTO has 13 named fields (the exact allowlist), not 14; corrected mistaken count assertion. FK case uses a unique SKU so it does not accidentally test duplicate precedence.
 
 Task 3 complete: full suite 16/16 against actual MySQL. Task 4: Thai setup/contract/CRUD/pagination/error/key/template/offline guides and request samples. Worked-example test RED missing module → GREEN real MySQL books string-PK CRUD with changed envelope/DTO/base path. Docs link/reproducibility check added.
+
+Task 4 docs check RED exposed HTML self-link incorrectly targeting absent chapter; fixed to README chapter. Suite GREEN18/18. Task 5 template verification: original teacher ZIP extracted to temp, unchanged package retained, documented sources copied, shared API contract suite GREEN8/8 on MySQL. No exam files altered.
+Ruling: use macOS sandbox-exec child-process policy denying external outbound connections while allowing localhost; this verifies offline API/dependencies without changing machine network settings. It does not replace learner testing with Wi-Fi disconnected.
