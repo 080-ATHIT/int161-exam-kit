@@ -1,0 +1,187 @@
+{
+  "info": {
+    "name": "INT161 local practice \u2014 run in order",
+    "description": "Fictional local practice. Run Create before Update/Delete. No cloud services required.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://127.0.0.1:3000/api/demo001"
+    },
+    {
+      "key": "productId",
+      "value": "CREATE_FIRST"
+    }
+  ],
+  "item": [
+    {
+      "name": "1 Identity",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/student-info"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+              ""
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "2 List",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/products?page=1&limit=10"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+              ""
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "3 Create own row",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/products",
+        "body": {
+          "mode": "raw",
+          "raw": "{\"sku\": \"POSTMAN-{{$timestamp}}\", \"name\": \"Postman Phone\", \"brand_id\": 1, \"category\": \"PHONE\", \"price\": 10.5}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 201\", () => pm.response.to.have.status(201));",
+              "const d=pm.response.json().data; pm.collectionVariables.set(\"productId\",d.id); pm.collectionVariables.set(\"createdSku\",d.sku);"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "4 Detail",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/products/{{productId}}"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+              ""
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "5 Update own row",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/products/{{productId}}",
+        "body": {
+          "mode": "raw",
+          "raw": "{\"sku\": \"{{createdSku}}\", \"name\": \"Updated\", \"brand_id\": 1, \"category\": \"PHONE\", \"price\": 0}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+              ""
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "6 Delete own row",
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": "{{baseUrl}}/products/{{productId}}"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 204\", () => pm.response.to.have.status(204));",
+              "pm.test(\"empty body\",()=>pm.expect(pm.response.text()).to.eql(\"\"));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "7 Confirm gone",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/products/{{productId}}"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 404\", () => pm.response.to.have.status(404));",
+              ""
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

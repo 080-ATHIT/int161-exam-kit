@@ -1,0 +1,41 @@
+@base = http://127.0.0.1:3000/api/demo001
+@productId = REPLACE_WITH_CREATED_ID
+
+### Identity
+GET {{base}}/student-info
+
+### Brands list/detail
+GET {{base}}/brands
+
+###
+GET {{base}}/brands/1
+
+### Product list (summary DTO)
+GET {{base}}/products?page=1&limit=10
+
+### Create: change sku if already used; copy returned data.id to productId
+POST {{base}}/products
+Content-Type: application/json
+
+{"sku":"MANUAL-001","name":"Manual Phone","brand_id":1,"category":"PHONE","price":1200.50}
+
+### Detail
+GET {{base}}/products/{{productId}}
+
+### Full PUT: unchanged values must still return 200
+PUT {{base}}/products/{{productId}}
+Content-Type: application/json
+
+{"sku":"MANUAL-001","name":"Manual Phone Updated","brand_id":1,"category":"PHONE","price":0}
+
+### Delete only the record YOU created: 204, empty body
+DELETE {{base}}/products/{{productId}}
+
+### After delete: 404
+GET {{base}}/products/{{productId}}
+
+### Invalid pagination: 400
+GET {{base}}/products?page=0
+
+### String key
+GET {{base}}/tags/NA
