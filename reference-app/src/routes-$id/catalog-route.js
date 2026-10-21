@@ -1,19 +1,25 @@
 import express from 'express';
 import {numericId} from '../services-$id/catalog-service.js';
 import {queryParser} from '../middlewares-$id/pagination.js';
-import {success,metadata} from '../mappers-$id/api-response.js';
+import {success} from '../mappers-$id/api-response.js';
+import {createProductHandler} from '../solutions-$id/01-create-product.js';
+import {readBrandsHandler} from '../solutions-$id/02-read-brands.js';
+import {readProductsHandler} from '../solutions-$id/03-read-products.js';
+import {readProductDetailHandler} from '../solutions-$id/04-read-product-detail.js';
+import {updateProductHandler} from '../solutions-$id/05-update-product.js';
+import {deleteProductHandler} from '../solutions-$id/06-delete-product.js';
 // Express 5 ส่ง rejected Promise จาก async handler เข้า error middleware ได้
 export function createCatalogRouter(service,identity) {
  const router=express.Router();
  router.get('/student-info',(req,res)=>success(res,{studentId:identity.studentId,name:identity.name,secretKey:identity.key}));
- router.get('/brands',async(req,res)=>success(res,await service.listBrands()));
+ router.get('/brands',readBrandsHandler(service));
  router.get('/brands/:id',async(req,res)=>success(res,await service.getBrand(numericId(req.params.id))));
  router.delete('/brands/:id',async(req,res)=>{await service.removeBrand(numericId(req.params.id));res.status(204).end();});
- router.get('/products',queryParser,async(req,res)=>{const {items,total}=await service.listProducts(req.pagination);return success(res,items,200,metadata(total,req.pagination));});
- router.get('/products/:id',async(req,res)=>success(res,await service.getProduct(numericId(req.params.id))));
- router.post('/products',async(req,res)=>success(res,await service.createProduct(req.body),201));
- router.put('/products/:id',async(req,res)=>success(res,await service.updateProduct(numericId(req.params.id),req.body)));
- router.delete('/products/:id',async(req,res)=>{await service.removeProduct(numericId(req.params.id));res.status(204).end();});
+ router.get('/products',queryParser,readProductsHandler(service));
+ router.get('/products/:id',readProductDetailHandler(service));
+ router.post('/products',createProductHandler(service));
+ router.put('/products/:id',updateProductHandler(service));
+ router.delete('/products/:id',deleteProductHandler(service));
  // ตัวอย่าง string key: ไม่ใช้ Number(req.params.code)
  router.get('/tags',async(req,res)=>success(res,await service.listTags()));
  router.get('/tags/:code',async(req,res)=>success(res,await service.getTag(req.params.code)));

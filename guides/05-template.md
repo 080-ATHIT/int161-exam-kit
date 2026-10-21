@@ -7,6 +7,7 @@ reference-app เป็นตัวอย่างให้ศึกษา ไ�
 | Kit | ใส่ที่ teacher src | หน้าที่ |
 | --- | --- | --- |
 | configs-$id/settings.js, db-config.js | configs-$id/ | env และ pool |
+| solutions-$id/*.js | solutions-$id/ | handler แยกตาม6ข้อ |
 | routes-$id/catalog-route.js | routes-$id/ | endpoints |
 | services-$id/catalog-service.js | services-$id/ | validation/business |
 | repositories-$id/catalog-repository.js | repositories-$id/ | SQL |
@@ -50,4 +51,4 @@ server.js ของ reference-app ตรวจ marker ฐานฝึกแล�
 npm run verify:template -- --template /absolute/path/midterm-exam-esm-template.zip
 ```
 
-สคริปต์แตก ZIP ใน temp directory เท่านั้น ตรวจ dependency family ของ template แล้วคัดลอก source ที่ระบุในตาราง (app + configs/routes/services/repositories/mappers/middlewares) จาก kit เข้า src ของ temp template ใช้ node_modules ที่ติดตั้งแล้วและรัน contract tests ชุดเดียวกันกับ MySQL ฐานฝึก ไม่ใช่เครื่องมือทำข้อสอบอัตโนมัติ และไม่พิสูจน์ว่า schema/โจทย์ในวันสอบเหมือนชุดฝึก
+สคริปต์แตก ZIP ใน temp directory เท่านั้น ตรวจ dependency family ของ template แล้วคัดลอก source ที่ระบุในตาราง (app + configs/routes/services/repositories/mappers/middlewares/solutions) จาก kit เข้า src ของ temp template ใช้ node_modules ที่ติดตั้งแล้วและรัน contract tests ชุดเดียวกันกับ MySQL ฐานฝึก ไม่ใช่เครื่องมือทำข้อสอบอัตโนมัติ และไม่พิสูจน์ว่า schema/โจทย์ในวันสอบเหมือนชุดฝึก

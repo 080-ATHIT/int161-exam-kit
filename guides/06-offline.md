@@ -22,7 +22,7 @@
 
 - ดาวน์โหลด repo/ZIP และเอกสารที่อนุญาต เตรียม template ตามประกาศ
 - ติดตั้ง Node/MySQL/Postman หรือ extension ที่ใช้แล้ว `npm ci` ให้สำเร็จใน project ที่จะรัน
-- ทดสอบ `npm start`, POST/GET/PUT/DELETE, เปิด HTML จาก Finder และเปิดไฟล์ request ในเครื่อง
+- ทดสอบ `npm start`, POST/GET/PUT/DELETE, เปิดไฟล์ .md ใน editor และเปิดไฟล์ request ในเครื่อง
 - ตัดการเชื่อมต่ออินเทอร์เน็ตด้วยตัวเองแล้วลองอีกครั้ง เอกสารอยู่ local แต่ npm ci ที่ไม่มี cache ยังต้องใช้เน็ต
 - การย้าย node_modules ข้าม OS/CPU/Node version ไม่รับประกัน ใช้เครื่องสอบจริงเตรียมและทดสอบ
 - นำ .env ส่วนตัวไว้ในเครื่อง ไม่ใส่ลง Git/ZIP ที่แชร์

@@ -27,13 +27,10 @@ npm start
 
 ## 2. อ่านตามลำดับนี้
 
-1. [Contract Sheet](guides/01-contract.md): จด path, body, DTO, status, pagination จากโจทย์จริง
-2. [CRUD](guides/02-crud.md): ตาม request จาก route ลง SQL แล้วกลับเป็น DTO
-3. [Pagination และ DTO](guides/03-pagination-dto.md)
-4. [Error, string key, composite key](guides/04-errors-keys.md)
-5. [เปลี่ยนตัวอย่าง products เป็น books](practice/worked-example.md)
-6. [ทำโจทย์เองโดยไม่เปิดเฉลย](practice/independent-task.md)
-7. [ย้ายไป template](guides/05-template.md) และ [เตรียมก่อนตัดเน็ต](guides/06-offline.md)
+1. [GUIDE.md](GUIDE.md) และ [กรอบสอบ](EXAM.md)
+2. [โจทย์ Week08 จริง](questions/week08-original.md) แล้วเปิด guide/js ทั้ง6ข้อจาก README
+3. [ย้ายไป template](guides/05-template.md) และ [เตรียมก่อนตัดเน็ต](guides/06-offline.md)
+4. หากต้องการอ่านเพิ่ม ดู [ส่วนเสริมที่ผู้ช่วยเพิ่ม](SUPPLEMENTS.md)
 
 อ่านสรุปอย่างเดียวไม่พอ ต้องลอง POST → GET → PUT → DELETE และดูแถวใน MySQL จริง
 
@@ -43,7 +40,7 @@ npm start
 - `requests/curl.sh`: ชุด smoke ที่สร้างและลบเฉพาะ product ของตัวเอง รัน `sh requests/curl.sh`
 - `requests/postman.json`: import เป็น collection; ไม่ต้องใช้ cloud account เพื่อส่ง localhost requests
 - `recipes/`: ตัวอย่าง response W6, pagination แบบเลือกใช้ และคีย์ string/composite อ่าน import และปรับ path ให้ตรงโครงงาน
-- `docs/offline-guide.html`: เปิดตรงจาก Finder ได้ ไม่โหลด CDN/ฟอนต์/API ภายนอก
+- `GUIDE.md`: คู่มือ Markdown เปิดอ่านใน editor ได้โดยไม่ต้องเปิด server
 
 ## 4. ขอบเขตสอบจากประกาศ
 

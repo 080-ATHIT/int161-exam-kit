@@ -1,12 +1,13 @@
 // macOS verification only: block outbound network except localhost for the test process tree.
-import {mkdtemp,symlink,rm,readdir} from 'node:fs/promises';
+import {mkdtemp,symlink,rm,readdir,readFile} from 'node:fs/promises';
 import {tmpdir} from 'node:os';
 import {join} from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {execFileSync,spawnSync} from 'node:child_process';
 if(process.platform!=='darwin')throw new Error('This verification uses macOS sandbox-exec. Prepare dependencies and test manually offline on other OSes.');
 const root=fileURLToPath(new URL('../',import.meta.url));const temp=await mkdtemp(join(tmpdir(),'int161-offline-'));
-const archive=process.argv[2]||join(root,'artifacts/int161-exam-kit-v1.0.0.zip');
+const {version}=JSON.parse(await readFile(join(root,'package.json'),'utf8'));
+const archive=process.argv[2]||join(root,`artifacts/int161-exam-kit-v${version}.zip`);
 try{
  execFileSync('python3',['-c',`import zipfile,pathlib,sys
 with zipfile.ZipFile(sys.argv[1]) as z:

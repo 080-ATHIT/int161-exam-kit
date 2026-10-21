@@ -1,19 +1,24 @@
-# INT161 Exam Kit
+# INT161 — Guide และโจทย์ฝึกปฏิบัติ
 
-ชุดฝึก Node.js ESM + Express 5 + MySQL พร้อมคู่มือภาษาไทยอ่านออฟไลน์
+เอกสารอ่านเป็น `.md` และแนวเฉลยเป็น `.js` ปกติ เปิดอ่านใน editor ได้ออฟไลน์
 
-เริ่มที่ [START-HERE.th.md](START-HERE.th.md) หรือเปิด [คู่มือ HTML](docs/offline-guide.html) หลังดาวน์โหลดลงเครื่อง
+เริ่มที่ [GUIDE.md](GUIDE.md) → [ติดตั้ง/เปิดตัวอย่าง](START-HERE.th.md) → [โจทย์จริง Week08](questions/week08-original.md)
 
-- ตัวอย่าง CRUD จริง: `reference-app/src/` แยก route → service → repository และ mapper
-- [แนวทำข้อสอบและ Contract Sheet](guides/01-contract.md)
-- [CRUD ทีละชั้น](guides/02-crud.md), [Pagination / DTO / JOIN](guides/03-pagination-dto.md)
-- [Exception / คีย์แบบอื่น](guides/04-errors-keys.md)
-- [ดัดแปลง teacher template](guides/05-template.md)
-- [แก้ปัญหา / เตรียมออฟไลน์ / ส่งงาน](guides/06-offline.md)
-- [วิธีใช้ recipes](recipes/README.md)
-- [ตัวอย่างเปลี่ยนโจทย์](practice/worked-example.md), [โจทย์ฝึกทำเอง](practice/independent-task.md)
-- [ผลตรวจจริงและข้อจำกัด](docs/VALIDATION.md)
+| แบบ | Guide วิธีทำ | เฉลย JavaScript ที่ route ใช้จริง |
+| --- | --- | --- |
+| 1C เพิ่มสินค้า | [01 Create](questions/six-tasks/01-create-product.md) | [01-create-product.js](reference-app/src/solutions-$id/01-create-product.js) |
+| R1 รายการแบรนด์ | [02 Brands](questions/six-tasks/02-read-brands.md) | [02-read-brands.js](reference-app/src/solutions-$id/02-read-brands.js) |
+| R2 รายการสินค้า + Pagination/DTO | [03 Products](questions/six-tasks/03-read-products.md) | [03-read-products.js](reference-app/src/solutions-$id/03-read-products.js) |
+| R3 รายละเอียดสินค้า + JOIN/DTO | [04 Detail](questions/six-tasks/04-read-product-detail.md) | [04-read-product-detail.js](reference-app/src/solutions-$id/04-read-product-detail.js) |
+| 1U แก้ไขสินค้า | [05 Update](questions/six-tasks/05-update-product.md) | [05-update-product.js](reference-app/src/solutions-$id/05-update-product.js) |
+| 1D ลบสินค้า | [06 Delete](questions/six-tasks/06-delete-product.md) | [06-delete-product.js](reference-app/src/solutions-$id/06-delete-product.js) |
 
-ตัวอย่างนี้สร้างเพื่อฝึก ไม่ใช่ข้อสอบจริงหรือเฉลยที่อาจารย์รับรอง ใช้ข้อมูลสมมติทั้งหมด ไม่รวมเอกสารรายวิชาและ ZIP ของอาจารย์ใน repo นี้
+handler ใช้ service/repository/mapper ร่วมกันเพื่อคงโครงสร้าง template ของอาจารย์ Guide แต่ละข้อลิงก์ไปทุกชั้นที่ต้องอ่าน/แก้
 
-ต้องติดตั้ง Node >=22.9 และ MySQL ที่เปิดใช้งานแล้ว เตรียม `npm ci` ขณะยังใช้อินเทอร์เน็ตได้ `node_modules` ไม่รวมใน ZIP; ไฟล์ `package-lock.json` อย่างเดียวไม่ทำให้ติดตั้งออฟไลน์ได้
+โจทย์มาจากใบงานอาจารย์ ส่วนเฉลยและการจัดกลุ่ม6ข้อเขียนเพิ่มโดยผู้ช่วย ไม่ใช่เฉลยที่อาจารย์รับรอง และยังไม่ใช่ข้อสอบกลางภาคที่ไม่ได้แจก ดู [ที่มาและสิ่งที่เพิ่ม](questions/SOURCES.md)
+
+- [กรอบสอบตามประกาศ](EXAM.md)
+- [เอกสารเสริมที่ติดป้ายชัดเจน](SUPPLEMENTS.md)
+- [ผลตรวจและข้อจำกัด](docs/VALIDATION.md)
+
+ไม่มีเว็บ/HTML และไม่ต้องเปิด server เพื่ออ่านเอกสาร ต้องเตรียม Node/MySQL และ `npm ci` ขณะมีอินเทอร์เน็ตเฉพาะเมื่อต้องการรันโค้ด `node_modules` ไม่รวมใน ZIP

@@ -12,7 +12,8 @@
 - Fresh review: ไม่มี critical; แก้ test initialization race และลำดับ db:init ก่อน doctor แล้ว ไม่มี minor ค้าง
 - สแกน source ที่ track: ไม่พบ credential signatures, .env จริง หรือ node_modules; ข้อมูล identity เป็นสมมติ
 - Postman collection ตรวจโครงสร้างเท่านั้น ยังไม่ได้เปิดใน Postman GUI; curl และ .http เป็นตัวเลือกอ่าน/ส่ง request ในเครื่อง
-- คู่มือ HTML สร้างจาก Markdown ซ้ำได้ ตรวจ internal links และไม่มี script/CDN/remote assets
+- รุ่น1.1.0 ใช้คู่มือ .md และเฉลย .js ปกติ เอา HTML/build-guide ออก ตรวจลิงก์เอกสารในเครื่อง และรัน integration suite ผ่าน handler6ข้อที่แยกใหม่
+- โจทย์จริงมาจาก Week08/Week06; การจัด6ข้อและแนวเฉลยเป็นงานผู้ช่วยเพิ่ม ดู questions/SOURCES.md
 
 ผู้เรียนยังไม่ได้ลอง independent-task ด้วยตัวเอง ผล automated tests ไม่ใช่การรับรองว่าทำข้อสอบได้หรือว่าจะผ่านโจทย์ใหม่
 
