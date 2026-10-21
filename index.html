@@ -1,0 +1,1940 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Express + sakila ทีละขั้น</title>
+  <link rel="stylesheet" href="fonts.css">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="layout">
+
+  <!-- ============================================================
+       Sidebar
+       ============================================================ -->
+  <aside class="sidebar">
+
+    <button class="sidebar-collapse" id="sidebar-collapse" aria-expanded="true" aria-label="ซ่อนสารบัญ" title="ซ่อนสารบัญ">«</button>
+
+    <button class="nav-toggle" aria-expanded="false" aria-controls="sidebar-body" id="nav-toggle">
+      <span class="nav-toggle-label">Express + sakila ทีละขั้น</span>
+      <span class="nav-toggle-arrow">▼</span>
+    </button>
+
+    <div class="sidebar-body" id="sidebar-body">
+      <div class="brand">Express + sakila ทีละขั้น</div>
+      <div class="brand-sub">Basic Backend Development · 2026-09-26</div>
+
+      <div class="progress-block">
+        <div class="progress-label">Self-check progress</div>
+        <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
+        <div class="progress-text" id="progress-text">เรียนไป 0 / 0 บท</div>
+        <button class="progress-reset" id="progress-reset">reset progress</button>
+      </div>
+
+      <nav class="toc" aria-label="Table of contents">
+        <div class="toc-section">เนื้อหา</div>
+        <a href="#part-0" class="toc-link"><span class="toc-star" aria-hidden="true">☆</span><span class="toc-num">00</span>เริ่มตรงนี้</a>
+        <a href="#part-1" class="toc-link"><span class="toc-star" aria-hidden="true">☆</span><span class="toc-num">01</span>ใช้ template ใน WebStorm</a>
+        <a href="#part-2" class="toc-link"><span class="toc-star" aria-hidden="true">☆</span><span class="toc-num">02</span>ต่อฐานข้อมูล sakila</a>
+        <a href="#part-3" class="toc-link"><span class="toc-star" aria-hidden="true">☆</span><span class="toc-num">03</span>Error handling</a>
+        <a href="#part-4" class="toc-link"><span class="toc-star" aria-hidden="true">☆</span><span class="toc-num">04</span>ทดสอบ API ด้วย Postman</a>
+        <a href="#part-5" class="toc-link"><span class="toc-star" aria-hidden="true">☆</span><span class="toc-num">05</span>สรุป</a>
+      </nav>
+    </div>
+  </aside>
+
+  <button class="sidebar-show" id="sidebar-show" aria-label="แสดงสารบัญ">☰ สารบัญ</button>
+
+  <!-- ============================================================
+       Main column
+       ============================================================ -->
+  <main class="main">
+
+    <header class="hero">
+      <div class="hero-eyebrow">คู่มือทำตาม · 6 บท · 2026-09-26</div>
+      <h1 class="hero-title">สร้าง REST API ด้วย Express ต่อฐานข้อมูล sakila</h1>
+      <p class="hero-lede">เริ่มจาก template ของรายวิชาใน WebStorm ต่อฐานข้อมูลตัวอย่าง sakila ทำ CRUD กับตาราง <code>country</code> ให้ครบ 5 endpoint จัดการ error ให้ตอบกลับเป็น JSON แล้วทดสอบทุกเส้นด้วย Postman ทำตามทีละขั้นได้เอง แม้จะตามคาบไม่ทัน</p>
+      <div class="hero-meta">
+        <span><strong>ระดับ</strong> ปี 1 · เริ่มต้น</span>
+        <span><strong>เนื้อหา</strong> สัปดาห์ Database Connection · Express · Error Handling</span>
+        <span><strong>เวลา</strong> ~2–3 ชั่วโมง</span>
+      </div>
+    </header>
+
+    <!-- ============================================================
+         Part 00 · เริ่มตรงนี้
+         ============================================================ -->
+    <article class="part" id="part-0">
+      <div class="dl-ghost" aria-hidden="true">0</div>
+      <div class="dl-stamp">บทที่ 00 <span class="sep">·</span> ~10 นาที <span class="sep">·</span> เตรียมตัว</div>
+      <h2 class="part-title">เริ่มตรงนี้</h2>
+      <p class="part-lede">อ่านบทนี้ก่อนลงมือ จะได้รู้ว่าปลายทางคืออะไร ต้องมีโปรแกรมอะไรในเครื่องบ้าง และโค้ดแต่ละไฟล์ใน template ส่งต่อข้อมูลกันอย่างไร</p>
+
+      <div class="objectives">
+        <div class="objectives-title">🎯 Learning Objectives</div>
+        <ul>
+          <li>บอกได้ว่าอ่านเล่มนี้จบแล้วจะได้โปรเจกต์หน้าตาแบบไหน</li>
+          <li>ตรวจว่าเครื่องตัวเองมีโปรแกรมครบ 4 อย่างก่อนเริ่ม</li>
+          <li>อธิบายลำดับการทำงาน Router → Service → Repository → Database ได้</li>
+        </ul>
+      </div>
+
+      <h3>เล่มนี้เหมาะกับใคร</h3>
+      <p>เล่มนี้เขียนให้คนที่พลาดคาบบางคาบ หรือเข้าเรียนแล้วแต่ตามไม่ทัน ในสัปดาห์ต่อฐานข้อมูล (Database Connection) สัปดาห์ Express และสัปดาห์ Error Handling ทุกขั้นเขียนเป็นข้อ ๆ ว่ากดอะไรแล้วจะเห็นอะไร พร้อมภาพหน้าจอจริง ถ้าทำตามลำดับตั้งแต่บทที่ 1 ถึงบทที่ 4 ตอนจบจะมี</p>
+      <ul>
+        <li>โปรเจกต์ Express ที่สร้างจาก template ของรายวิชา รันได้ที่ <code>http://localhost:3000</code></li>
+        <li>ฐานข้อมูล <code>sakila</code> ใน MySQL ของเครื่องตัวเอง</li>
+        <li>API ของตาราง <code>country</code> ครบ 5 เส้น คือ ดูทั้งหมด ดูทีละตัว เพิ่ม แก้ และลบ</li>
+        <li>error ทุกแบบตอบกลับเป็น JSON พร้อม status code ที่ถูกต้อง ไม่ใช่หน้า HTML</li>
+        <li>ชุด request ทดสอบใน Postman ครบทุกเส้น (เก็บเป็น Collection ได้ถ้า Sign in)</li>
+      </ul>
+      <p>บทสุดท้ายสรุปว่าการใส่ error handler ต้องแก้ตรงไหนบ้าง พร้อมแบบฝึกทำ resource actor เอง</p>
+
+      <hr class="dl-rule" />
+
+      <h3>ต้องมีอะไรในเครื่องก่อนเริ่ม</h3>
+      <p>ต้องมีโปรแกรม 4 ตัวนี้ ถ้ายังไม่มีตัวไหนให้ติดตั้งก่อน แล้วค่อยเริ่มบทที่ 1</p>
+      <div class="table-wrap">
+        <table class="compare">
+          <thead>
+            <tr><th>โปรแกรม</th><th>ใช้ทำอะไร</th><th>ตรวจว่ามีแล้วหรือยัง</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>WebStorm</strong></td>
+              <td>เขียนโค้ด รันโปรแกรม และเปิดดูฐานข้อมูล (มีเครื่องมือ Database ในตัว)</td>
+              <td>เปิดโปรแกรมได้ นักศึกษาใช้สิทธิ์ฟรีของ JetBrains ได้</td>
+            </tr>
+            <tr>
+              <td><strong>Node.js</strong></td>
+              <td>ตัวรันโค้ด JavaScript ฝั่ง server มี <code>npm</code> มาด้วย</td>
+              <td>พิมพ์ <code>node -v</code> ใน Terminal ควรได้ v18 ขึ้นไป (Express 5 ต้องใช้ Node 18+)</td>
+            </tr>
+            <tr>
+              <td><strong>MySQL Server</strong></td>
+              <td>ระบบฐานข้อมูลที่เก็บ sakila</td>
+              <td>MySQL ต้องเปิดทำงานอยู่ และ<strong>ต้องจำรหัสผ่านของ user <code>root</code> ได้</strong></td>
+            </tr>
+            <tr>
+              <td><strong>Postman</strong></td>
+              <td>ส่ง request ไปทดสอบ API</td>
+              <td>ใช้แอปแบบติดตั้งลงเครื่อง (desktop) เพราะเรียก <code>localhost</code> ได้ทันที ถ้าจะบันทึก request เก็บเป็น Collection ต้อง Sign in (สมัครบัญชีฟรี)</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <aside class="dl-margin-note">
+        <div class="dl-margin-note-label">จดไว้ตรงนี้</div>
+        ภาพหน้าจอส่วนใหญ่ถ่ายบน macOS ด้วย WebStorm 2025.1 · MySQL 8.4 · Postman 12 · Node.js 26 · Express 5.2 · mysql2 3.24 ส่วนรูปที่คำบรรยายเขียนว่า "ภาพจากเครื่องแล็บ" มาจากเครื่อง Windows ในห้องแล็บ (WebStorm ธีมมืด) ถ้าใช้เวอร์ชันอื่นหน้าตาเมนูอาจต่างไปเล็กน้อย แต่ขั้นตอนเหมือนกัน
+      </aside>
+
+      <pre class="code-block"><span class="kw">node</span> -v
+<span class="kw">npm</span> -v</pre>
+      <p>พิมพ์สองคำสั่งนี้ใน Terminal ถ้าได้เลขเวอร์ชันออกมาทั้งสองบรรทัดก็พร้อมแล้ว ถ้าขึ้นว่า <code>command not found</code> หรือ <code>'node' is not recognized</code> แปลว่ายังไม่ได้ติดตั้ง Node.js หรือติดตั้งแล้วแต่ยังไม่ได้ปิดเปิด Terminal ใหม่</p>
+
+      <div class="dl-pitfall">
+        <div class="dl-pitfall-label">พลาดกันบ่อย</div>
+        <div class="dl-pitfall-title">จำรหัสผ่าน root ของ MySQL ไม่ได้</div>
+        <p>รหัสนี้ตั้งตอนติดตั้ง MySQL ครั้งแรก ต้องใช้ทั้งตอนสร้าง Data Source ในบทที่ 2 และตอนแก้ไฟล์ <code>db-config.js</code> ถ้าจำไม่ได้ ให้แก้ปัญหานี้ก่อนเริ่ม (reset รหัสผ่าน root หรือติดตั้ง MySQL ใหม่) เพราะไปต่อไม่ได้ถ้าไม่มีรหัสนี้</p>
+      </div>
+
+      <hr class="dl-rule" />
+
+      <h3>ภาพรวม: request หนึ่งครั้งเดินทางผ่านอะไรบ้าง</h3>
+      <p>template ของรายวิชาแบ่งโค้ดเป็นชั้น (layer) ตามหลัก Layered System ของ REST แต่ละชั้นมีหน้าที่ของตัวเองและคุยกับชั้นที่ติดกันเท่านั้น เปรียบกับโรงพยาบาลก็ได้ <strong>Router</strong> คือเคาน์เตอร์ต้อนรับ รับเรื่องแล้วส่งต่อ <strong>Service</strong> คือหมอ ตัดสินใจตามกฎ ส่วน <strong>Repository</strong> คือห้องเวชระเบียน มีหน้าที่หยิบและเก็บแฟ้มข้อมูลอย่างเดียว</p>
+
+      <figure class="dl-diagram">
+        <svg viewBox="0 0 460 478" role="img" aria-labelledby="dg1-title dg1-desc">
+          <title id="dg1-title">ลำดับชั้นของ template</title>
+          <desc id="dg1-desc">request จาก Postman เข้า app.js แล้วผ่าน Router, Service, Repository ลงไปถึงฐานข้อมูล MySQL ถ้าเกิด error ที่ชั้นไหน error จะถูกส่งขึ้นไปที่ Error middleware ท้าย app.js ซึ่งตอบกลับเป็น JSON</desc>
+          <!-- client -->
+          <rect class="dg-box" x="10" y="10" width="270" height="50" rx="8"/>
+          <text class="dg-t" x="145" y="32" text-anchor="middle">Postman (Client)</text>
+          <text class="dg-s" x="145" y="50" text-anchor="middle">GET /countries/1</text>
+          <!-- app.js -->
+          <line class="dg-arrow" x1="145" y1="60" x2="145" y2="80"/><polygon class="dg-head" points="140,78 150,78 145,86"/>
+          <rect class="dg-box-accent" x="10" y="86" width="270" height="56" rx="8"/>
+          <text class="dg-t" x="145" y="109" text-anchor="middle">app.js</text>
+          <text class="dg-s" x="145" y="129" text-anchor="middle">app.use('/countries', …)</text>
+          <!-- router -->
+          <line class="dg-arrow" x1="145" y1="142" x2="145" y2="160"/><polygon class="dg-head" points="140,158 150,158 145,166"/>
+          <rect class="dg-box" x="10" y="166" width="270" height="56" rx="8"/>
+          <text class="dg-t" x="145" y="189" text-anchor="middle">Router</text>
+          <text class="dg-s" x="145" y="209" text-anchor="middle">routes/country-route.js</text>
+          <!-- service -->
+          <line class="dg-arrow" x1="145" y1="222" x2="145" y2="240"/><polygon class="dg-head" points="140,238 150,238 145,246"/>
+          <rect class="dg-box" x="10" y="246" width="270" height="56" rx="8"/>
+          <text class="dg-t" x="145" y="269" text-anchor="middle">Service</text>
+          <text class="dg-s" x="145" y="289" text-anchor="middle">services/country-service.js</text>
+          <!-- repository -->
+          <line class="dg-arrow" x1="145" y1="302" x2="145" y2="320"/><polygon class="dg-head" points="140,318 150,318 145,326"/>
+          <rect class="dg-box" x="10" y="326" width="270" height="56" rx="8"/>
+          <text class="dg-t" x="145" y="349" text-anchor="middle">Repository</text>
+          <text class="dg-s" x="145" y="369" text-anchor="middle">repositories/country-repo.js</text>
+          <!-- db -->
+          <line class="dg-arrow" x1="145" y1="382" x2="145" y2="408"/><polygon class="dg-head" points="140,406 150,406 145,414"/>
+          <text class="dg-lbl" x="153" y="400">SQL ผ่าน mysql2</text>
+          <rect class="dg-box-db" x="10" y="414" width="270" height="56" rx="8"/>
+          <text class="dg-t" x="145" y="437" text-anchor="middle">MySQL · ฐานข้อมูล sakila</text>
+          <text class="dg-s" x="145" y="457" text-anchor="middle">ตาราง country</text>
+          <!-- error middleware -->
+          <rect class="dg-box-err" x="300" y="86" width="150" height="76" rx="8"/>
+          <text class="dg-t" x="375" y="108" text-anchor="middle">Error middleware</text>
+          <text class="dg-s" x="375" y="128" text-anchor="middle">(err,req,res,next)</text>
+          <text class="dg-s-err" x="375" y="148" text-anchor="middle">อยู่ท้าย app.js</text>
+          <!-- error paths -->
+          <line class="dg-arrow-err" x1="280" y1="194" x2="375" y2="194"/>
+          <line class="dg-arrow-err" x1="280" y1="274" x2="375" y2="274"/>
+          <line class="dg-arrow-err" x1="280" y1="354" x2="375" y2="354"/>
+          <line class="dg-arrow-err" x1="375" y1="354" x2="375" y2="170"/>
+          <polygon class="dg-head-err" points="370,172 380,172 375,163"/>
+          <text class="dg-lbl-err" x="290" y="188">error</text>
+          <text class="dg-lbl-err" x="290" y="268">error</text>
+          <text class="dg-lbl-err" x="290" y="348">error</text>
+          <!-- json back to client -->
+          <line class="dg-arrow-err" x1="375" y1="86" x2="375" y2="35"/>
+          <line class="dg-arrow-err" x1="375" y1="35" x2="290" y2="35"/>
+          <polygon class="dg-head-err" points="291,30 291,40 282,35"/>
+          <text class="dg-lbl-err" x="300" y="27">JSON + status code</text>
+        </svg>
+        <figcaption>เส้นทึบ = ทางเดินปกติ (ขาลงไปหาข้อมูล แล้วส่งคำตอบกลับทางเดิม) · เส้นประ = เมื่อมี error ที่ชั้นไหนก็ตาม error จะถูกส่งขึ้นไปที่จุดเดียว คือ Error middleware</figcaption>
+      </figure>
+
+      <div class="table-wrap">
+        <table class="compare">
+          <thead>
+            <tr><th>ชั้น</th><th>ไฟล์ของ resource country (คัดลอกจาก example-*)</th><th>หน้าที่</th><th>ไม่ควรมี</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Router (Controller)</td><td><code>src/routes/country-route.js</code></td><td>รับ request อ่าน <code>req.params</code> / <code>req.body</code> เรียก service แล้วส่ง response กลับ</td><td>SQL, กฎทางธุรกิจ</td></tr>
+            <tr><td>Service</td><td><code>src/services/country-service.js</code></td><td>กฎทางธุรกิจ การตรวจเงื่อนไข (ตอนนี้ยังส่งต่อให้ repository ตรง ๆ)</td><td>รายละเอียด HTTP, SQL</td></tr>
+            <tr><td>Repository</td><td><code>src/repositories/country-repo.js</code></td><td>เขียน SQL คุยกับฐานข้อมูล</td><td>กฎทางธุรกิจ, HTTP</td></tr>
+            <tr><td>Config</td><td><code>src/configs/db-config.js</code></td><td>เก็บค่าการเชื่อมต่อฐานข้อมูล (connection pool)</td><td>—</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="dl-flashcard" data-flashcard aria-live="polite">
+        <div class="dl-card-inner">
+          <div class="dl-card-face dl-card-front">
+            <span class="dl-card-fold" aria-hidden="true"></span>
+            <div class="dl-card-eyebrow">คำถาม 0</div>
+            <p class="dl-card-q">คำสั่ง SQL <code>SELECT * FROM country</code> ควรอยู่ในไฟล์ชั้นไหน?</p>
+            <div class="dl-card-choices">
+              <button class="dl-choice" data-correct="false"><span class="dl-choice-k">a.</span>Router เพราะเป็นจุดที่รับ request</button>
+              <button class="dl-choice" data-correct="false"><span class="dl-choice-k">b.</span>Service เพราะเป็นตัวกลาง</button>
+              <button class="dl-choice" data-correct="true"><span class="dl-choice-k">c.</span>Repository เพราะมีหน้าที่คุยกับฐานข้อมูล</button>
+            </div>
+          </div>
+          <div class="dl-card-face dl-card-back">
+            <span class="dl-card-fold" aria-hidden="true"></span>
+            <span class="dl-card-stamp"></span>
+            <p class="dl-card-picked"></p>
+            <p class="dl-card-expl"
+               data-correct-text="ถูกต้อง — SQL ทุกคำสั่งอยู่ใน repository ชั้นอื่นไม่ต้องรู้ว่าข้อมูลมาจากตารางไหน"
+               data-wrong-text="ยังไม่ใช่ — ชั้นที่คุยกับฐานข้อมูลคือ Repository (ห้องเวชระเบียน) Router กับ Service ไม่ควรมี SQL"></p>
+            <button class="dl-card-retry" type="button">← ลองอีกครั้ง</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="self-check">
+        <div class="self-check-title">✓ Self-Check</div>
+        <label><input type="checkbox" data-key="int161-express-sakila:p0:1"> <code>node -v</code> และ <code>npm -v</code> ขึ้นเลขเวอร์ชันแล้ว</label>
+        <label><input type="checkbox" data-key="int161-express-sakila:p0:2"> MySQL เปิดทำงานอยู่ และจำรหัสผ่าน root ได้</label>
+        <label><input type="checkbox" data-key="int161-express-sakila:p0:3"> ติดตั้ง WebStorm และ Postman (desktop) แล้ว</label>
+        <label><input type="checkbox" data-key="int161-express-sakila:p0:4"> อธิบายได้ว่า Router, Service, Repository ทำหน้าที่อะไร</label>
+      </div>
+
+      <nav class="dl-progress-footer" aria-label="ระหว่างบท">
+        <a class="dl-pf-next" href="#part-1">
+          <span class="dl-pf-eyebrow">บทถัดไป</span>
+          <span class="dl-pf-title">ใช้ template ใน WebStorm →</span>
+        </a>
+      </nav>
+    </article>
+
+    <!-- ============================================================
+         Part 01 · ใช้ template ใน WebStorm
+         ============================================================ -->
+    <article class="part" id="part-1">
+      <div class="dl-ghost" aria-hidden="true">1</div>
+      <div class="dl-stamp">บทที่ 01 <span class="sep">·</span> ~20 นาที <span class="sep">·</span> เริ่มต้น</div>
+      <h2 class="part-title">ใช้ template ใน WebStorm</h2>
+      <p class="part-lede">เอา template ของรายวิชามาบันทึกเป็น template ชื่อ <code>Node-Express-ESM</code> ใน WebStorm สร้างโปรเจกต์งาน <code>error-handler</code> จาก template นั้น ติดตั้ง package และรู้ว่าแต่ละไฟล์มีไว้ทำอะไร</p>
+
+      <div class="objectives">
+        <div class="objectives-title">🎯 Learning Objectives</div>
+        <ul>
+          <li>บันทึก template <code>Node-Express-ESM</code> และสร้างโปรเจกต์ใหม่จาก template ได้</li>
+          <li>รัน <code>npm install</code> และอธิบายได้ว่าคำสั่งนี้ทำอะไร</li>
+          <li>บอกหน้าที่ของแต่ละไฟล์ใน template และความหมายของ <code>"type": "module"</code></li>
+        </ul>
+      </div>
+
+      <h3>template คืออะไร ทำไมต้องใช้</h3>
+      <p>template คือโครงโปรเจกต์ตั้งต้นที่มีโฟลเดอร์และไฟล์พื้นฐานเตรียมไว้แล้ว ทุกครั้งที่เริ่มงานใหม่ (แบบฝึกหัดในคาบ หรืองานชิ้นใหม่) ไม่ต้องสร้าง <code>package.json</code> ติดตั้ง Express แล้วสร้างโฟลเดอร์ <code>configs</code> <code>repositories</code> <code>services</code> <code>routes</code> ใหม่ทุกรอบ แค่สร้างโปรเจกต์ใหม่จาก template แล้วเพิ่มเฉพาะส่วนที่ต่างกัน</p>
+      <p>ในคาบ ขั้นตอนมี 3 ช่วง คือ (1) เอา template ของรายวิชามาเปิดใน WebStorm (2) บันทึกเป็น template ชื่อ <code>Node-Express-ESM</code> (3) สร้างโปรเจกต์งานจริงจาก template นั้น</p>
+
+      <div class="dl-pitfall">
+        <div class="dl-pitfall-label">พลาดกันบ่อย</div>
+        <div class="dl-pitfall-title">ใช้ template ผิดตัว</div>
+        <p>ต้องใช้ <code>express-template.zip</code> ตัวใหม่ใน Class Materials โฟลเดอร์ <strong>Week-06 Error Handling</strong> เท่านั้น <strong>ไม่ใช่</strong> template ที่เคย save เองในสัปดาห์ Express ตัวเก่ามีไฟล์ไม่ครบ ในคาบมีหลายคนติดเพราะใช้ตัวเก่า</p>
+      </div>
+
+      <hr class="dl-rule" />
+
+      <h3>ขั้นที่ 1 — ดาวน์โหลดและแตก zip</h3>
+      <ol>
+        <li>ใน MS Teams ของรายวิชา ไปที่ <strong>General → Shared → Class Materials → Week-06 Error Handling</strong> แล้วดาวน์โหลด <code>express-template.zip</code> (ในโฟลเดอร์เดียวกันมีสไลด์ <code>06-INT161-Error Handling</code> ด้วย)</li>
+      </ol>
+      <figure class="dl-shot dl-shot--narrow">
+        <a href="img/lab-teams-week06-files.png"><img src="img/lab-teams-week06-files.png" alt="หน้า Class Materials ในทีม INT161 ช่อง General แท็บ Shared มีโฟลเดอร์ Week#01 ถึง Week#05 และ Week-06 Error Handling" loading="lazy"></a>
+        <figcaption><b>Teams → Class Materials</b> — ไฟล์อยู่ในโฟลเดอร์ <b>Week-06 Error Handling</b> (ภาพจากเครื่องในห้องแล็บ)</figcaption>
+      </figure>
+      <ol start="2">
+        <li>แตก zip (Windows: คลิกขวา → <strong>Extract All…</strong> · macOS: ดับเบิลคลิก)</li>
+        <li><strong>ดูให้ดีว่าโฟลเดอร์ไม่ซ้อน 2 ชั้น</strong> ต้องเปิดเข้าไปแล้วเจอ <code>package.json</code> กับ <code>src</code> ทันที ถ้าเปิดไปเจอโฟลเดอร์ <code>express-template</code> อีกชั้น ให้ใช้โฟลเดอร์ด้านใน</li>
+        <li>โฟลเดอร์ <code>__MACOSX</code> ที่ติดมา (zip ทำบน Mac) ไม่ต้องใช้ ลบทิ้งได้ ส่วนไฟล์เปล่าชื่อ <code>npm</code> ใน template ก็ไม่ได้ใช้</li>
+      </ol>
+      <figure class="dl-shot dl-shot--narrow">
+        <a href="img/lab-template-unzipped.png"><img src="img/lab-template-unzipped.png" alt="File Explorer ของ Windows ในโฟลเดอร์ Week-06 Error Handling หลังแตก zip มีโฟลเดอร์ __MACOSX และโฟลเดอร์ express-template ถูกเลือกอยู่" loading="lazy"></a>
+        <figcaption><b>หลังแตก zip</b> — ใช้โฟลเดอร์ <code>express-template</code> ส่วน <code>__MACOSX</code> ไม่ต้องสนใจ</figcaption>
+      </figure>
+      <ol start="5">
+        <li>คัดลอกโฟลเดอร์ <code>express-template</code> ไปไว้ในโฟลเดอร์ <code>WebstormProjects</code> (Windows: <code>C:\Users\&lt;ชื่อผู้ใช้&gt;\WebstormProjects</code> · macOS: <code>~/WebstormProjects</code>) จะได้หาเจอง่ายและอยู่ที่เดียวกับโปรเจกต์อื่น</li>
+      </ol>
+
+      <h3>ขั้นที่ 2 — เปิด template ใน WebStorm</h3>
+      <ol>
+        <li>ถ้ามีโปรเจกต์อื่นเปิดค้างอยู่ ให้ปิดก่อน: <strong>File → Close Project</strong> จะกลับมาที่หน้า Welcome</li>
+        <li>กด <strong>Open</strong> เลือกโฟลเดอร์ <code>express-template</code> ใน <code>WebstormProjects</code> แล้วกด <strong>Select Folder</strong> (macOS: <strong>Open</strong>)</li>
+        <li>WebStorm จะถามว่าไว้ใจโปรเจกต์นี้หรือไม่ ให้กด <strong>Trust Project</strong> ถ้ามีช่องให้ติ๊กเรื่อง Microsoft Defender บนเครื่องแล็บให้เอาติ๊กออก (ต้องใช้สิทธิ์ admin ซึ่งเครื่องแล็บไม่มี) ถ้ามีหน้าต่างขอสิทธิ์ admin ให้ตอบ No</li>
+      </ol>
+      <figure class="dl-shot">
+        <a href="img/lab-template-trust.png"><img src="img/lab-template-trust.png" alt="หน้าต่าง Trust and Open Project express-template บนหน้า Welcome to WebStorm มีช่องติ๊กเรื่อง Microsoft Defender และปุ่ม Trust Project" loading="lazy"></a>
+        <figcaption><b>Trust and Open Project</b> — กด <b>Trust Project</b> (ภาพจากเครื่องแล็บ ซึ่งใช้ WebStorm ธีมมืด)</figcaption>
+      </figure>
+
+      <h4>ดูโครง template ก่อน</h4>
+      <p>ดูที่แถบ Project ด้านซ้าย (หน้าตาเหมือนในรูป Template created ของขั้นที่ 3) โค้ดทั้งหมดอยู่ใต้ <code>src</code> ไฟล์ที่ขึ้นต้นด้วย <code>example-</code> คือต้นแบบของแต่ละชั้น เวลาจะทำ resource ใหม่ (เช่น country) เราจะ<strong>คัดลอก</strong>ไฟล์พวกนี้ไปตั้งชื่อใหม่ ไม่แก้ตัวต้นแบบตรง ๆ (ทำในบทที่ 2)</p>
+      <div class="table-wrap">
+        <table class="compare">
+          <thead>
+            <tr><th>ไฟล์ / โฟลเดอร์</th><th>หน้าที่</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><code>package.json</code></td><td>ข้อมูลโปรเจกต์ + รายชื่อ package (<code>express</code> เวอร์ชัน 5, <code>mysql2</code>) + <code>"type": "module"</code></td></tr>
+            <tr><td><code>package-lock.json</code></td><td>ล็อกเวอร์ชัน package ที่ติดตั้งจริง ไม่ต้องแก้เอง</td></tr>
+            <tr><td><code>node_modules/</code></td><td>ตัว package ที่ <code>npm install</code> ดาวน์โหลดมา ไม่ต้องแก้ ถ้าจะ zip โปรเจกต์ส่งต่อให้คนอื่น<strong>ให้ลบโฟลเดอร์นี้ออกก่อน</strong> (ไฟล์เยอะมาก และสร้างใหม่ได้ด้วย <code>npm install</code>)</td></tr>
+            <tr><td><code>.idea/</code></td><td>การตั้งค่าของ WebStorm</td></tr>
+            <tr><td><code>src/app.js</code></td><td>จุดเริ่มของแอป สร้าง Express app ใส่ <code>express.json()</code> ผูก router กับ path (ใน template ยัง comment ไว้) เปิด port 3000 และมี error middleware อยู่ท้ายไฟล์</td></tr>
+            <tr><td><code>src/configs/db-config.js</code></td><td>สร้าง connection pool ไปที่ MySQL (host, user, password, database) ใช้ร่วมกันทุก resource</td></tr>
+            <tr><td><code>src/repositories/example-repo.js</code></td><td>ต้นแบบชั้น repository: SQL ของ CRUD 5 แบบเป็นค่าคงที่ ใช้ <code>TABLE_NAME</code> กับ <code>ENTITY_NAME</code> คัดลอกแล้วเปลี่ยนแค่ชื่อตาราง ชื่อ entity และชื่อคอลัมน์ key</td></tr>
+            <tr><td><code>src/services/example-service.js</code></td><td>ต้นแบบชั้น service ตอนนี้แค่ส่งต่อให้ repository</td></tr>
+            <tr><td><code>src/routes/example-route.js</code></td><td>ต้นแบบชั้น router: 5 เส้น <code>GET /</code> <code>GET /:id</code> <code>POST /</code> <code>PUT /:id</code> <code>DELETE /:id</code></td></tr>
+            <tr><td><code>src/test-service.js</code> · <code>src/test-exception-handling.js</code></td><td>ไฟล์ทดลอง ไม่นับเป็นส่วนของ template (ใช้ในบทที่ 2 และ 3)</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>ขั้นที่ 3 — บันทึกเป็น template ชื่อ Node-Express-ESM</h3>
+      <ol>
+        <li>ไปที่เมนู <strong>Tools → Save Project as Template…</strong></li>
+      </ol>
+      <figure class="dl-shot">
+        <a href="img/01-template-menu.png"><img src="img/01-template-menu.png" alt="เมนู Tools ของ WebStorm เปิดอยู่ มีคำสั่ง Save Project as Template ถูกเลือกไว้ ด้านซ้ายเป็นโปรเจกต์ express-template" loading="lazy"></a>
+        <figcaption><b>Tools → Save Project as Template…</b> — บันทึกโปรเจกต์ที่เปิดอยู่ให้เป็น template</figcaption>
+      </figure>
+      <ol start="2">
+        <li>ช่อง <strong>Name</strong> พิมพ์ <code>Node-Express-ESM</code> (N, E ตัวใหญ่ · ESM ตัวใหญ่ทั้งหมด · คั่นด้วยขีดกลาง) ช่อง Description เว้นว่างได้ แล้วกด <strong>OK</strong></li>
+      </ol>
+      <figure class="dl-shot dl-shot--narrow">
+        <a href="img/02-template-dialog.png"><img src="img/02-template-dialog.png" alt="หน้าต่าง Save Project As Template ช่อง Name กรอกว่า Node-Express-ESM ช่อง Description ว่าง และปุ่ม OK" loading="lazy"></a>
+        <figcaption><b>ตั้งชื่อ template</b> — <code>Node-Express-ESM</code></figcaption>
+      </figure>
+      <ol start="3">
+        <li>มุมขวาล่างจะขึ้นแจ้งเตือน <strong>Template created — Node-Express-ESM was successfully created</strong></li>
+        <li>ปิดโปรเจกต์ template ทิ้งไปเลย (<strong>File → Close Project</strong>) เพราะมันเป็นแค่ตัวตั้งต้น ไม่ใช้ทำงานจริง</li>
+      </ol>
+      <figure class="dl-shot">
+        <a href="img/lab-template-created.png"><img src="img/lab-template-created.png" alt="WebStorm เปิดโปรเจกต์ express-template อยู่ มุมขวาล่างมีแจ้งเตือน Template created Node-Express-ESM was successfully created" loading="lazy"></a>
+        <figcaption><b>Template created</b> — บันทึก template สำเร็จ (ภาพจากเครื่องแล็บ)</figcaption>
+      </figure>
+
+      <h3>ขั้นที่ 4 — สร้างโปรเจกต์งานจาก template</h3>
+      <ol>
+        <li>ที่หน้า Welcome กด <strong>New Project</strong> (หรือ <strong>File → New → Project…</strong>)</li>
+        <li>ด้านซ้ายเลื่อนลงไปที่หมวด <strong>User-defined</strong> แล้วเลือก <strong>Node-Express-ESM</strong></li>
+        <li>ช่อง <strong>Location</strong> ให้ท้าย path เป็นชื่อโปรเจกต์ <code>error-handler</code> (เช่น <code>…\WebstormProjects\error-handler</code>) แล้วกด <strong>Create</strong></li>
+      </ol>
+      <figure class="dl-shot">
+        <a href="img/03-newproject-template.png"><img src="img/03-newproject-template.png" alt="หน้าต่าง New Project ของ WebStorm หมวด User-defined มี Node-Express-ESM ถูกเลือก ช่อง Location ลงท้ายด้วย error-handler" loading="lazy"></a>
+        <figcaption><b>New Project</b> — หมวด <b>User-defined</b> → <b>Node-Express-ESM</b> แล้วตั้ง Location เป็น <code>error-handler</code></figcaption>
+      </figure>
+      <p>ครั้งต่อไปที่เริ่มงานใหม่ ทำแค่ขั้นที่ 4 ก็พอ ไม่ต้องทำขั้น 1–3 ซ้ำ</p>
+
+      <h3>ขั้นที่ 5 — ติดตั้ง package (npm install)</h3>
+      <p>โปรเจกต์ที่สร้างจาก template <strong>ไม่มีโฟลเดอร์ <code>node_modules</code></strong> มาให้ พอเปิดโปรเจกต์ใหม่ WebStorm จะเด้งแจ้งเตือน <strong>Install dependencies — From package.json</strong> มุมขวาล่าง ให้กด <strong>Run 'npm install'</strong> WebStorm จะอ่าน <code>package.json</code> แล้วติดตั้ง express กับ mysql2 ให้เอง</p>
+      <figure class="dl-shot">
+        <a href="img/lab-npm-install-prompt.png"><img src="img/lab-npm-install-prompt.png" alt="โปรเจกต์ error-handler เพิ่งสร้าง แถบ Project ยังไม่มี node_modules มุมขวาล่างมีแจ้งเตือน Install dependencies From package.json พร้อมปุ่ม Run 'npm install'" loading="lazy"></a>
+        <figcaption><b>Install dependencies</b> — กด <b>Run 'npm install'</b> (ภาพจากเครื่องแล็บ)</figcaption>
+      </figure>
+      <p>ถ้าแจ้งเตือนหายไปแล้ว จะพิมพ์เองใน Terminal ก็ได้ เปิด Terminal ด้วย <strong>View → Tool Windows → Terminal</strong> หรือ <kbd class="dl-kbd">Alt</kbd>+<kbd class="dl-kbd">F12</kbd> (Windows) · <kbd class="dl-kbd">⌥</kbd><kbd class="dl-kbd">F12</kbd> (macOS) ตรวจว่าอยู่ที่โฟลเดอร์โปรเจกต์ (ที่มี <code>package.json</code>) แล้วพิมพ์</p>
+      <pre class="code-block"><span class="kw">npm</span> install</pre>
+      <div class="dl-out-label">ผลที่ได้จริง (ตัวเลขในเครื่องตัวเองอาจต่างเล็กน้อย)</div>
+      <pre class="code-block">added 78 packages, and audited 79 packages in 510ms
+
+30 packages are looking for funding
+  run `npm fund` for details
+
+found 0 vulnerabilities</pre>
+      <figure class="dl-shot">
+        <a href="img/05-npm-install.png"><img src="img/05-npm-install.png" alt="Terminal ใน WebStorm หลังรัน npm install ขึ้น added 78 packages และ found 0 vulnerabilities แถบ Project มีโฟลเดอร์ node_modules เพิ่มขึ้นมา" loading="lazy"></a>
+        <figcaption><b>npm install สำเร็จ</b> — มีโฟลเดอร์ <code>node_modules</code> (library root) เพิ่มขึ้นในแถบ Project และไม่มี error สีแดง</figcaption>
+      </figure>
+      <p><strong>ทำไมต้องรัน</strong> — <code>package.json</code> บอกแค่รายชื่อ package ที่โปรเจกต์ต้องใช้ คำสั่ง <code>npm install</code> จะดาวน์โหลดตัวจริงมาไว้ใน <code>node_modules</code> ถ้าไม่รัน ตอนรันแอปจะเจอ error <code>ERR_MODULE_NOT_FOUND: Cannot find package 'express'</code></p>
+
+      <details class="dl-answer">
+        <summary>ถาม: ใช้ VS Code แทน WebStorm ได้ไหม ทำ template ยังไง</summary>
+        <p>VS Code ไม่มีระบบ project template ในตัวแบบ WebStorm วิธีง่ายที่สุดคือเก็บโฟลเดอร์ <code>express-template</code> ไว้ แล้วทุกครั้งที่เริ่มงานใหม่ให้คัดลอกทั้งโฟลเดอร์ไปตั้งชื่อใหม่ แล้วรัน <code>npm install</code> หรือหา extension ที่ทำ template ได้ ใช้ AI ช่วยอธิบายวิธีตั้งค่าได้ แต่อย่าให้ AI ทำงานแทน</p>
+      </details>
+
+      <h4><code>"type": "module"</code> ใน package.json</h4>
+      <pre class="code-block">{
+  <span class="str">"name"</span>: <span class="str">"express-template"</span>,
+  <span class="str">"type"</span>: <span class="str">"module"</span>,   <span class="comm">// ← บรรทัดนี้ทำให้ใช้ import / export ได้</span>
+  <span class="str">"dependencies"</span>: {
+    <span class="str">"express"</span>: <span class="str">"^5.2.1"</span>,
+    <span class="str">"mysql2"</span>: <span class="str">"^3.24.3"</span>
+  }
+}</pre>
+      <p>Node.js เขียนโมดูลได้ 2 แบบ แบบเก่าคือ CommonJS ใช้ <code>require()</code> กับ <code>module.exports</code> แบบใหม่คือ ES Module (ESM) ใช้ <code>import</code> กับ <code>export</code> บรรทัด <code>"type": "module"</code> บอก Node ว่าโปรเจกต์นี้ใช้แบบ ESM ทั้งโปรเจกต์ (ตัว <code>ESM</code> ในชื่อ template <code>Node-Express-ESM</code> ก็มาจากตรงนี้) ถ้าบรรทัดนี้หายไป ตอนรันจะเจอ <code>SyntaxError: Cannot use import statement outside a module</code> (หมายเหตุ: JSON จริงใส่ comment ไม่ได้ ข้อความ <code>// ←</code> ในกล่องด้านบนใส่ไว้อธิบายเท่านั้น)</p>
+
+      <div class="dl-flashcard" data-flashcard aria-live="polite">
+        <div class="dl-card-inner">
+          <div class="dl-card-face dl-card-front">
+            <span class="dl-card-fold" aria-hidden="true"></span>
+            <div class="dl-card-eyebrow">คำถาม 1</div>
+            <p class="dl-card-q">เปิดโปรเจกต์ใหม่จาก template แล้วกด Run ทันที ขึ้น <code>ERR_MODULE_NOT_FOUND: Cannot find package 'express'</code> ลืมทำอะไร?</p>
+            <div class="dl-card-choices">
+              <button class="dl-choice" data-correct="true"><span class="dl-choice-k">a.</span>ลืมรัน <code>npm install</code></button>
+              <button class="dl-choice" data-correct="false"><span class="dl-choice-k">b.</span>ลืมใส่ <code>"type": "module"</code></button>
+              <button class="dl-choice" data-correct="false"><span class="dl-choice-k">c.</span>ลืมเปิด MySQL</button>
+            </div>
+          </div>
+          <div class="dl-card-face dl-card-back">
+            <span class="dl-card-fold" aria-hidden="true"></span>
+            <span class="dl-card-stamp"></span>
+            <p class="dl-card-picked"></p>
+            <p class="dl-card-expl"
+               data-correct-text="ถูกต้อง — package ยังไม่ถูกดาวน์โหลดมาไว้ใน node_modules รัน npm install แล้วลองใหม่"
+               data-wrong-text="ยังไม่ใช่ — ข้อความบอกว่าหา package express ไม่เจอ แปลว่ายังไม่มีใน node_modules คำตอบคือรัน npm install"></p>
+            <button class="dl-card-retry" type="button">← ลองอีกครั้ง</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="dl-checkpoint">
+        <div class="dl-checkpoint-title"><span class="k">Checkpoint</span><span class="t">สรุปสั้น ๆ</span></div>
+        <ul>
+          <li>ใช้ <code>express-template.zip</code> ของ Week-06 → Save Project as Template ชื่อ <code>Node-Express-ESM</code> → New Project จาก User-defined</li>
+          <li>เปิดโปรเจกต์ใหม่ทุกครั้งต้องรัน <code>npm install</code></li>
+          <li><code>"type": "module"</code> ทำให้ใช้ <code>import</code>/<code>export</code> ได้</li>
+        </ul>
+      </div>
+
+      <div class="self-check">
+        <div class="self-check-title">✓ Self-Check</div>
+        <label><input type="checkbox" data-key="int161-express-sakila:p1:1"> มี template <code>Node-Express-ESM</code> ใน WebStorm และสร้างโปรเจกต์ <code>error-handler</code> แล้ว</label>
+        <label><input type="checkbox" data-key="int161-express-sakila:p1:2"> รัน <code>npm install</code> สำเร็จ มีโฟลเดอร์ <code>node_modules</code></label>
+        <label><input type="checkbox" data-key="int161-express-sakila:p1:3"> บอกได้ว่าไฟล์ต้นแบบของ repository, service, router อยู่ที่ไหน</label>
+      </div>
+
+      <nav class="dl-progress-footer" aria-label="ระหว่างบท">
+        <a class="dl-pf-prev" href="#part-0">← บทที่แล้ว</a>
+        <a class="dl-pf-next" href="#part-2">
+          <span class="dl-pf-eyebrow">บทถัดไป</span>
+          <span class="dl-pf-title">ต่อฐานข้อมูล sakila →</span>
+        </a>
+      </nav>
+    </article>
+
+    <!-- ============================================================
+         Part 02 · ต่อฐานข้อมูล sakila
+         ============================================================ -->
+    <article class="part" id="part-2">
+      <div class="dl-ghost" aria-hidden="true">2</div>
+      <div class="dl-stamp">บทที่ 02 <span class="sep">·</span> ~60 นาที <span class="sep">·</span> เริ่มต้น</div>
+      <h2 class="part-title">ต่อฐานข้อมูล sakila และสร้าง resource country</h2>
+      <p class="part-lede">ต่อ WebStorm กับฐานข้อมูลตัวอย่าง sakila แล้วสร้าง resource <code>country</code> ครบ 3 ชั้น (repository → service → router) โดยคัดลอกจากไฟล์ต้นแบบ และทดสอบทีละชั้นก่อนรันแอป ตามลำดับเดียวกับในคาบ</p>
+
+      <div class="objectives">
+        <div class="objectives-title">🎯 Learning Objectives</div>
+        <ul>
+          <li>สร้าง Data Source ของ MySQL ใน WebStorm และติดตั้ง sakila ในเครื่องตัวเองได้ถ้ายังไม่มี</li>
+          <li>สร้าง <code>country-repo.js</code>, <code>country-service.js</code>, <code>country-route.js</code> จากไฟล์ต้นแบบ</li>
+          <li>ทดสอบทีละชั้นด้วยไฟล์ test และอ่าน error เพื่อหาจุดที่พังได้เอง</li>
+        </ul>
+      </div>
+
+      <h3>sakila คืออะไร</h3>
+      <p>sakila คือฐานข้อมูลตัวอย่างที่ MySQL แจกให้ใช้ฝึก จำลองร้านเช่าหนัง DVD มีทั้งหนัง (<code>film</code>) นักแสดง (<code>actor</code>) ลูกค้า (<code>customer</code>) การเช่า (<code>rental</code>) การจ่ายเงิน (<code>payment</code>) สาขา (<code>store</code>) พนักงาน (<code>staff</code>) และที่อยู่ ซึ่งแยกเป็น <code>address</code> → <code>city</code> → <code>country</code></p>
+      <p>sakila มี <strong>16 ตาราง</strong> แต่ละตารางคือ resource หนึ่งตัวของ REST API ถ้าจะทำ API ของทั้ง sakila ต้องมีอย่างน้อย 16 resource ในคาบเริ่มจาก resource <code>country</code> (1 ใน 16) เพราะง่ายที่สุด มีแค่ 3 คอลัมน์ (สนุก ๆ: ประเทศไทยใน sakila มีเมืองเดียว)</p>
+      <div class="table-wrap">
+        <table class="compare">
+          <thead><tr><th>คอลัมน์</th><th>ความหมาย</th></tr></thead>
+          <tbody>
+            <tr><td><code>country_id</code></td><td>primary key เป็นตัวเลข auto increment (ฐานข้อมูลออกเลขให้เอง)</td></tr>
+            <tr><td><code>country</code></td><td>ชื่อประเทศ</td></tr>
+            <tr><td><code>last_update</code></td><td>เวลาแก้ไขล่าสุด ฐานข้อมูลใส่ให้เอง</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <aside class="dl-margin-note">
+        <div class="dl-margin-note-label">จดไว้ตรงนี้</div>
+        primary key ของ <code>country</code> ชื่อ <code>country_id</code> ไม่ใช่ <code>id</code> — เดี๋ยวจะได้เจอกับตัวเองตอนทดสอบ repository
+      </aside>
+      <p>สังเกตว่าตาราง <code>city</code> อ้างถึง <code>country</code> ด้วย foreign key ประเทศเดิมใน sakila จึงลบไม่ได้ เพราะยังมีเมืองผูกอยู่ ในบทที่ 4 จะทดลองลบเฉพาะประเทศที่เราเพิ่มเอง</p>
+
+      <hr class="dl-rule" />
+
+      <h3>ขั้นที่ 1 — สร้าง Data Source ใน WebStorm</h3>
+      <p>Data Source คือการบอก WebStorm ว่าจะต่อไปที่ MySQL ตัวไหน ด้วย user อะไร เพื่อเปิดดูตารางและรัน SQL ได้จากใน WebStorm เลย</p>
+      <ol>
+        <li>เปิดหน้าต่าง Database: เมนู <strong>View → Tool Windows → Database</strong> (หรือคลิกไอคอนรูปถังข้อมูลที่แถบด้านข้าง)</li>
+        <li>กดปุ่ม <strong>+</strong> → <strong>Data Source</strong> → <strong>MySQL</strong></li>
+      </ol>
+      <figure class="dl-shot dl-shot--narrow">
+        <a href="img/10-db-add-datasource.png"><img src="img/10-db-add-datasource.png" alt="หน้าต่าง Database ของ WebStorm กดปุ่มบวก เลือก Data Source แล้วรายการด้านขวามี MySQL ถูกเลือก" loading="lazy"></a>
+        <figcaption><b>เพิ่ม Data Source</b> — ปุ่ม + → Data Source → MySQL</figcaption>
+      </figure>
+      <ol start="3">
+        <li>ถ้าเพิ่งใช้ครั้งแรก ด้านล่างจะมีข้อความ <strong>Download missing driver files</strong> ให้กดดาวน์โหลด driver ก่อน (ในคาบมีหลายคนติดตรงนี้ ถ้าไม่โหลด Test Connection จะไม่ผ่าน)</li>
+        <li>กรอก <strong>Host</strong> = <code>localhost</code> · <strong>Port</strong> = <code>3306</code> · <strong>User</strong> = <code>root</code> · <strong>Password</strong> = รหัสผ่าน MySQL ของเครื่องตัวเอง (เครื่องในห้องแล็บใช้รหัสที่อาจารย์แจ้งในคาบ)</li>
+        <li>ช่อง <strong>Database</strong>: <strong>เครื่องในห้องแล็บมี sakila ติดตั้งไว้แล้ว</strong> พิมพ์ <code>sakila</code> หรือกด <kbd class="dl-kbd">Ctrl</kbd>+<kbd class="dl-kbd">Space</kbd> ให้ขึ้นรายชื่อฐานข้อมูลแล้วเลือก <code>sakila</code> · ถ้าเป็น<strong>เครื่องตัวเองที่ยังไม่มี sakila</strong> ให้ปล่อยว่างไว้ก่อน แล้วทำขั้นที่ 2</li>
+        <li>กด <strong>Test Connection</strong> ต้องขึ้นกล่องสีเขียว <strong>Succeeded</strong> แล้วกด <strong>OK</strong></li>
+      </ol>
+      <figure class="dl-shot">
+        <a href="img/lab-db-choose-sakila.png"><img src="img/lab-db-choose-sakila.png" alt="หน้าต่าง Data Sources and Drivers บนเครื่องแล็บ กด Ctrl+Space ที่ช่อง Database แล้วมีรายชื่อ classicmodels information_schema mysql performance_schema sakila sampledb sys ให้เลือก" loading="lazy"></a>
+        <figcaption><b>เครื่องแล็บ: เลือก Database = sakila</b> — กด <kbd class="dl-kbd">Ctrl</kbd>+<kbd class="dl-kbd">Space</kbd> ที่ช่อง Database จะเห็นฐานข้อมูลที่มีในเครื่อง</figcaption>
+      </figure>
+      <figure class="dl-shot">
+        <a href="img/11-db-datasource-config.png"><img src="img/11-db-datasource-config.png" alt="หน้าต่าง Data Sources and Drivers ชื่อ @localhost กรอก Host localhost Port 3306 User root ช่อง Database ว่าง และกล่อง Succeeded แสดง MySQL 8.4.10" loading="lazy"></a>
+        <figcaption><b>ตั้งค่าการเชื่อมต่อ</b> — Test Connection ขึ้น <b>Succeeded</b> ก่อนกด OK (รูปนี้เป็นเครื่องที่ยังไม่มี sakila จึงเว้นช่อง Database ไว้ และได้ชื่อ <code>@localhost</code>)</figcaption>
+      </figure>
+      <p>ถ้า Test Connection ไม่ผ่าน ดูกล่อง "ถ้าเจอแบบนี้" ท้ายบท สาเหตุเกือบทั้งหมดคือ MySQL ยังไม่ได้เปิด หรือรหัสผ่านผิด</p>
+
+      <h3>ขั้นที่ 2 — (เฉพาะเครื่องที่ยังไม่มี sakila) ติดตั้ง sakila</h3>
+      <p>เครื่องในห้องแล็บมีให้แล้ว ข้ามไปขั้นที่ 3 ได้เลย ถ้าเป็นเครื่องตัวเองและรายชื่อฐานข้อมูลไม่มี <code>sakila</code> ให้ติดตั้งตามนี้</p>
+      <h4>2.1 ดาวน์โหลด</h4>
+      <ol>
+        <li>เข้าเว็บ <code>https://dev.mysql.com/doc/index-other.html</code></li>
+        <li>หัวข้อ <strong>Example Databases</strong> แถว <strong>sakila database</strong> ให้กดลิงก์ <strong>Zip</strong> จะได้ไฟล์ <code>sakila-db.zip</code></li>
+        <li>แตก zip จะได้โฟลเดอร์ <code>sakila-db</code> ข้างในมี <code>sakila-schema.sql</code> <code>sakila-data.sql</code> และ <code>sakila.mwb</code> (ไฟล์ .mwb ไม่ได้ใช้)</li>
+      </ol>
+
+      <h4>2.2 รันสคริปต์ sakila (ลำดับสำคัญ)</h4>
+      <p>ต้องรัน <strong><code>sakila-schema.sql</code> ก่อน</strong> แล้วจึงรัน <strong><code>sakila-data.sql</code></strong> ไฟล์แรกสร้างฐานข้อมูลกับตาราง ไฟล์ที่สองเติมข้อมูลลงตารางเหล่านั้น ถ้ารันสลับกัน ไฟล์ข้อมูลจะไม่มีตารางให้ใส่ข้อมูลและขึ้น error</p>
+      <ol>
+        <li>ลากโฟลเดอร์ <code>sakila-db</code> มาวางในแถบ Project ของโปรเจกต์ (หรือคัดลอกไปไว้ในโฟลเดอร์โปรเจกต์) จะได้คลิกไฟล์ .sql จาก WebStorm ได้ ใช้เสร็จแล้วลบออกได้ ไม่ต้องส่งไปกับงาน</li>
+        <li>คลิกขวาที่ <code>sakila-schema.sql</code> → <strong>Run 'sakila-schema.sql'</strong> (<kbd class="dl-kbd">Ctrl</kbd>+<kbd class="dl-kbd">Shift</kbd>+<kbd class="dl-kbd">F10</kbd> · <kbd class="dl-kbd">⌃</kbd><kbd class="dl-kbd">⇧</kbd><kbd class="dl-kbd">R</kbd>)</li>
+      </ol>
+      <figure class="dl-shot dl-shot--narrow">
+        <a href="img/12-sakila-run-script.png"><img src="img/12-sakila-run-script.png" alt="แถบ Project มีโฟลเดอร์ sakila-db คลิกขวาที่ไฟล์ sakila-schema.sql แล้วเมนู Run 'sakila-schema.sql' ถูกเลือก" loading="lazy"></a>
+        <figcaption><b>Run 'sakila-schema.sql'</b> — คลิกขวาที่ไฟล์ในโฟลเดอร์ <code>sakila-db</code></figcaption>
+      </figure>
+      <ol start="3">
+        <li>ครั้งแรกจะขึ้นหน้าต่าง <strong>Edit Configuration</strong> ด้านล่างมีข้อความแดง <strong>Error: No configured target data sources</strong> แปลว่ายังไม่ได้บอกว่าจะรันสคริปต์นี้ที่ฐานข้อมูลไหน</li>
+      </ol>
+      <figure class="dl-shot dl-shot--narrow">
+        <a href="img/12b-run-config-no-target.png"><img src="img/12b-run-config-no-target.png" alt="หน้าต่าง Edit Configuration ช่อง Target data source ว่าง ด้านล่างมีข้อความ Error: No configured target data sources" loading="lazy"></a>
+        <figcaption><b>No configured target data sources</b> — ช่อง Target data source / schema ยังว่าง</figcaption>
+      </figure>
+      <ol start="4">
+        <li>กดปุ่ม <strong>+</strong> ใต้หัวข้อ <strong>Target data source / schema</strong> แล้วเลือก <code>@localhost</code> (Data Source ที่สร้างในขั้นที่ 1)</li>
+      </ol>
+      <figure class="dl-shot dl-shot--narrow">
+        <a href="img/12c-choose-target.png"><img src="img/12c-choose-target.png" alt="กดปุ่มบวกใต้ Target data source แล้วมีรายการให้เลือก @localhost" loading="lazy"></a>
+        <figcaption><b>เลือก target</b> — กด + แล้วเลือก <code>@localhost</code></figcaption>
+      </figure>
+      <ol start="5">
+        <li>ช่อง target จะขึ้น <code>@localhost / &lt;unknown&gt;</code> ตัวสีแดง ไม่เป็นไร (ยังไม่ได้เลือก schema และสคริปต์นี้จะสร้างฐานข้อมูล sakila เอง) ข้อความ error ด้านล่างหายไปแล้ว กด <strong>Run</strong></li>
+      </ol>
+      <figure class="dl-shot dl-shot--narrow">
+        <a href="img/12d-run-config-ready.png"><img src="img/12d-run-config-ready.png" alt="หน้าต่าง Edit Configuration มี target เป็น @localhost / unknown และไฟล์ sakila-schema.sql พร้อมกด Run" loading="lazy"></a>
+        <figcaption><b>พร้อมรัน</b> — target = <code>@localhost</code> แล้วกด Run</figcaption>
+      </figure>
+      <ol start="6">
+        <li>ดูที่หน้าต่าง Run ด้านล่าง บรรทัดสุดท้ายต้องเป็น <strong>Summary: 46 of 46 statements executed</strong> (ใช้เวลาไม่กี่วินาที)</li>
+      </ol>
+      <figure class="dl-shot">
+        <a href="img/12e-schema-run-result.png"><img src="img/12e-schema-run-result.png" alt="หน้าต่าง Run ของ sakila-schema.sql บรรทัดสุดท้าย Summary: 46 of 46 statements executed in 2 sec" loading="lazy"></a>
+        <figcaption><b>รัน schema สำเร็จ</b> — 46 of 46 statements</figcaption>
+      </figure>
+      <ol start="7">
+        <li>ทำซ้ำข้อ 2–5 กับ <code>sakila-data.sql</code> ผลต้องเป็น <strong>Summary: 62 of 62 statements executed</strong></li>
+      </ol>
+      <figure class="dl-shot">
+        <a href="img/12f-data-run-result.png"><img src="img/12f-data-run-result.png" alt="หน้าต่าง Run ของ sakila-data.sql บรรทัดสุดท้าย Summary: 62 of 62 statements executed in 3 sec" loading="lazy"></a>
+        <figcaption><b>รัน data สำเร็จ</b> — 62 of 62 statements</figcaption>
+      </figure>
+
+      <details class="dl-answer">
+        <summary>ทางเลือก: รันสคริปต์ด้วย MySQL command line แทน</summary>
+        <p>ถ้าเมนูใน WebStorm มีปัญหา ใช้ MySQL client ใน Terminal ได้ (ต้องมีคำสั่ง <code>mysql</code> ใน PATH) เข้าไปที่โฟลเดอร์ <code>sakila-db</code> แล้วพิมพ์</p>
+        <pre class="code-block"><span class="kw">mysql</span> -u root -p
+<span class="comm">-- ใส่รหัสผ่านแล้ว พิมพ์ต่อใน mysql&gt;</span>
+SOURCE sakila-schema.sql;
+SOURCE sakila-data.sql;</pre>
+      </details>
+
+      <h4>2.3 ให้ Data Source แสดงฐานข้อมูล sakila</h4>
+      <p>หลังรันสคริปต์ ในหน้าต่าง Database จะยังเห็นแค่ <code>@localhost</code> พร้อมป้าย <strong>0 of 5</strong> ยังไม่เห็นตาราง เพราะ Data Source ยังไม่รู้ว่าจะแสดงฐานข้อมูลไหน</p>
+      <ol>
+        <li>คลิกขวาที่ <code>@localhost</code> → <strong>Properties</strong> (หรือไอคอนเฟืองในหน้าต่าง Database) เพื่อเปิดหน้าต่าง Data Sources and Drivers อีกครั้ง</li>
+        <li>ช่อง <strong>Database</strong> พิมพ์ <code>sakila</code> ชื่อ Data Source จะเปลี่ยนเป็น <code>sakila@localhost</code> เอง แล้วกด <strong>OK</strong></li>
+        <li>ถ้ายังไม่เห็นตาราง ให้กดปุ่ม Refresh (⟳) ในหน้าต่าง Database</li>
+      </ol>
+      <figure class="dl-shot">
+        <a href="img/13b-datasource-database-sakila.png"><img src="img/13b-datasource-database-sakila.png" alt="หน้าต่าง Data Sources and Drivers ช่อง Database กรอก sakila ชื่อเปลี่ยนเป็น sakila@localhost และ URL ลงท้ายด้วย /sakila" loading="lazy"></a>
+        <figcaption><b>กรอก Database = sakila</b> — ชื่อเปลี่ยนเป็น <code>sakila@localhost</code> และ URL ลงท้ายด้วย <code>/sakila</code></figcaption>
+      </figure>
+      <details class="dl-answer">
+        <summary>อีกวิธี: เลือก schema จากป้าย "0 of 5"</summary>
+        <p>คลิกที่ป้าย <strong>0 of 5</strong> ข้างชื่อ <code>@localhost</code> จะมีรายการ schema ให้ติ๊ก เลือก <code>sakila</code> แล้วกด Enter หรือคลิกนอกรายการ</p>
+        <figure class="dl-shot dl-shot--narrow">
+          <a href="img/13a-choose-schema.png"><img src="img/13a-choose-schema.png" alt="คลิกป้าย 0 of 5 ข้าง @localhost มีรายการ schema ให้ติ๊ก ได้แก่ information_schema mysql performance_schema sakila sys" loading="lazy"></a>
+          <figcaption><b>ติ๊กเลือก sakila</b> ในรายการ schema</figcaption>
+        </figure>
+      </details>
+      <figure class="dl-shot dl-shot--narrow">
+        <a href="img/13-sakila-tables.png"><img src="img/13-sakila-tables.png" alt="หน้าต่าง Database แสดง sakila@localhost 1 of 5 กางฐานข้อมูล sakila เห็น tables 16 ตาราง เช่น actor address city country customer film" loading="lazy"></a>
+        <figcaption><b>ติดตั้ง sakila สำเร็จ</b> — <code>sakila@localhost</code> มี tables 16 ตาราง รวม <code>country</code></figcaption>
+      </figure>
+
+      <h3>ขั้นที่ 3 — เปิดดูตาราง country</h3>
+      <ol>
+        <li>กางฐานข้อมูล <code>sakila</code> → <strong>tables</strong> → เลือก <code>country</code> แล้วกด <kbd class="dl-kbd">F4</kbd> หรือดับเบิลคลิก (ถ้ากด Enter เฉย ๆ จะแค่กางโหนด columns/keys/indexes)</li>
+        <li>จะเห็นข้อมูลเป็นตาราง มีคอลัมน์ <code>country_id</code> <code>country</code> <code>last_update</code> ด้านล่างบอกจำนวน <strong>109 rows</strong></li>
+      </ol>
+      <figure class="dl-shot">
+        <a href="img/14-country-data.png"><img src="img/14-country-data.png" alt="แท็บ country แสดงข้อมูลเป็นตาราง แถวแรก country_id 1 Afghanistan ต่อด้วย Algeria American Samoa ด้านล่างมีป้าย 109 rows" loading="lazy"></a>
+        <figcaption><b>ข้อมูลในตาราง country</b> — 109 ประเทศ แถวแรกคือ Afghanistan</figcaption>
+      </figure>
+      <p>ถ้าอยากลองพิมพ์ SQL เอง คลิกขวาที่ Data Source → <strong>New → Query Console</strong> แล้วพิมพ์ <code>SELECT * FROM sakila.country;</code> กด <kbd class="dl-kbd">Ctrl</kbd>+<kbd class="dl-kbd">Enter</kbd> (Windows) · <kbd class="dl-kbd">⌘</kbd><kbd class="dl-kbd">↩</kbd> (macOS) เพื่อรัน</p>
+
+      <hr class="dl-rule" />
+
+      <h3>ขั้นที่ 4 — แก้ db-config.js ให้ชี้ไปที่ sakila</h3>
+      <p>ไฟล์นี้ใช้ร่วมกันทุก resource จึงแก้ตัวเดิมได้เลย (ไม่ต้องคัดลอก) template ยังชี้ไปที่ฐานข้อมูลตัวอย่างของอาจารย์ (<code>sampledb</code>)</p>
+      <div class="code-tabs" data-tabs>
+        <div class="code-tabs-bar">
+          <button class="code-tab" data-tab="before">ก่อน</button>
+          <button class="code-tab active" data-tab="after">หลัง</button>
+        </div>
+        <pre class="code-panel" data-panel="before"><span class="kw">import</span> mysql <span class="kw">from</span> <span class="str">'mysql2/promise'</span>
+
+<span class="kw">const</span> db = mysql.<span class="fn">createPool</span>({
+    host: <span class="str">'localhost'</span>,
+    user: <span class="str">'root'</span>,
+    password: <span class="str">'(รหัสผ่านของเครื่องอาจารย์)'</span>,
+    database: <span class="str">'sampledb'</span>,
+})
+<span class="kw">export default</span> db</pre>
+        <pre class="code-panel active" data-panel="after"><span class="kw">import</span> mysql <span class="kw">from</span> <span class="str">'mysql2/promise'</span>
+
+<span class="kw">const</span> db = mysql.<span class="fn">createPool</span>({
+    host: <span class="str">'localhost'</span>,
+    user: <span class="str">'root'</span>,
+    password: <span class="str">'รหัสผ่าน MySQL ของเครื่องตัวเอง'</span>,  <span class="comm">// ← แก้เป็นรหัสผ่าน root ของเครื่องตัวเอง</span>
+    database: <span class="str">'sakila'</span>,                          <span class="comm">// ← เปลี่ยนจาก sampledb เป็น sakila</span>
+})
+<span class="kw">export default</span> db</pre>
+      </div>
+      <p>แก้ 2 จุด คือ <code>password</code> ใส่รหัสผ่าน root ของเครื่องตัวเอง (รหัสเดียวกับตอนสร้าง Data Source · เครื่องในห้องแล็บใช้รหัสที่อาจารย์แจ้งในคาบ) และ <code>database</code> เปลี่ยนเป็น <code>'sakila'</code></p>
+      <figure class="dl-shot">
+        <a href="img/15-db-config-edit.png"><img src="img/15-db-config-edit.png" alt="ไฟล์ db-config.js ใน WebStorm หลังแก้ ค่า password เป็นรหัสของเครื่องที่ใช้ถ่ายรูป และ database เป็น sakila" loading="lazy"></a>
+        <figcaption><b>db-config.js</b> — database เปลี่ยนเป็น <code>sakila</code> · password ในรูปเป็นของเครื่องที่ใช้ถ่าย ให้ใส่ของเครื่องตัวเอง</figcaption>
+      </figure>
+
+
+      <hr class="dl-rule" />
+
+      <h3>ขั้นที่ 5 — ชั้น Repository: สร้าง country-repo.js</h3>
+      <p>ในคาบ<strong>ไม่แก้ไฟล์ <code>example-*</code> ตรง ๆ</strong> แต่คัดลอกเป็นไฟล์ใหม่ของ resource นั้น ต้นแบบจะได้อยู่ครบไว้ใช้กับ resource ถัดไป (เช่น actor)</p>
+      <ol>
+        <li>คลิกขวาที่ <code>src/repositories/example-repo.js</code> → <strong>Copy</strong> (<kbd class="dl-kbd">Ctrl</kbd>+<kbd class="dl-kbd">C</kbd> · <kbd class="dl-kbd">⌘</kbd><kbd class="dl-kbd">C</kbd>)</li>
+        <li>คลิกขวาที่โฟลเดอร์ <code>repositories</code> → <strong>Paste</strong> (<kbd class="dl-kbd">Ctrl</kbd>+<kbd class="dl-kbd">V</kbd> · <kbd class="dl-kbd">⌘</kbd><kbd class="dl-kbd">V</kbd>) จะมีหน้าต่าง Copy ให้ตั้งชื่อใหม่ พิมพ์ <code>country-repo.js</code> แล้วกด <strong>OK</strong></li>
+      </ol>
+      <figure class="dl-shot dl-shot--narrow">
+        <a href="img/16a-copy-paste-dialog.png"><img src="img/16a-copy-paste-dialog.png" alt="หน้าต่าง Copy ของ WebStorm ช่อง New name กรอก country-repo.js ปลายทางเป็นโฟลเดอร์ repositories" loading="lazy"></a>
+        <figcaption><b>Copy → Paste</b> — ตั้งชื่อไฟล์ใหม่เป็น <code>country-repo.js</code></figcaption>
+      </figure>
+      <ol start="3">
+        <li>เปิด <code>country-repo.js</code> แก้ 2 บรรทัดบน: <code>TABLE_NAME</code> เป็น <code>"country"</code> (ดูชื่อจริงจากหน้าต่าง Database ไม่มี s) และ <code>ENTITY_NAME</code> เป็น <code>"Country"</code> (ใช้แสดงในข้อความ error ไม่จำเป็นต้องตรงกับชื่อตาราง)</li>
+      </ol>
+      <pre class="code-block"><span class="kw">const</span> TABLE_NAME = <span class="str">"country"</span>      <span class="comm">// ← ชื่อตารางใน sakila (ไม่มี s)</span>
+<span class="kw">const</span> ENTITY_NAME = <span class="str">"Country"</span>    <span class="comm">// ← ใช้ในข้อความ error เช่น "Country not found for id = 999"</span></pre>
+      <figure class="dl-shot">
+        <a href="img/16-repo-edit.png"><img src="img/16-repo-edit.png" alt="ไฟล์ country-repo.js หลังแก้ TABLE_NAME เป็น country และ ENTITY_NAME เป็น Country โดย SQL ยังเป็น WHERE id อยู่" loading="lazy"></a>
+        <figcaption><b>country-repo.js</b> — แก้ชื่อตารางกับ entity แล้ว (SQL ยังเป็น <code>WHERE id</code> อยู่ ลองรันดูก่อน)</figcaption>
+      </figure>
+
+      <h4>ทดสอบ repository ก่อนไปชั้นถัดไป</h4>
+      <p>อาจารย์ย้ำว่าให้<strong>ทดสอบทีละชั้น</strong> ถ้าเขียนครบ 3 ชั้นแล้วค่อยทดสอบทีเดียว พอพังจะไม่รู้ว่าพังที่ชั้นไหน</p>
+      <ol>
+        <li>คลิกขวาที่ <code>src</code> → <strong>New → JavaScript File</strong> ตั้งชื่อ <code>test-repo</code> แล้วพิมพ์</li>
+      </ol>
+      <pre class="code-block"><span class="kw">import</span> * <span class="kw">as</span> repo <span class="kw">from</span> <span class="str">'./repositories/country-repo.js'</span>
+
+<span class="kw">const</span> countries = <span class="kw">await</span> repo.<span class="fn">findAll</span>();
+console.<span class="fn">log</span>(countries);</pre>
+      <ol start="2">
+        <li>คลิกขวาในไฟล์ → <strong>Run 'test-repo.js'</strong> จะเห็นรายชื่อประเทศทั้งหมด เริ่มจาก <code>country_id: 1, country: 'Afghanistan'</code> แปลว่าต่อฐานข้อมูลได้แล้ว</li>
+        <li>ใส่ comment 2 บรรทัดนั้น (<kbd class="dl-kbd">Ctrl</kbd>+<kbd class="dl-kbd">/</kbd> · <kbd class="dl-kbd">⌘</kbd><kbd class="dl-kbd">/</kbd>) แล้วลองดึงประเทศเดียว เช่นไทย (<code>country_id</code> 94)</li>
+      </ol>
+      <pre class="code-block"><span class="comm">// const countries = await repo.findAll();</span>
+<span class="comm">// console.log(countries);</span>
+
+<span class="kw">const</span> country = <span class="kw">await</span> repo.<span class="fn">findOne</span>(<span class="num">94</span>);
+console.<span class="fn">log</span>(country);</pre>
+      <p>รันแล้ว<strong>จะเจอ error</strong> ซึ่งเป็นสิ่งที่ตั้งใจให้เจอ</p>
+      <div class="dl-out-label">ผลที่ได้จริง (path เป็นของเครื่องในห้องแล็บ)</div>
+      <pre class="code-block">Error: Unknown column 'id' in 'where clause'
+    at Module.findOne (file:///C:/Users/INT161/WebstormProjects/error-handler/src/repositories/country-repo.js:18:29)
+    at file:///C:/Users/INT161/WebstormProjects/error-handler/src/test-repo.js:6:28
+    ... {
+  code: 'ER_BAD_FIELD_ERROR',
+  errno: 1054,
+  ...
+}
+
+Process finished with exit code 1</pre>
+      <figure class="dl-shot">
+        <a href="img/16b-test-repo-unknown-column.png"><img src="img/16b-test-repo-unknown-column.png" alt="หน้าต่าง Run ของ test-repo.js แสดง Error Unknown column 'id' in 'where clause' พร้อมลิงก์ไปที่ country-repo.js และ code ER_BAD_FIELD_ERROR" loading="lazy"></a>
+        <figcaption><b>Unknown column 'id'</b> — error บอกทั้งสาเหตุและบรรทัดที่พัง</figcaption>
+      </figure>
+
+      <div class="dl-concept">
+        <div class="dl-concept-label">แนวคิด</div>
+        <div class="dl-concept-title">เจอ error ให้อ่าน error ก่อน</div>
+        <p>อย่าเพิ่งไปนั่งเทียบโค้ดกับต้นฉบับ ข้อความบรรทัดแรกบอกสาเหตุแล้วว่า <strong>ไม่มีคอลัมน์ชื่อ <code>id</code></strong> และบรรทัด <code>at Module.findOne (…country-repo.js:18:29)</code> บอกว่าพังที่ไฟล์ไหนบรรทัดไหน คลิกลิงก์สีฟ้านั้นใน WebStorm จะกระโดดไปที่บรรทัดนั้นเลย</p>
+      </div>
+      <ol start="4">
+        <li>คลิกลิงก์ <code>country-repo.js:18:29</code> จะเห็นว่าเป็นบรรทัดที่รัน <code>FIND_ONE_SQL</code> ซึ่งใช้ <code>WHERE id = ?</code></li>
+        <li>ไปดูคอลัมน์ของตาราง <code>country</code> ในหน้าต่าง Database จะเห็นว่า primary key ชื่อ <strong><code>country_id</code></strong> ไม่ใช่ <code>id</code></li>
+        <li>แก้ <code>WHERE id = ?</code> เป็น <code>WHERE country_id = ?</code> ให้<strong>ครบทั้ง 3 จุด</strong> (FIND_ONE, UPDATE, REMOVE) ถ้ามีหลายจุดใช้ค้นหาแทนที่ <kbd class="dl-kbd">Ctrl</kbd>+<kbd class="dl-kbd">R</kbd> · <kbd class="dl-kbd">⌘</kbd><kbd class="dl-kbd">R</kbd> ก็ได้ แต่ 3 จุดแก้มือได้</li>
+      </ol>
+      <pre class="code-block"><span class="kw">const</span> FIND_ALL_SQL = <span class="str">`SELECT * FROM ${TABLE_NAME}`</span>
+<span class="kw">const</span> FIND_ONE_SQL = <span class="str">`SELECT * FROM ${TABLE_NAME} WHERE country_id = ?`</span>    <span class="comm">// ← id → country_id</span>
+<span class="kw">const</span> UPDATE_SQL = <span class="str">`UPDATE ${TABLE_NAME} SET ? WHERE country_id = ?`</span>       <span class="comm">// ← id → country_id</span>
+<span class="kw">const</span> REMOVE_SQL = <span class="str">`DELETE FROM ${TABLE_NAME} WHERE country_id = ?`</span>       <span class="comm">// ← id → country_id</span>
+<span class="kw">const</span> CREATE_SQL = <span class="str">`INSERT INTO ${TABLE_NAME} SET ?`</span></pre>
+      <figure class="dl-shot">
+        <a href="img/16c-repo-country-id-fix.png"><img src="img/16c-repo-country-id-fix.png" alt="ไฟล์ country-repo.js หลังแก้ SQL สามบรรทัดให้ใช้ WHERE country_id" loading="lazy"></a>
+        <figcaption><b>แก้เป็น country_id</b> — FIND_ONE, UPDATE, REMOVE ครบ 3 จุด</figcaption>
+      </figure>
+      <ol start="7">
+        <li>รัน <code>test-repo.js</code> อีกครั้ง (ในรูปเปิดทั้ง <code>findAll</code> และ <code>findOne(94)</code>) คราวนี้ได้รายชื่อประเทศ (Node พิมพ์ 100 แถวแรกแล้วบอก <code>... 9 more items</code>) ตามด้วยข้อมูลของ Thailand</li>
+      </ol>
+      <figure class="dl-shot">
+        <a href="img/16d-test-repo-ok.png"><img src="img/16d-test-repo-ok.png" alt="WebStorm เปิด test-repo.js ที่เรียก findAll และ findOne(94) หน้าต่าง Run แสดง ... 9 more items ตามด้วย object country_id 94 Thailand และปุ่ม Stop สีแดงยังสว่างอยู่" loading="lazy"></a>
+        <figcaption><b>repository ผ่านแล้ว</b> — ได้ Thailand และปุ่ม Stop สีแดงมุมขวาบนยังสว่าง (โปรแกรมยังไม่จบ)</figcaption>
+      </figure>
+      <div class="dl-pitfall">
+        <div class="dl-pitfall-label">ไม่ใช่ error</div>
+        <div class="dl-pitfall-title">ผลออกครบแล้ว แต่โปรแกรมไม่จบเอง</div>
+        <p>connection pool ของ <code>mysql2</code> ยังถือ connection ไว้ ไฟล์ทดสอบจึงค้างอยู่แม้ทำงานเสร็จแล้ว รอนานแค่ไหนก็ไม่จบ ให้กดปุ่ม Stop สี่เหลี่ยมแดง (<kbd class="dl-kbd">Ctrl</kbd>+<kbd class="dl-kbd">F2</kbd> · <kbd class="dl-kbd">⌘</kbd><kbd class="dl-kbd">F2</kbd>) จะขึ้น <code>Process finished with exit code 130 (interrupted by signal 2:SIGINT)</code> ซึ่งแปลว่าเราสั่งหยุดเอง ไม่ใช่ error (ถ้าไฟล์ทดสอบจบด้วย error เช่น not found Node จะหยุดเองด้วย exit code 1)</p>
+      </div>
+      <p>ในคาบลองต่อจนครบทุกฟังก์ชันของ repository ด้วยวิธีเดียวกัน (comment ของเก่า แล้วเปิดบรรทัดใหม่ทีละคู่) ลองทำตามได้</p>
+      <pre class="code-block"><span class="comm">// เพิ่ม: ไม่ต้องส่ง country_id (auto increment) และ last_update (ฐานข้อมูลใส่ให้)</span>
+<span class="kw">const</span> created = <span class="kw">await</span> repo.<span class="fn">create</span>({ country: <span class="str">"Thailand Test"</span> })
+console.<span class="fn">log</span>(created)          <span class="comm">// ได้ object พร้อม country_id ใหม่ (จดเลขไว้)</span>
+
+<span class="comm">// แก้: ใส่เลข country_id ที่ได้จากข้างบน</span>
+<span class="comm">// console.log(await repo.update(110, { country: "Thailande" }))</span>
+
+<span class="comm">// ลบ: ใช้เลขที่เพิ่มเองเท่านั้น ห้ามลบประเทศเดิม</span>
+<span class="comm">// console.log(await repo.remove(110))   // ได้ affectedRows: 1</span></pre>
+      <p>ลองรัน <code>remove</code> เลขเดิมซ้ำอีกครั้ง จะได้ <code>Error: Country not found for id = 110</code> เพราะ <code>remove</code> เรียก <code>findOne</code> ก่อน และ <code>findOne</code> โยน error 404 เมื่อหาไม่เจอ (เรื่อง error แบบนี้คือหัวข้อของบทที่ 3) เลข id ในเครื่องตัวเองอาจไม่ใช่ 110 ขึ้นกับว่าเคยเพิ่มข้อมูลไปกี่ครั้ง</p>
+      <div class="dl-pitfall">
+        <div class="dl-pitfall-label">พลาดกันบ่อย</div>
+        <div class="dl-pitfall-title">ลบประเทศเดิมของ sakila</div>
+        <p>ทดลองลบเฉพาะแถวที่เพิ่มเอง ประเทศเดิมทุกประเทศมีเมืองในตาราง <code>city</code> อ้างถึงอยู่ ลบไม่ได้และจะได้ error (ดูบทที่ 4 ข้อ 4.6)</p>
+      </div>
+
+      <h3>ขั้นที่ 6 — ชั้น Service: สร้าง country-service.js</h3>
+      <ol>
+        <li>คัดลอก <code>src/services/example-service.js</code> แล้ววางในโฟลเดอร์ <code>services</code> ตั้งชื่อ <code>country-service.js</code> (วิธีเดียวกับขั้นที่ 5)</li>
+        <li>แก้บรรทัดแรกให้ import จาก repository ของ country ชื่อฟังก์ชัน <code>getObject</code>, <code>getAllObjects</code>, <code>createObject</code>, <code>updateObject</code>, <code>removeObject</code> <strong>ไม่ต้องเปลี่ยน</strong> (ในคาบตัดสินใจใช้ชื่อเดิม)</li>
+      </ol>
+      <pre class="code-block"><span class="kw">import</span> * <span class="kw">as</span> repo <span class="kw">from</span> <span class="str">"../repositories/country-repo.js"</span>   <span class="comm">// ← example-repo.js → country-repo.js</span>
+
+<span class="kw">export async function</span> <span class="fn">getObject</span>(id) {
+    <span class="kw">return await</span> repo.<span class="fn">findOne</span>(id)
+}
+<span class="comm">// ... ฟังก์ชันที่เหลือเหมือนเดิมทุกบรรทัด</span></pre>
+      <figure class="dl-shot">
+        <a href="img/16e-service-edit.png"><img src="img/16e-service-edit.png" alt="ไฟล์ country-service.js ในโฟลเดอร์ services บรรทัดแรก import จาก ../repositories/country-repo.js ตามด้วยฟังก์ชัน getObject getAllObjects updateObject removeObject เหมือนเดิม" loading="lazy"></a>
+        <figcaption><b>country-service.js</b> — เปลี่ยนแค่ import</figcaption>
+      </figure>
+      <ol start="3">
+        <li>ทดสอบชั้น service ด้วย <code>src/test-service.js</code> ที่มีอยู่แล้ว แก้ import เป็น service ของ country และเปลี่ยน <code>data</code> ให้เป็นข้อมูลของตาราง country ในคาบเปิดทดสอบทีละคู่เหมือนตอนทดสอบ repository ถ้าอยากรันทีเดียวครบทุกฟังก์ชัน ใช้แบบนี้ได้ (ใช้ <code>object.country_id</code> ที่เพิ่งเพิ่ม จึงไม่ต้องจดเลข id เอง)</li>
+      </ol>
+      <pre class="code-block"><span class="kw">import</span> * <span class="kw">as</span> service <span class="kw">from</span> <span class="str">'./services/country-service.js'</span>;   <span class="comm">// ← เปลี่ยน import</span>
+
+<span class="kw">const</span> countries = <span class="kw">await</span> service.<span class="fn">getAllObjects</span>()
+console.<span class="fn">log</span>(countries.length + <span class="str">' countries'</span>)
+<span class="kw">const</span> data = {
+    country : <span class="str">'Thailand Dan Smile'</span>        <span class="comm">// ← เดิมเป็น subject_code / subject_title / credit</span>
+}
+
+console.<span class="fn">log</span>(<span class="kw">await</span> service.<span class="fn">getObject</span>(<span class="num">94</span>))
+
+<span class="kw">const</span> object = <span class="kw">await</span> service.<span class="fn">createObject</span>(data)
+console.<span class="fn">log</span>(object)
+
+<span class="kw">const</span> updated = <span class="kw">await</span> service.<span class="fn">updateObject</span>(object.country_id, {country: <span class="str">'Thailande'</span>})
+console.<span class="fn">log</span>(updated)
+
+<span class="kw">await</span> service.<span class="fn">removeObject</span>(object.country_id)
+console.<span class="fn">log</span>(<span class="kw">await</span> service.<span class="fn">getObject</span>(object.country_id))   <span class="comm">// ลบแล้ว → ต้องได้ Country not found</span></pre>
+      <figure class="dl-shot">
+        <a href="img/16f-test-service-ok.png"><img src="img/16f-test-service-ok.png" alt="หน้าต่าง Run ของ test-service.js แสดง 109 countries ข้อมูล Thailand id 94 ประเทศที่เพิ่มใหม่ id 115 ชื่อ Thailand Dan Smile แล้วแก้เป็น Thailande และจบด้วย Error Country not found for id = 115 exit code 1" loading="lazy"></a>
+        <figcaption><b>test-service.js</b> — ทุกฟังก์ชันผ่าน และ<b>ตั้งใจให้จบด้วย error</b> <code>Country not found</code> เพราะดึง id ที่เพิ่งลบไป (เลข id ในเครื่องตัวเองไม่จำเป็นต้องเป็น 115 เหมือนในรูป)</figcaption>
+      </figure>
+
+      <h3>ขั้นที่ 7 — ชั้น Router และ app.js</h3>
+      <ol>
+        <li>คัดลอก <code>src/routes/example-route.js</code> แล้ววางในโฟลเดอร์ <code>routes</code> ตั้งชื่อ <code>country-route.js</code></li>
+        <li>แก้บรรทัดแรกให้ import จาก service ของ country ส่วน route ทั้ง 5 เส้นใช้ของเดิม</li>
+      </ol>
+      <pre class="code-block"><span class="kw">import</span> * <span class="kw">as</span> service <span class="kw">from</span> <span class="str">"../services/country-service.js"</span>   <span class="comm">// ← example-service.js → country-service.js</span>
+<span class="kw">import</span> express <span class="kw">from</span> <span class="str">"express"</span>
+<span class="comm">// ... route 5 เส้นเหมือนเดิม</span></pre>
+      <figure class="dl-shot">
+        <a href="img/16g-route-edit.png"><img src="img/16g-route-edit.png" alt="ไฟล์ country-route.js บรรทัดแรก import จาก ../services/country-service.js และมี router.get router.post router.put router.delete" loading="lazy"></a>
+        <figcaption><b>country-route.js</b> — เปลี่ยนแค่ import</figcaption>
+      </figure>
+      <p>ทบทวนหน้าที่ของ router แต่ละเส้น: <code>GET /</code> ดึงทั้งหมด · <code>GET /:id</code> ดึงตาม id · <code>POST /</code> อ่าน <code>req.body</code> แล้วตอบ <strong>201</strong> · <code>PUT /:id</code> ต้องได้ทั้ง id และ body · <code>DELETE /:id</code> ตอบ <strong>204</strong> (ตอนนี้ยังไม่ได้ตรวจความถูกต้องของ body)</p>
+      <ol start="3">
+        <li>เปิด <code>src/app.js</code> แก้ 2 จุด: เปลี่ยนบรรทัด import router เป็นของ country และเอา comment ออกจาก <code>app.use</code> พร้อมเปลี่ยน path เป็น <code>/countries</code></li>
+      </ol>
+      <div class="code-tabs" data-tabs>
+        <div class="code-tabs-bar">
+          <button class="code-tab" data-tab="before">ก่อน</button>
+          <button class="code-tab active" data-tab="after">หลัง</button>
+        </div>
+        <pre class="code-panel" data-panel="before"><span class="kw">import</span> express <span class="kw">from</span> <span class="str">'express'</span>
+<span class="kw">import</span> exRouter <span class="kw">from</span> <span class="str">'./routes/example-route.js'</span>
+
+<span class="kw">const</span> app = <span class="fn">express</span>()
+app.<span class="fn">use</span>(express.<span class="fn">json</span>())
+
+<span class="comm">// app.use('/examples', exRouter)</span></pre>
+        <pre class="code-panel active" data-panel="after"><span class="kw">import</span> express <span class="kw">from</span> <span class="str">'express'</span>
+<span class="kw">import</span> countryRouter <span class="kw">from</span> <span class="str">'./routes/country-route.js'</span>   <span class="comm">// ← router ของ country</span>
+
+<span class="kw">const</span> app = <span class="fn">express</span>()
+app.<span class="fn">use</span>(express.<span class="fn">json</span>())                    <span class="comm">// ← ต้องมี และต้องอยู่ก่อน router</span>
+
+app.<span class="fn">use</span>(<span class="str">'/countries'</span>, countryRouter)     <span class="comm">// ← path เป็นพหูพจน์ c-o-u-n-t-r-i-e-s</span></pre>
+      </div>
+      <figure class="dl-shot">
+        <a href="img/17-app-js-route.png"><img src="img/17-app-js-route.png" alt="ไฟล์ app.js import countryRouter จาก ./routes/country-route.js และมีบรรทัด app.use('/countries', countryRouter)" loading="lazy"></a>
+        <figcaption><b>app.js</b> — ผูก <code>countryRouter</code> กับ path <code>/countries</code></figcaption>
+      </figure>
+      <p>ถึงตรงนี้ โครงโปรเจกต์จะมีไฟล์ของ country ครบทั้ง 3 ชั้น อยู่คู่กับไฟล์ต้นแบบ <code>example-*</code> ที่ไม่ได้แตะ</p>
+      <figure class="dl-shot dl-shot--narrow">
+        <a href="img/04-project-tree.png"><img src="img/04-project-tree.png" alt="แถบ Project ของโปรเจกต์ error-handler มี node_modules และใน src มี country-repo.js country-route.js country-service.js อยู่คู่กับ example-repo.js example-route.js example-service.js พร้อม app.js test-repo.js test-service.js" loading="lazy"></a>
+        <figcaption><b>โครงโปรเจกต์ที่เสร็จแล้ว</b> — ไฟล์ <code>country-*</code> อยู่คู่กับ <code>example-*</code> ในแต่ละชั้น</figcaption>
+      </figure>
+      <p><code>app.use('/countries', countryRouter)</code> คือการผูก router กับ path ใน router เขียน <code>router.get("/")</code> ของจริงจะกลายเป็น <code>GET /countries</code> และ <code>router.get("/:id")</code> จะกลายเป็น <code>GET /countries/:id</code> ชื่อตารางเป็นเอกพจน์ (<code>country</code>) แต่ path ของ REST นิยมใช้พหูพจน์ (<code>/countries</code>) ถ้ามี resource อื่นในอนาคตก็ import router ของมันแล้วเพิ่ม <code>app.use</code> อีกบรรทัด</p>
+      <div class="table-wrap">
+        <table class="compare">
+          <thead><tr><th>route ในไฟล์ router</th><th>URL จริงหลังผูกกับ /countries</th><th>ทำอะไร</th></tr></thead>
+          <tbody>
+            <tr><td><code>router.get("/")</code></td><td><code>GET /countries</code></td><td>ดูทุกประเทศ</td></tr>
+            <tr><td><code>router.get("/:id")</code></td><td><code>GET /countries/:id</code></td><td>ดูประเทศตาม id</td></tr>
+            <tr><td><code>router.post("/")</code></td><td><code>POST /countries</code></td><td>เพิ่มประเทศ</td></tr>
+            <tr><td><code>router.put("/:id")</code></td><td><code>PUT /countries/:id</code></td><td>แก้ประเทศตาม id</td></tr>
+            <tr><td><code>router.delete("/:id")</code></td><td><code>DELETE /countries/:id</code></td><td>ลบประเทศตาม id</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <hr class="dl-rule" />
+
+      <h3>ขั้นที่ 8 — รันแอป</h3>
+      <ol>
+        <li>คลิกขวาที่ไฟล์ <code>src/app.js</code> → <strong>Run 'app.js'</strong> (หรือเปิดไฟล์แล้วกด <kbd class="dl-kbd">Ctrl</kbd>+<kbd class="dl-kbd">Shift</kbd>+<kbd class="dl-kbd">F10</kbd> (Windows) · <kbd class="dl-kbd">⌃</kbd><kbd class="dl-kbd">⇧</kbd><kbd class="dl-kbd">R</kbd> (macOS))</li>
+        <li>หน้าต่าง Run ด้านล่างต้องขึ้นข้อความ <code>Example app listening on port 3000</code> และโปรแกรมไม่จบเอง (server รอรับ request อยู่)</li>
+        <li>ลองเปิดเบราว์เซอร์ไปที่ <code>http://localhost:3000/countries</code> ควรเห็นข้อมูล JSON ของทุกประเทศ</li>
+      </ol>
+      <figure class="dl-shot">
+        <a href="img/18-app-run.png"><img src="img/18-app-run.png" alt="WebStorm เปิดโปรเจกต์ error-handler ไฟล์ app.js ที่ใช้ countryRouter หน้าต่าง Run ด้านล่างแสดงคำสั่ง node …/error-handler/src/app.js และข้อความ Example app listening on port 3000" loading="lazy"></a>
+        <figcaption><b>แอปรันแล้ว</b> — ขึ้น <code>Example app listening on port 3000</code> และปุ่มหยุดสี่เหลี่ยมสีแดงมุมขวาบนสว่างอยู่ (server ยังทำงาน)</figcaption>
+      </figure>
+      <p>ถ้าไม่อยากใช้เมนู จะรันจาก Terminal ก็ได้ด้วยคำสั่งด้านล่าง กด <kbd class="dl-kbd">Ctrl</kbd>+<kbd class="dl-kbd">C</kbd> เพื่อหยุด</p>
+      <pre class="code-block"><span class="kw">node</span> src/app.js</pre>
+
+      <div class="dl-concept">
+        <div class="dl-concept-label">แนวคิด</div>
+        <div class="dl-concept-title">แอปขึ้นได้ ไม่ได้แปลว่าต่อฐานข้อมูลได้</div>
+        <p>template ใช้ connection pool ซึ่งจะต่อ MySQL จริงตอนมี request แรก ถ้า MySQL ปิดอยู่ รหัสผ่านผิด หรือชื่อฐานข้อมูลผิด แอปยังขึ้นข้อความ listening ได้ปกติ และหน้าต่าง Run ก็ไม่พิมพ์ error อะไร (error middleware รับไปตอบเป็น JSON) error จะไปโผล่ใน response ของ Postman แทน จึงต้องทดสอบเรียก endpoint ทุกครั้งหลังรัน ถ้าอยากเห็น error เต็ม ๆ ให้รัน <code>test-repo.js</code> ซึ่งไม่มีตัวดัก</p>
+      </div>
+
+      <div class="dl-pitfall">
+        <div class="dl-pitfall-label">พลาดกันบ่อย</div>
+        <div class="dl-pitfall-title">แก้โค้ดแล้วไม่ Rerun</div>
+        <p>Node ไม่โหลดโค้ดใหม่ให้เอง แก้ไฟล์ไหนก็ตามต้องหยุดแล้วรันใหม่ทุกครั้ง กดปุ่ม Rerun ในหน้าต่าง Run หรือ <kbd class="dl-kbd">Ctrl</kbd>+<kbd class="dl-kbd">F5</kbd> (Windows) · <kbd class="dl-kbd">⌘</kbd><kbd class="dl-kbd">R</kbd> (macOS) ถ้าลืม จะนั่งงงว่าแก้แล้วทำไมผลเหมือนเดิม ถ้ากด Run 'app.js' ซ้ำตอนตัวเดิมยังรันอยู่ WebStorm จะถามแบบในรูป ให้กด <strong>Stop and Rerun</strong></p>
+      </div>
+      <figure class="dl-shot dl-shot--narrow">
+        <a href="img/18b-stop-and-rerun.png"><img src="img/18b-stop-and-rerun.png" alt="กล่องข้อความ Process 'app.js' Is Running ถามว่าจะหยุดตัวที่รันอยู่หรือไม่ มีปุ่ม Cancel และ Stop and Rerun" loading="lazy"></a>
+        <figcaption><b>Process 'app.js' Is Running</b> — กด <b>Stop and Rerun</b> เพื่อหยุดตัวเก่าแล้วรันโค้ดใหม่</figcaption>
+      </figure>
+
+      <div class="mistakes">
+        <div class="mistakes-title">⚠ ถ้าเจอแบบนี้</div>
+        <div class="mistake">
+          <div class="mistake-head">แอป Run ขึ้น listening ปกติ แต่ Postman ได้ 500 พร้อม <code>"error": "ECONNREFUSED"</code> และ <code>"message": ""</code></div>
+          <p>MySQL ไม่ได้เปิดทำงาน (แอปต่อ port 3306 ไม่ได้) ผลจริงคือ <code>{"status":500,"error":"ECONNREFUSED","message":"",...}</code> ช่อง message ว่างเพราะ mysql2 ลองต่อหลายที่อยู่แล้วล้มทั้งหมด เลยไม่มีข้อความสรุปให้ ให้เปิด MySQL Server ก่อน (Windows: Services → MySQL → Start · macOS: System Settings → MySQL → Start) แล้วส่ง request ใหม่ได้เลย ไม่ต้องรันแอปใหม่ เพราะ pool ต่อใหม่ให้เอง</p>
+        </div>
+        <div class="mistake">
+          <div class="mistake-head">500 <code>ER_ACCESS_DENIED_ERROR</code> · <code>Access denied for user 'root'@'localhost' (using password: YES)</code></div>
+          <p>รหัสผ่านใน <code>db-config.js</code> ผิด ให้ใช้รหัสเดียวกับที่ Test Connection ของ Data Source ผ่าน (เครื่องแล็บใช้รหัสที่อาจารย์แจ้งในคาบ) แก้แล้วอย่าลืม Rerun</p>
+        </div>
+        <div class="mistake">
+          <div class="mistake-head">500 <code>ER_BAD_DB_ERROR</code> · <code>Unknown database 'sakilla'</code></div>
+          <p>ชื่อฐานข้อมูลใน <code>db-config.js</code> สะกดผิด (ข้อความจะบอกชื่อที่เราพิมพ์ไว้) หรือเครื่องตัวเองยังไม่ได้ติดตั้ง sakila (กลับไปทำขั้นที่ 2)</p>
+        </div>
+        <div class="mistake">
+          <div class="mistake-head"><code>Unknown column 'id' in 'where clause'</code></div>
+          <p>ยังเหลือ <code>WHERE id = ?</code> ใน <code>country-repo.js</code> เปลี่ยนเป็น <code>WHERE country_id = ?</code> ให้ครบทั้ง 3 จุด (ขั้นที่ 5) คลิกลิงก์ใน stack trace จะพาไปบรรทัดที่พัง</p>
+        </div>
+        <div class="mistake">
+          <div class="mistake-head">กด Run แล้วขึ้น listening ปกติ แต่ Postman ยังได้ผลจากโค้ดเก่า</div>
+          <p>port 3000 ถูกแอปตัวเก่าที่รันค้างไว้ใช้อยู่ (เช่นรันจาก Terminal ไว้อีกตัว) กับดักคือ Express 5 ส่ง error <code>EADDRINUSE</code> เข้าไปใน callback ของ <code>app.listen</code> แต่ template ไม่ได้รับตัวแปร error ไว้ จึงยังพิมพ์ <code>Example app listening on port 3000</code> แล้วตัวใหม่ก็จบเงียบ ๆ (exit code 0) request ทั้งหมดยังไปที่ตัวเก่า ให้หยุดทุกตัวที่รันอยู่ (ปุ่มสี่เหลี่ยมแดง <kbd class="dl-kbd">Ctrl</kbd>+<kbd class="dl-kbd">F2</kbd> · <kbd class="dl-kbd">⌘</kbd><kbd class="dl-kbd">F2</kbd> และปิด Terminal ที่รัน <code>node</code> ค้างไว้) แล้วรันใหม่ครั้งเดียว</p>
+        </div>
+        <div class="mistake">
+          <div class="mistake-head">Test Connection ไม่ผ่าน หรือไม่มีปุ่ม Test Connection ให้กด</div>
+          <p>ยังไม่ได้ดาวน์โหลด driver ของ MySQL กดลิงก์ <strong>Download missing driver files</strong> ด้านล่างของหน้าต่าง Data Source ก่อน (ครั้งแรกครั้งเดียว)</p>
+        </div>
+        <div class="mistake">
+          <div class="mistake-head"><code>Cannot find module …/repositories/country-repo.js</code> หรือ import แล้วยังได้ข้อมูล subjects</div>
+          <p>คัดลอกไฟล์แล้วลืมแก้บรรทัด import ของชั้นถัดไป ไล่ดูให้ครบ: <code>country-service.js</code> ต้อง import <code>country-repo.js</code> · <code>country-route.js</code> ต้อง import <code>country-service.js</code> · <code>app.js</code> ต้อง import <code>country-route.js</code> และสะกดชื่อไฟล์ให้ตรง</p>
+        </div>
+        <div class="mistake">
+          <div class="mistake-head"><code>ERR_MODULE_NOT_FOUND: Cannot find package 'express'</code></div>
+          <p>ยังไม่ได้รัน <code>npm install</code> ในโฟลเดอร์โปรเจกต์ โปรเจกต์ที่สร้างจาก template จะไม่มี <code>node_modules</code> มาให้ (ดูบทที่ 1)</p>
+        </div>
+        <div class="mistake">
+          <div class="mistake-head">รันไฟล์ .sql แล้วขึ้น <code>Error: No configured target data sources</code></div>
+          <p>ยังไม่ได้เลือกว่าจะรันสคริปต์ที่ Data Source ไหน กด + ใต้ Target data source / schema แล้วเลือก <code>@localhost</code> (ขั้นที่ 2.2 ข้อ 4)</p>
+        </div>
+        <div class="mistake">
+          <div class="mistake-head">รันสคริปต์ครบแล้ว แต่หน้าต่าง Database ขึ้น <code>@localhost 0 of 5</code> ไม่เห็นตาราง</div>
+          <p>Data Source ยังไม่ได้บอกว่าจะแสดงฐานข้อมูลไหน กรอกช่อง Database = <code>sakila</code> ใน Properties ของ Data Source แล้วกด Refresh (ขั้นที่ 2.3)</p>
+        </div>
+      </div>
+
+      <div class="dl-flashcard" data-flashcard aria-live="polite">
+        <div class="dl-card-inner">
+          <div class="dl-card-face dl-card-front">
+            <span class="dl-card-fold" aria-hidden="true"></span>
+            <div class="dl-card-eyebrow">คำถาม 2</div>
+            <p class="dl-card-q"><code>GET /countries</code> ได้ข้อมูลครบ แต่ <code>GET /countries/1</code> ได้ 500 พร้อม <code>Unknown column 'id'</code> น่าจะลืมแก้อะไร?</p>
+            <div class="dl-card-choices">
+              <button class="dl-choice" data-correct="false"><span class="dl-choice-k">a.</span>ลืมแก้ password ใน db-config.js</button>
+              <button class="dl-choice" data-correct="true"><span class="dl-choice-k">b.</span>ลืมเปลี่ยน <code>WHERE id</code> เป็น <code>WHERE country_id</code></button>
+              <button class="dl-choice" data-correct="false"><span class="dl-choice-k">c.</span>ลืมผูก router ใน app.js</button>
+            </div>
+          </div>
+          <div class="dl-card-face dl-card-back">
+            <span class="dl-card-fold" aria-hidden="true"></span>
+            <span class="dl-card-stamp"></span>
+            <p class="dl-card-picked"></p>
+            <p class="dl-card-expl"
+               data-correct-text="ถูกต้อง — GET ทั้งหมดใช้ SQL ที่ไม่มี WHERE จึงผ่าน แต่ GET ทีละตัวใช้ FIND_ONE_SQL ที่ยังอ้างคอลัมน์ id"
+               data-wrong-text="ยังไม่ใช่ — ถ้ารหัสผ่านผิดหรือไม่ได้ผูก router จะใช้ไม่ได้ทั้งคู่ อาการใช้ได้แค่บางเส้นชี้ไปที่ SQL ที่ยังเป็น WHERE id"></p>
+            <button class="dl-card-retry" type="button">← ลองอีกครั้ง</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="dl-checkpoint">
+        <div class="dl-checkpoint-title"><span class="k">Checkpoint</span><span class="t">สรุปสั้น ๆ</span></div>
+        <ul>
+          <li>เครื่องแล็บมี sakila แล้ว · เครื่องตัวเองรัน <code>sakila-schema.sql</code> ก่อน <code>sakila-data.sql</code> เสมอ</li>
+          <li>ไม่แก้ <code>example-*</code> ตรง ๆ แต่คัดลอกเป็น <code>country-repo.js</code> / <code>country-service.js</code> / <code>country-route.js</code> แล้วแก้ import + ชื่อตาราง + <code>country_id</code></li>
+          <li>ทดสอบทีละชั้นด้วย <code>test-repo.js</code> → <code>test-service.js</code> ก่อนผูก <code>/countries</code> ใน app.js · เจอ error ให้อ่าน error ก่อน</li>
+        </ul>
+      </div>
+
+      <div class="self-check">
+        <div class="self-check-title">✓ Self-Check</div>
+        <label><input type="checkbox" data-key="int161-express-sakila:p2:1"> Data Source ใน WebStorm Test Connection ผ่าน</label>
+        <label><input type="checkbox" data-key="int161-express-sakila:p2:2"> เห็นฐานข้อมูล <code>sakila</code> และข้อมูลในตาราง <code>country</code></label>
+        <label><input type="checkbox" data-key="int161-express-sakila:p2:3"> มี <code>country-repo.js</code>, <code>country-service.js</code>, <code>country-route.js</code> และ <code>test-repo.js</code> / <code>test-service.js</code> รันผ่าน</label>
+        <label><input type="checkbox" data-key="int161-express-sakila:p2:4"> เปิด <code>http://localhost:3000/countries</code> แล้วเห็น JSON</label>
+      </div>
+
+      <nav class="dl-progress-footer" aria-label="ระหว่างบท">
+        <a class="dl-pf-prev" href="#part-1">← บทที่แล้ว</a>
+        <a class="dl-pf-next" href="#part-3">
+          <span class="dl-pf-eyebrow">บทถัดไป</span>
+          <span class="dl-pf-title">Error handling →</span>
+        </a>
+      </nav>
+    </article>
+
+    <!-- ============================================================
+         Part 03 · Error handling
+         ============================================================ -->
+    <article class="part" id="part-3">
+      <div class="dl-ghost" aria-hidden="true">3</div>
+      <div class="dl-stamp">บทที่ 03 <span class="sep">·</span> ~45 นาที <span class="sep">·</span> สำคัญ</div>
+      <h2 class="part-title">Error handling</h2>
+      <p class="part-lede">ทำตามลำดับเดียวกับในคาบ เริ่มจากดูว่าโปรแกรมที่ไม่ดัก error พังอย่างไร แล้วค่อยขยับไป try/catch, สร้าง error เอง, AppError และจบที่ error middleware ของ Express ที่ทำให้ API ตอบ error เป็น JSON</p>
+
+      <div class="objectives">
+        <div class="objectives-title">🎯 Learning Objectives</div>
+        <ul>
+          <li>อธิบาย error propagation และเหตุผลที่ดัก error ไว้จุดเดียว</li>
+          <li>ใช้ try/catch และอ่านค่า <code>message</code>, <code>code</code>, <code>stack</code> ของ Error object ได้</li>
+          <li>สร้าง custom error และ class <code>AppError</code> ที่มี <code>statusCode</code></li>
+          <li>อธิบายความต่างของ middleware ปกติกับ error middleware และทดลองให้เห็นผล HTML กับ JSON</li>
+        </ul>
+      </div>
+
+      <h3>3.1 Error propagation — ส่ง error ขึ้นไปดักจุดเดียว</h3>
+      <p>error เกิดได้ทุกชั้น เช่น router ได้ข้อมูลผิดรูปแบบ service เจอเงื่อนไขไม่ผ่าน หรือ repository หาข้อมูลไม่เจอ ถ้าไม่มีใครดัก error ไว้ในฟังก์ชันที่เกิด มันจะถูกส่งต่อขึ้นไปหาฟังก์ชันที่เรียก ขึ้นไปเรื่อย ๆ ตาม call stack เรียกว่า <strong>error propagation</strong></p>
+      <p>แทนที่จะเขียนดัก error ทีละชั้น (ซ้ำ ๆ และลืมง่าย) เราปล่อยให้ error ไหลขึ้นไปแล้วดักไว้ที่เดียวบนสุด ซึ่งใน Express ก็คือ error middleware ท้าย <code>app.js</code> (เส้นประในแผนภาพบทที่ 0)</p>
+      <p>ถ้าไหลขึ้นไปจนสุดแล้วยังไม่มีใครดักเลย Node.js จะหยุดโปรแกรมทันที (exit code 1) ถ้าเป็น server แปลว่า API ล่มทั้งตัว ทุกคนใช้ไม่ได้ ลองดูของจริงในหัวข้อถัดไป</p>
+
+      <hr class="dl-rule" />
+
+      <h3>3.2 ทดลอง: โปรแกรมที่ไม่ดัก error</h3>
+      <p>เปิดไฟล์ <code>src/test-exception-handling.js</code> ที่มีอยู่ใน template ไฟล์นี้เป็นเวอร์ชันสุดท้ายหลังจบคาบ เราจะไม่พิมพ์ใหม่ทั้งไฟล์ แต่จะใช้ comment เปิด-ปิดทีละส่วน (<kbd class="dl-kbd">Ctrl</kbd>+<kbd class="dl-kbd">/</kbd> · <kbd class="dl-kbd">⌘</kbd><kbd class="dl-kbd">/</kbd> สลับ comment บรรทัดที่เลือก) เพื่อดูผลไปทีละขั้นเหมือนในคาบ</p>
+      <p>ส่วนบนสุดของไฟล์คือ <code>class AppError</code> (ไว้ใช้ในข้อ 3.5 ข้ามไปก่อน) ถัดลงมาคือฟังก์ชัน 3 ตัวนี้</p>
+      <pre class="code-block"><span class="kw">import</span> fs <span class="kw">from</span> <span class="str">'node:fs'</span>
+
+<span class="kw">function</span> <span class="fn">main</span>(value=<span class="num">0</span>) {
+    console.<span class="fn">log</span>(<span class="fn">a</span>(value));
+}
+<span class="kw">function</span> <span class="fn">a</span>(value) {
+    <span class="kw">return</span> <span class="fn">b</span>(value);
+}
+<span class="kw">function</span> <span class="fn">b</span>(value) {
+    <span class="kw">if</span> (value &gt; <span class="num">0</span>) {
+        <span class="kw">return</span> ++value;
+    }
+    <span class="kw">const</span> data = fs.<span class="fn">readFileSync</span>(<span class="str">'test.txt'</span>);   <span class="comm">// ไม่มีไฟล์ test.txt → error</span>
+}</pre>
+      <p><code>main</code> เรียก <code>a</code> และ <code>a</code> เรียก <code>b</code> ถ้าค่าที่ส่งมามากกว่า 0 จะคืนค่าบวก 1 แต่ถ้าไม่ส่งค่า (<code>value</code> จะเป็น 0) จะไปอ่านไฟล์ <code>test.txt</code> ซึ่งไม่มีอยู่ในเครื่อง</p>
+      <p><strong>ขั้น A — ปิด try/catch แล้วเรียก <code>main()</code> ตรง ๆ</strong></p>
+      <ol>
+        <li>เลือกบรรทัดตั้งแต่ <code>try {</code> จนถึงวงเล็บปิด <code>}</code> ของ <code>catch</code> แล้วกด <kbd class="dl-kbd">Ctrl</kbd>+<kbd class="dl-kbd">/</kbd> · <kbd class="dl-kbd">⌘</kbd><kbd class="dl-kbd">/</kbd> ให้เป็น comment ทั้งก้อน</li>
+        <li>เอา comment หน้าบรรทัด <code>// main(); //without error handler</code> ออก ส่วนล่างของไฟล์จะหน้าตาแบบนี้</li>
+      </ol>
+      <pre class="code-block"><span class="fn">main</span>(); <span class="comm">//without error handler</span>
+<span class="comm">// try {</span>
+<span class="comm">//     main(1);</span>
+<span class="comm">//     ...</span>
+<span class="comm">// }</span>
+
+console.<span class="fn">log</span>(<span class="str">'Program was normal ended'</span>);</pre>
+      <ol start="3">
+        <li>คลิกขวาที่ไฟล์ → <strong>Run 'test-exception-handling.js'</strong></li>
+      </ol>
+      <div class="dl-out-label">ผลที่ได้จริง (path เป็นของเครื่องที่ใช้ทดสอบ)</div>
+      <pre class="code-block">node:fs:556
+  return binding.open(
+                 ^
+
+Error: ENOENT: no such file or directory, open 'test.txt'
+    at Object.openSync (node:fs:556:18)
+    at Object.readFileSync (node:fs:440:35)
+    at b (file:///Users/Shared/int161-lab/express-sakila/src/test-exception-handling.js:25:21)
+    at a (file:///Users/Shared/int161-lab/express-sakila/src/test-exception-handling.js:19:12)
+    at main (file:///Users/Shared/int161-lab/express-sakila/src/test-exception-handling.js:16:17)
+    at file:///Users/Shared/int161-lab/express-sakila/src/test-exception-handling.js:28:1
+    ... {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: 'test.txt'
+}
+
+Node.js v26.0.0
+
+Process finished with exit code 1</pre>
+      <figure class="dl-shot">
+        <a href="img/20-exc-uncaught.png"><img src="img/20-exc-uncaught.png" alt="หน้าต่าง Run ของ test-exception-handling.js แสดง Error ENOENT no such file or directory open test.txt พร้อม stack trace ผ่าน b a main และ Process finished with exit code 1" loading="lazy"></a>
+        <figcaption><b>ไม่ดัก error</b> — โปรแกรมหยุดทันที บรรทัด <code>Program was normal ended</code> ไม่ถูกพิมพ์ และจบด้วย exit code 1</figcaption>
+      </figure>
+      <p>สังเกต 3 อย่าง</p>
+      <ul>
+        <li>error เกิดที่ <code>b</code> แล้วไม่มีใครดัก โปรแกรมจึงตายตรงนั้น บรรทัด <code>Program was normal ended</code> ไม่ถูกทำ และจบด้วย <strong>exit code 1</strong> (ถ้าเป็น server = API ล่มทั้งตัว)</li>
+        <li>error พิมพ์ <strong>stack trace</strong> ออกมา อ่านจากบนลงล่างจะเห็นทางเดินของ error ย้อนกลับ <code>b</code> → <code>a</code> → <code>main</code> ตรงกับเรื่อง error propagation</li>
+        <li>stack trace มี path ไฟล์บนเครื่องติดมาด้วย ซึ่งเป็นข้อมูลภายใน <strong>ห้ามส่ง stack trace ให้ frontend หรือผู้ใช้เห็น</strong> เพราะเปิดเผยโครงสร้างเครื่องและโค้ด</li>
+      </ul>
+      <p>ลองเปลี่ยน <code>main();</code> เป็น <code>main(2);</code> แล้วรันดู จะได้ <code>3</code> ตามด้วย <code>Program was normal ended</code> และ exit code 0 เพราะไม่เข้าเงื่อนไขที่อ่านไฟล์ ดูเสร็จแล้วเปลี่ยนกลับ</p>
+
+      <hr class="dl-rule" />
+
+      <h3>3.3 ทดลอง: ดักด้วย try/catch</h3>
+      <p><strong>ขั้น B — เปิด try/catch แล้วพิมพ์ field ของ error</strong></p>
+      <ol>
+        <li>ใส่ comment กลับหน้าบรรทัด <code>main(); //without error handler</code></li>
+        <li>เลือกก้อน try/catch เดิมแล้วกดคีย์ลัดเดิมอีกครั้งเพื่อเอา comment ออก</li>
+        <li>ใน <code>catch</code> เอา comment ออกจาก 3 บรรทัด Message / Status / Code และใส่ comment ให้ 2 บรรทัดของ AppError ส่วนล่างของไฟล์จะเป็นแบบนี้</li>
+      </ol>
+      <pre class="code-block"><span class="comm">// main(); //without error handler</span>
+<span class="kw">try</span> {
+    <span class="fn">main</span>(<span class="num">1</span>);
+    console.<span class="fn">log</span>(<span class="str">'After main success'</span>);
+    console.<span class="fn">log</span>(<span class="str">'------------------'</span>);
+    <span class="fn">main</span>();
+    console.<span class="fn">log</span>(<span class="str">'After main error'</span>);    <span class="comm">// บรรทัดนี้จะไม่ถูกทำ</span>
+} <span class="kw">catch</span> (e) {
+    console.<span class="fn">log</span>(<span class="str">'Message: '</span>, e.message);
+    console.<span class="fn">log</span>(<span class="str">'Status: '</span>, e.status);
+    console.<span class="fn">log</span>(<span class="str">'Code: '</span>, e.code);
+    <span class="comm">// console.log('Stack Trace: ', e.stack);</span>
+    <span class="comm">// const err = new AppError(e.message, 404);</span>
+    <span class="comm">// console.log(err);</span>
+}
+
+console.<span class="fn">log</span>(<span class="str">'Program was normal ended'</span>);</pre>
+      <div class="dl-out-label">ผลที่ได้จริง</div>
+      <pre class="code-block">2
+After main success
+------------------
+Message:  ENOENT: no such file or directory, open 'test.txt'
+Status:  undefined
+Code:  ENOENT
+Program was normal ended
+
+Process finished with exit code 0</pre>
+      <figure class="dl-shot">
+        <a href="img/21-exc-trycatch.png"><img src="img/21-exc-trycatch.png" alt="หน้าต่าง Run แสดง 2 After main success เส้นประ Message ENOENT Status undefined Code ENOENT Program was normal ended และ exit code 0" loading="lazy"></a>
+        <figcaption><b>ดักด้วย try/catch</b> — error ถูกโยนมาที่ <code>catch</code> โปรแกรมทำต่อจนจบ และจบด้วย exit code 0</figcaption>
+      </figure>
+      <p>อ่านผลทีละบรรทัด</p>
+      <ul>
+        <li><code>main(1)</code> พิมพ์ <code>2</code> และ <code>After main success</code> ตามปกติ</li>
+        <li><code>main()</code> เกิด error → กระโดดข้ามไปที่ <code>catch</code> ทันที บรรทัด <code>After main error</code> จึง<strong>ไม่ถูกพิมพ์</strong></li>
+        <li><code>e.status</code> เป็น <code>undefined</code> เพราะ <code>status</code> ไม่ใช่ field มาตรฐานของ JavaScript ถ้าอยากได้ต้องตั้งเองทีหลัง</li>
+        <li><code>e.code</code> เป็น <code>ENOENT</code> (Error NO ENTry = ไม่มีไฟล์) Node.js ใส่มาให้</li>
+        <li>โปรแกรมไม่ตาย ทำต่อจนพิมพ์ <code>Program was normal ended</code> และจบด้วย exit code 0</li>
+      </ul>
+      <p>ลองเอา comment ออกจากบรรทัด <code>Stack Trace</code> แล้วรันดูว่า <code>e.stack</code> ยาวแค่ไหน ดูเสร็จแล้วใส่ comment กลับ ผลจะอ่านง่ายขึ้น</p>
+
+      <h4>Error object มี field อะไรบ้าง</h4>
+      <div class="table-wrap">
+        <table class="compare">
+          <thead><tr><th>field</th><th>ความหมาย</th><th>ตัวอย่าง</th></tr></thead>
+          <tbody>
+            <tr><td><code>message</code></td><td>ข้อความอธิบาย error ที่คนอ่านเข้าใจ</td><td><code>ENOENT: no such file or directory, open 'test.txt'</code></td></tr>
+            <tr><td><code>name</code></td><td>ชนิดของ error</td><td><code>Error</code>, <code>TypeError</code>, <code>ReferenceError</code></td></tr>
+            <tr><td><code>stack</code></td><td>stack trace บอกว่า error เกิดที่ไหน ผ่านฟังก์ชันอะไรมา (ใช้ debug เท่านั้น)</td><td><code>Error: ... at b (...)</code></td></tr>
+            <tr><td><code>code</code></td><td>รหัส error ของระบบ (Node.js / MySQL ใส่ให้)</td><td><code>ENOENT</code>, <code>ER_DUP_ENTRY</code></td></tr>
+            <tr><td><code>errno</code></td><td>หมายเลข error ของระบบ</td><td>ตัวเลขติดลบ ขึ้นกับระบบปฏิบัติการ</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <hr class="dl-rule" />
+
+      <h3>3.4 สร้าง error เอง (custom error)</h3>
+      <p>นอกจากรอให้ระบบโยน error มา เราสร้าง error เองด้วย <code>new Error('ข้อความ')</code> ได้ และเพราะ Error เป็น object ธรรมดาของ JavaScript เราจึงเพิ่ม field อย่าง <code>code</code> หรือ <code>status</code> เข้าไปเองได้ จากนั้นใช้ <code>throw</code> โยนต่อขึ้นไป</p>
+      <pre class="code-block"><span class="kw">const</span> err = <span class="kw">new</span> <span class="fn">Error</span>(<span class="str">'File data.txt not found'</span>);
+err.code = <span class="str">'FILE_NOT_FOUND'</span>;   <span class="comm">// เพิ่ม field เอง</span>
+err.status = <span class="num">404</span>;             <span class="comm">// เพิ่ม field เอง</span>
+<span class="kw">throw</span> err;</pre>
+      <p>template ใช้วิธีนี้อยู่แล้ว ดูใน <code>country-repo.js</code> (คัดลอกมาจาก <code>example-repo.js</code>) ฟังก์ชัน <code>findOne</code> ถ้าหาไม่เจอจะสร้าง error ที่มี <code>statusCode = 404</code> และ <code>code = "NOT FOUND"</code> แล้วโยนขึ้นไป</p>
+      <pre class="code-block"><span class="kw">if</span> (data.length === <span class="num">0</span>) {
+    <span class="kw">const</span> err = <span class="kw">new</span> <span class="fn">Error</span>(<span class="str">`${ENTITY_NAME} not found for id = ${id}`</span>)
+    err.statusCode = <span class="num">404</span>
+    err.code = <span class="str">"NOT FOUND"</span>
+    <span class="kw">throw</span> err
+}</pre>
+
+      <h3>3.5 class AppError — error ที่มีโครงเดียวกันทั้งโปรเจกต์</h3>
+      <p>ถ้าทุกคนในทีมสร้าง error เองคนละแบบ บางคนใช้ <code>status</code> บางคนใช้ <code>statusCode</code> ฝั่ง frontend จะอ่านยาก วิธีที่ดีกว่าคือสร้าง class ของเราเองที่สืบทอดจาก <code>Error</code> ทุก error ในโปรเจกต์จะมี field ชุดเดียวกัน ต่างกันแค่ข้อความกับ status code</p>
+      <p>class นี้อยู่ด้านบนสุดของ <code>test-exception-handling.js</code> แล้ว (ใต้บรรทัด <code>import</code>) ถ้าสร้างไฟล์เองให้พิมพ์เพิ่มตามนี้</p>
+      <pre class="code-block"><span class="kw">class</span> AppError <span class="kw">extends</span> Error {
+    errors = {<span class="num">404</span>: <span class="str">'NOT_FOUND'</span>, <span class="num">400</span>: <span class="str">'BAD REQUEST'</span>, <span class="num">409</span>: <span class="str">'CONFLICT'</span>,
+        <span class="num">500</span>: <span class="str">'INTERNAL SERVER ERROR'</span>, <span class="num">403</span>: <span class="str">'FORBIDDEN'</span>, <span class="num">401</span>: <span class="str">'UNAUTHORIZED'</span>}
+    <span class="fn">constructor</span>(message, statusCode) {
+        <span class="kw">super</span>(message);                        <span class="comm">// ส่ง message ให้ Error (คลาสแม่) เป็นคนเก็บ</span>
+        <span class="kw">this</span>.statusCode = statusCode;          <span class="comm">// เก็บ status code เช่น 404</span>
+        <span class="kw">this</span>.error = <span class="kw">this</span>.errors[statusCode];  <span class="comm">// แปลงเป็นชื่อ เช่น 404 → 'NOT_FOUND'</span>
+        <span class="kw">this</span>.isOperational = <span class="kw">true</span>;           <span class="comm">// เป็น error ที่คาดไว้แล้ว (ไม่ใช่ bug)</span>
+        Error.<span class="fn">captureStackTrace</span>(<span class="kw">this</span>, <span class="kw">this</span>.constructor);
+    }
+}</pre>
+      <ul>
+        <li><code>super(message)</code> — <code>message</code> เป็น field ของคลาสแม่ (<code>Error</code>) ต้องส่งผ่าน <code>super</code> ให้คลาสแม่ตั้งค่าเอง</li>
+        <li><code>errors</code> — ตารางแปลงเลข status เป็นชื่อที่อ่านเข้าใจ</li>
+        <li><code>isOperational</code> — ใช้แยก error ที่คาดไว้ (หาข้อมูลไม่เจอ ข้อมูลซ้ำ) ออกจาก bug ในโค้ด</li>
+        <li><code>Error.captureStackTrace(...)</code> — ให้ stack trace เริ่มจากจุดที่สร้าง AppError ไม่รวมบรรทัดภายใน constructor</li>
+      </ul>
+      <p><strong>ขั้น C</strong> — ใน <code>catch</code> ใส่ comment กลับให้ 3 บรรทัด Message / Status / Code แล้วเอา comment ออกจาก 2 บรรทัดของ AppError (ไฟล์จะกลับเป็นแบบเดียวกับใน template) แล้วรัน</p>
+      <pre class="code-block">} <span class="kw">catch</span> (e) {
+    <span class="comm">// console.log('Message: ', e.message);</span>
+    <span class="comm">// console.log('Status: ', e.status);</span>
+    <span class="comm">// console.log('Code: ', e.code);</span>
+    <span class="comm">// console.log('Stack Trace: ', e.stack);</span>
+    <span class="kw">const</span> err = <span class="kw">new</span> <span class="fn">AppError</span>(e.message, <span class="num">404</span>);
+    console.<span class="fn">log</span>(err);
+}</pre>
+      <div class="dl-out-label">ผลที่ได้จริง</div>
+      <pre class="code-block">2
+After main success
+------------------
+AppError: ENOENT: no such file or directory, open 'test.txt'
+    at file:///Users/Shared/int161-lab/express-sakila/src/test-exception-handling.js:40:17
+    ... {
+  errors: {
+    '400': 'BAD REQUEST',
+    '401': 'UNAUTHORIZED',
+    '403': 'FORBIDDEN',
+    '404': 'NOT_FOUND',
+    '409': 'CONFLICT',
+    '500': 'INTERNAL SERVER ERROR'
+  },
+  statusCode: 404,
+  error: 'NOT_FOUND',
+  isOperational: true
+}
+Program was normal ended
+
+Process finished with exit code 0</pre>
+      <figure class="dl-shot">
+        <a href="img/22-exc-apperror.png"><img src="img/22-exc-apperror.png" alt="หน้าต่าง Run แสดง AppError ENOENT พร้อม object ที่มี errors statusCode 404 error NOT_FOUND isOperational true และ Program was normal ended exit code 0" loading="lazy"></a>
+        <figcaption><b>AppError</b> — error มี <code>statusCode: 404</code> และ <code>error: 'NOT_FOUND'</code> ในรูปแบบเดียวกันทุกครั้ง</figcaption>
+      </figure>
+      <p>สังเกตว่า <code>errors</code> (ตารางแปลงรหัส) ติดมาใน object ด้วย เพราะประกาศเป็น field ของ class และ stack trace ของ AppError เริ่มที่บรรทัดที่สั่ง <code>new AppError(...)</code> ใน <code>catch</code> (ผลของ <code>captureStackTrace</code>) อีกจุดที่ควรรู้คือ error ของ repository ใน template ใช้ <code>code = "NOT FOUND"</code> (เว้นวรรค) ส่วน AppError ใช้ <code>'NOT_FOUND'</code> (ขีดล่าง) ทั้งสองแบบเป็นแค่ข้อความที่ทีมตกลงกันเอง ไม่มีแบบไหนผิด แต่ในโปรเจกต์เดียวกันควรใช้แบบเดียว</p>
+
+      <hr class="dl-rule" />
+
+      <h3>3.6 Middleware ของ Express</h3>
+      <p>middleware คือฟังก์ชันที่รับ <code>(req, res, next)</code> Express เรียกมันตามลำดับที่เขียน <code>app.use(...)</code> ไว้ เหมือนด่านตรวจที่ request ต้องผ่านทีละด่าน แต่ละด่านทำอย่างใดอย่างหนึ่ง</p>
+      <ul>
+        <li>เรียก <code>next()</code> — ส่ง request ต่อให้ด่านถัดไป</li>
+        <li>เรียก <code>res.json()</code> / <code>res.send()</code> / <code>res.end()</code> — ตอบกลับ client แล้วจบ ไม่ไปด่านถัดไป</li>
+      </ul>
+      <pre class="code-block"><span class="comm">// ด่านที่ 1 — พิมพ์ log ทุก request</span>
+app.<span class="fn">use</span>((req, res, next) =&gt; {
+    console.<span class="fn">log</span>(<span class="str">`${req.method} ${req.url}`</span>)
+    <span class="fn">next</span>()                      <span class="comm">// ส่งต่อด่านถัดไป ถ้าลืม request จะค้าง</span>
+})
+
+<span class="comm">// ด่านที่ 2 — แปลง body ที่เป็น JSON ให้เป็น req.body</span>
+app.<span class="fn">use</span>(express.<span class="fn">json</span>())
+
+<span class="comm">// ด่านที่ 3 — router ของเรา</span>
+app.<span class="fn">use</span>(<span class="str">'/countries'</span>, countryRouter)</pre>
+      <p>ลองเพิ่มด่านที่ 1 ไว้ใน <code>app.js</code> ต่อจาก <code>const app = express()</code> แล้ว Rerun ทุกครั้งที่เรียก API จะเห็นบรรทัดเช่น <code>GET /countries</code> ในหน้าต่าง Run</p>
+      <div class="dl-pitfall">
+        <div class="dl-pitfall-label">พลาดกันบ่อย</div>
+        <div class="dl-pitfall-title">ลำดับของ app.use มีผล</div>
+        <p><code>express.json()</code> ต้องมาก่อน router เสมอ ถ้าสลับกัน ตอน router ทำงาน body ยังไม่ถูกแปลง <code>req.body</code> จะเป็น <code>undefined</code> ส่วน error middleware ต้องอยู่หลังสุด (หัวข้อถัดไป)</p>
+      </div>
+
+      <h3>3.7 Error middleware — ฟังก์ชัน 4 พารามิเตอร์</h3>
+      <div class="dl-concept">
+        <div class="dl-concept-label">แนวคิด</div>
+        <div class="dl-concept-title">error middleware</div>
+        <p>middleware ที่รับ <strong>4 พารามิเตอร์</strong> <code>(err, req, res, next)</code> Express จะเรียกตัวนี้<strong>เฉพาะตอนมี error</strong> เท่านั้น และข้าม middleware / route ปกติที่เหลือทั้งหมดมาที่นี่ทันที ต้องวางไว้<strong>หลังสุด</strong> ต่อจาก route ทั้งหมด</p>
+      </div>
+      <p>Express แยกสองแบบจากจำนวนพารามิเตอร์ ถ้าเขียนแค่ 3 ตัว Express จะมองว่าเป็น middleware ปกติ ดูตัวที่อยู่ท้าย <code>app.js</code> ใน template</p>
+      <pre class="code-block">app.<span class="fn">use</span>((err, req, res, next) =&gt; {
+    <span class="comm">// error จาก MySQL เมื่อข้อมูลซ้ำ (unique / primary key) → แปลงเป็น 409</span>
+    <span class="kw">if</span> (err.code == <span class="str">"ER_DUP_ENTRY"</span>) {
+        err.statusCode = <span class="num">409</span>
+        err.code = <span class="str">"CONFLICT"</span>
+    }
+    <span class="comm">// ถ้า error ไม่ได้บอก statusCode มา ถือว่าเป็นความผิดพลาดฝั่ง server (500)</span>
+    <span class="kw">const</span> statusCode = err.statusCode || <span class="num">500</span>;
+    res.<span class="fn">status</span>(statusCode).<span class="fn">json</span>({
+        status: statusCode,
+        error: err.code || <span class="str">'Server Error'</span>,
+        message: err.message,
+        resource: req.originalUrl,              <span class="comm">// URL ที่ถูกเรียก</span>
+        timestamp: <span class="kw">new</span> <span class="fn">Date</span>().<span class="fn">toLocaleString</span>()
+    });                                         <span class="comm">// สังเกต: ไม่ส่ง err.stack ออกไป</span>
+})</pre>
+      <p>สังเกตว่าตัวนี้ส่งแค่ <code>message</code> กับ <code>code</code> <strong>ไม่ส่ง stack trace</strong> ให้ client ตามหลักข้อ 3.2 และใน template บรรทัด <code>app.listen(...)</code> อยู่ก่อน error middleware ก็ยังทำงานได้ เพราะ <code>app.use</code> ทั้งหมดลงทะเบียนเสร็จตั้งแต่ตอนเริ่มโปรแกรม ก่อนมี request แรกเข้ามา สิ่งที่สำคัญคือ error middleware ต้องอยู่<strong>หลัง route</strong></p>
+
+      <h4>ทำไม route ใน template ไม่มี try/catch</h4>
+      <p>route ใน <code>country-route.js</code> (คัดลอกจาก <code>example-route.js</code>) เป็น <code>async</code> function ที่ไม่มี try/catch เลย แต่ error จาก repository ก็ยังไปถึง error middleware ได้ เพราะ template ใช้ <strong>Express 5</strong> ซึ่งถ้า async route handler โยน error ออกมา (หรือ Promise ถูก reject) Express 5 จะส่ง error นั้นต่อให้ error middleware ให้เอง ใน Express 4 ต้องเขียนเองแบบแท็บที่สอง</p>
+      <div class="code-tabs" data-tabs>
+        <div class="code-tabs-bar">
+          <button class="code-tab active" data-tab="ex5">Express 5 (template)</button>
+          <button class="code-tab" data-tab="ex4">Express 4 (แบบเก่า)</button>
+        </div>
+        <pre class="code-panel active" data-panel="ex5">router.<span class="fn">get</span>(<span class="str">"/:id"</span>, <span class="kw">async</span> (req, res) =&gt; {
+    <span class="kw">const</span> id = req.params.id
+    <span class="kw">const</span> object = <span class="kw">await</span> service.<span class="fn">getObject</span>(id)   <span class="comm">// ถ้า throw → ไป error middleware เอง</span>
+    res.<span class="fn">json</span>(object)
+})</pre>
+        <pre class="code-panel" data-panel="ex4">router.<span class="fn">get</span>(<span class="str">"/:id"</span>, <span class="kw">async</span> (req, res, next) =&gt; {
+    <span class="kw">try</span> {
+        <span class="kw">const</span> object = <span class="kw">await</span> service.<span class="fn">getObject</span>(req.params.id)
+        res.<span class="fn">json</span>(object)
+    } <span class="kw">catch</span> (err) {
+        <span class="fn">next</span>(err)    <span class="comm">// ต้องส่ง error ให้ error middleware เอง</span>
+    }
+})</pre>
+      </div>
+      <p>การเรียก <code>next(err)</code> (ส่ง error เข้าไปใน <code>next</code>) คือวิธีบอก Express ตรง ๆ ว่า "มี error ข้ามไป error middleware เลย" ยังใช้ได้ใน Express 5 เช่นกัน (บทที่ 5 ใช้วิธีนี้ดัก path ที่ไม่มีอยู่)</p>
+
+      <hr class="dl-rule" />
+
+      <h3>3.8 ทดลอง: ปิด error middleware แล้วดูผลใน Postman</h3>
+      <p>ขั้นนี้ใช้ Postman ถ้ายังไม่เคยใช้ ข้ามไปอ่านบทที่ 4 ข้อ 4.1–4.2 ก่อนแล้วค่อยกลับมา</p>
+      <ol>
+        <li>ใน <code>app.js</code> เลือกบรรทัดทั้งหมดของ error middleware (ตั้งแต่ <code>app.use((err, req, res, next) =&gt; {</code> จนถึง <code>})</code> ตัวสุดท้าย) แล้วกด <kbd class="dl-kbd">Ctrl</kbd>+<kbd class="dl-kbd">/</kbd> · <kbd class="dl-kbd">⌘</kbd><kbd class="dl-kbd">/</kbd> เพื่อใส่ comment ทั้งก้อน</li>
+        <li>Rerun แอป</li>
+        <li>ใน Postman ส่ง <code>GET http://localhost:3000/countries/999</code> (ไม่มีประเทศ id 999)</li>
+      </ol>
+      <div class="dl-out-label">ผลที่ได้จริง — status 404 Not Found แต่ body เป็น HTML</div>
+      <pre class="code-block">&lt;!DOCTYPE html&gt;
+&lt;html lang="en"&gt;
+&lt;head&gt;
+&lt;meta charset="utf-8"&gt;
+&lt;title&gt;Error&lt;/title&gt;
+&lt;/head&gt;
+&lt;body&gt;
+&lt;pre&gt;Error: Country not found for id = 999&lt;br&gt; &amp;nbsp; &amp;nbsp;at Module.findOne (file:///Users/Shared/int161-lab/error-handler/src/repositories/country-repo.js:20:21)&lt;br&gt; &amp;nbsp; &amp;nbsp;at process.processTicksAndRejections (node:internal/process/task_queues:104:5)&lt;br&gt; &amp;nbsp; &amp;nbsp;at async Module.getObject (file:///Users/Shared/int161-lab/error-handler/src/services/country-service.js:4:12)&lt;br&gt; &amp;nbsp; &amp;nbsp;at async file:///Users/Shared/int161-lab/error-handler/src/routes/country-route.js:13:20&lt;/pre&gt;
+&lt;/body&gt;
+&lt;/html&gt;</pre>
+      <figure class="dl-shot">
+        <a href="img/23-postman-html-error.png"><img src="img/23-postman-html-error.png" alt="Postman เปิด request Get country by id ใน Collection INT161 Countries ส่ง GET localhost:3000/countries/999 ได้ 404 Not Found แต่ body เป็นหน้า HTML มี Error Country not found for id = 999 และ stack trace ผ่าน country-repo.js country-service.js พร้อม path ในเครื่อง" loading="lazy"></a>
+        <figcaption><b>ไม่มี error middleware</b> — Express ตอบเป็นหน้า HTML ของตัวเอง แถมมี stack trace และ path ไฟล์ในเครื่องติดไปด้วย ไล่ให้เห็นครบ 3 ชั้น repo → service → route</figcaption>
+      </figure>
+      <p>เมื่อไม่มี error middleware ของเรา Express จะใช้ตัวจัดการ error ของตัวเอง status ยังเป็น 404 ได้ (Express อ่านจาก <code>err.statusCode</code>) แต่ body เป็นหน้า HTML ซึ่งฝั่ง frontend เอาไปใช้ต่อยาก (ต้องการ JSON) และเพราะไม่ได้ตั้ง <code>NODE_ENV=production</code> จึงแนบ stack trace พร้อม path ไฟล์ในเครื่องออกไปด้วย นี่คือตัวอย่างจริงว่าทำไมห้ามปล่อยแบบนี้ไปถึงผู้ใช้ (หน้าต่าง Run ของ WebStorm ก็พิมพ์ stack trace เดียวกันไว้ด้วย)</p>
+      <ol start="4">
+        <li>เอา comment ออก (เลือกก้อนเดิมแล้วกดคีย์ลัดเดิมอีกครั้ง) → Rerun → ส่ง request เดิมอีกครั้ง</li>
+      </ol>
+      <div class="dl-out-label">ผลที่ได้จริง — status 404 Not Found</div>
+      <pre class="code-block">{
+    <span class="str">"status"</span>: <span class="num">404</span>,
+    <span class="str">"error"</span>: <span class="str">"NOT FOUND"</span>,
+    <span class="str">"message"</span>: <span class="str">"Country not found for id = 999"</span>,
+    <span class="str">"resource"</span>: <span class="str">"/countries/999"</span>,
+    <span class="str">"timestamp"</span>: <span class="str">"9/26/2026, 1:19:05 PM"</span>
+}</pre>
+      <figure class="dl-shot">
+        <a href="img/24-postman-json-404.png"><img src="img/24-postman-json-404.png" alt="Postman ส่ง GET localhost:3000/countries/999 ได้ Status 404 Not Found พร้อม JSON ที่มี status 404 error NOT FOUND message resource และ timestamp" loading="lazy"></a>
+        <figcaption><b>มี error middleware</b> — ได้ JSON และ status 404 ที่ frontend เอาไปใช้ต่อได้ทันที</figcaption>
+      </figure>
+      <p>รูปแบบ <code>timestamp</code> มาจาก <code>toLocaleString()</code> จึงขึ้นกับการตั้งค่าภาษาของเครื่อง เครื่องอื่นอาจแสดงเป็นแบบไทยหรือเรียงวันที่ต่างไปได้</p>
+      <p>error ตัวนี้เกิดใน repository (<code>findOne</code> หาไม่เจอ) แล้วไหลขึ้นผ่าน service และ router มาถึง error middleware ตามเส้นประในแผนภาพ โดยไม่มีชั้นไหนต้องเขียนดักเลย</p>
+
+      <hr class="dl-rule" />
+
+      <h3>3.9 ทดลอง: ข้อมูลซ้ำ → 409 Conflict</h3>
+      <p>ตาราง <code>country</code> ของ sakila ยังไม่ห้ามชื่อประเทศซ้ำ ถ้า POST ประเทศที่มีอยู่แล้ว ฐานข้อมูลก็ยอมเพิ่มให้ ขั้นนี้จะทำให้คอลัมน์ <code>country</code> เป็น <strong>unique key</strong> แล้วดูว่าเกิดอะไรขึ้นเมื่อเพิ่มซ้ำ</p>
+      <p>ถ้าลอง POST <code>{"country": "Thailand"}</code> ตอนนี้ (ก่อนตั้ง unique key) จะได้ 201 และมี Thailand เพิ่มเป็นแถวที่สอง ทั้งที่ sakila มี Thailand อยู่แล้ว (<code>country_id</code> 94) ถ้าเผลอลองไปแล้ว ให้ลบแถวที่เพิ่งเพิ่มก่อน ดูกล่อง "พลาดกันบ่อย" ด้านล่าง</p>
+      <ol>
+        <li>ในหน้าต่าง Database คลิกขวาที่ตาราง <code>country</code> → <strong>Modify Table…</strong> (<kbd class="dl-kbd">Ctrl</kbd>+<kbd class="dl-kbd">F6</kbd> · <kbd class="dl-kbd">⌘</kbd><kbd class="dl-kbd">F6</kbd>)</li>
+      </ol>
+      <figure class="dl-shot dl-shot--narrow">
+        <a href="img/25a-modify-table-menu.png"><img src="img/25a-modify-table-menu.png" alt="คลิกขวาที่ตาราง country ในหน้าต่าง Database เมนู Modify Table ถูกเลือก" loading="lazy"></a>
+        <figcaption><b>Modify Table…</b> — คลิกขวาที่ตาราง <code>country</code></figcaption>
+      </figure>
+      <ol start="2">
+        <li>แถบซ้ายเลือกคอลัมน์ <code>country</code> แล้วกดปุ่ม <strong>⋮</strong> (จุด 3 จุดแนวตั้ง) ข้างช่อง Name → <strong>Make Unique Key</strong></li>
+      </ol>
+      <figure class="dl-shot">
+        <a href="img/25-modify-table-unique.png"><img src="img/25-modify-table-unique.png" alt="หน้าต่าง Modify ของตาราง country เลือกคอลัมน์ country varchar(50) กดปุ่มจุดสามจุดข้างช่อง Name แล้วมีเมนู Make Unique Key" loading="lazy"></a>
+        <figcaption><b>ปุ่ม ⋮ → Make Unique Key</b> — ทำให้คอลัมน์ <code>country</code> ห้ามซ้ำ</figcaption>
+      </figure>
+      <ol start="3">
+        <li>ช่อง <strong>Preview</strong> ด้านล่างจะแสดง SQL ที่ WebStorm จะรันให้ WebStorm ตั้งชื่อ key ให้เองว่า <code>country_pk</code> ตรวจแล้วกด <strong>OK</strong></li>
+      </ol>
+      <figure class="dl-shot">
+        <a href="img/25b-unique-key-preview.png"><img src="img/25b-unique-key-preview.png" alt="หน้าต่าง Modify ใต้ keys มี country_pk (country) เพิ่มขึ้น ช่อง Preview แสดง alter table country add constraint country_pk unique (country)" loading="lazy"></a>
+        <figcaption><b>Preview SQL</b> — <code>alter table country add constraint country_pk unique (country);</code></figcaption>
+      </figure>
+      <details class="dl-answer">
+        <summary>ทางเลือก: ใช้ SQL แทนเมนู</summary>
+        <p>เปิด Query Console ของ <code>sakila@localhost</code> แล้วรันคำสั่งเดียวกับที่ Preview แสดง</p>
+        <pre class="code-block"><span class="kw">alter table</span> country
+    <span class="kw">add constraint</span> country_pk
+        <span class="kw">unique</span> (country);</pre>
+      </details>
+      <div class="dl-pitfall">
+        <div class="dl-pitfall-label">พลาดกันบ่อย</div>
+        <div class="dl-pitfall-title">เพิ่ม unique key ไม่ได้เพราะมีข้อมูลซ้ำอยู่แล้ว</div>
+        <p>ถ้าก่อนหน้านี้เคย POST ชื่อซ้ำเข้าไปแล้ว (เช่น Thailand 2 แถว) การตั้ง unique key จะล้มพร้อมข้อความ <code>ERROR 1062 (23000): Duplicate entry 'Thailand' for key 'country.country_pk'</code> ให้ลบแถวที่ซ้ำออกก่อน (แถวที่ <code>country_id</code> มากกว่า 109 เช่นส่ง <code>DELETE /countries/111</code>) แล้วทำใหม่</p>
+      </div>
+      <ol start="4">
+        <li>ใน Postman ส่ง <code>POST http://localhost:3000/countries</code> เลือก Body → raw → JSON แล้วใส่ชื่อประเทศที่มีอยู่แล้ว</li>
+      </ol>
+      <pre class="code-block">{
+    <span class="str">"country"</span>: <span class="str">"Thailand"</span>
+}</pre>
+      <div class="dl-out-label">ผลที่ได้จริง — status 409 Conflict</div>
+      <pre class="code-block">{
+    <span class="str">"status"</span>: <span class="num">409</span>,
+    <span class="str">"error"</span>: <span class="str">"CONFLICT"</span>,
+    <span class="str">"message"</span>: <span class="str">"Duplicate entry 'Thailand' for key 'country.country_pk'"</span>,
+    <span class="str">"resource"</span>: <span class="str">"/countries"</span>,
+    <span class="str">"timestamp"</span>: <span class="str">"9/26/2026, 1:26:55 PM"</span>
+}</pre>
+      <figure class="dl-shot">
+        <a href="img/26-postman-409.png"><img src="img/26-postman-409.png" alt="Postman ส่ง POST localhost:3000/countries body raw JSON country Thailand ได้ Status 409 Conflict พร้อม JSON error CONFLICT และ message Duplicate entry Thailand for key country.country_pk" loading="lazy"></a>
+        <figcaption><b>POST ชื่อซ้ำ</b> — MySQL ส่ง <code>ER_DUP_ENTRY</code> มา error middleware แปลงเป็น 409 CONFLICT</figcaption>
+      </figure>
+      <p>ลำดับเหตุการณ์คือ MySQL ปฏิเสธการ INSERT และส่ง error ที่มี <code>code = 'ER_DUP_ENTRY'</code> กลับมา error ไหลขึ้นจาก repository ถึง error middleware ซึ่งมี <code>if</code> ดักรหัสนี้ไว้ จึงเปลี่ยนเป็น <code>statusCode = 409</code> และ <code>code = "CONFLICT"</code> ก่อนตอบกลับ ถ้าไม่มี <code>if</code> นี้ จะได้ 500 ซึ่งผิดความหมาย เพราะความจริงคือ client ส่งข้อมูลซ้ำ ไม่ใช่ server พัง ชื่อ <code>country_pk</code> ในข้อความคือชื่อ key ที่ WebStorm ตั้งให้ตอน Make Unique Key</p>
+      <p>ลองส่ง <code>"thailand"</code> ตัวพิมพ์เล็กดูด้วย ก็ได้ 409 เหมือนกัน เพราะ collation ของตาราง (<code>utf8mb4_0900_ai_ci</code>) เปรียบเทียบแบบไม่สนตัวพิมพ์เล็ก-ใหญ่ อีกเรื่องที่อาจสังเกตเห็นคือ INSERT ที่ล้มเพราะซ้ำก็ใช้เลข auto increment ไปด้วย เลข <code>country_id</code> ของประเทศถัดไปจึงกระโดดข้าม (ตอนทดสอบจริง POST Thailand ที่ได้ 409 ใช้เลข 111 ไป POST ถัดไปได้ 112)</p>
+
+      <hr class="dl-rule" />
+
+      <h3>3.10 HTTP status code ที่ใช้บ่อย</h3>
+      <p>status code คือเลข 3 หลักที่บอก client ว่าผลเป็นอย่างไร กลุ่ม 2xx = สำเร็จ · 4xx = client ส่งมาผิด · 5xx = ฝั่ง server มีปัญหา การเลือกเลขให้ถูกช่วยให้ frontend รู้ว่าต้องทำอะไรต่อ</p>
+      <div class="table-wrap">
+        <table class="compare">
+          <thead><tr><th>code</th><th>ชื่อ</th><th>ใช้เมื่อ</th><th>ตัวอย่างเข้าใจง่าย</th></tr></thead>
+          <tbody>
+            <tr><td><span class="st st-ok">200</span></td><td>OK</td><td>สำเร็จ ส่งข้อมูลกลับ</td><td><code>GET /countries</code> ได้รายชื่อประเทศ</td></tr>
+            <tr><td><span class="st st-ok">201</span></td><td>Created</td><td>สร้างข้อมูลใหม่สำเร็จ</td><td><code>POST /countries</code> เพิ่มประเทศแล้ว</td></tr>
+            <tr><td><span class="st st-ok">204</span></td><td>No Content</td><td>สำเร็จ แต่ไม่มีเนื้อหาส่งกลับ</td><td><code>DELETE /countries/110</code> ลบแล้ว</td></tr>
+            <tr><td><span class="st st-4xx">400</span></td><td>Bad Request</td><td>ข้อมูลที่ client ส่งมาไม่ตรงสเปก</td><td>ต้องการตัวเลขแต่ส่งตัวอักษร หรือ body ขาด field ที่บังคับ</td></tr>
+            <tr><td><span class="st st-4xx">401</span></td><td>Unauthorized</td><td>ยังไม่ได้ยืนยันตัวตน</td><td>ไม่ได้ส่ง token ล็อกอินมา</td></tr>
+            <tr><td><span class="st st-4xx">403</span></td><td>Forbidden</td><td>รู้ว่าเป็นใคร แต่ไม่มีสิทธิ์</td><td>ล็อกอินแล้วแต่ไม่ใช่ admin จะลบข้อมูล</td></tr>
+            <tr><td><span class="st st-4xx">404</span></td><td>Not Found</td><td>หาสิ่งที่ขอไม่เจอ</td><td><code>GET /countries/999</code></td></tr>
+            <tr><td><span class="st st-4xx">409</span></td><td>Conflict</td><td>ขัดกับข้อมูลที่มีอยู่</td><td>เพิ่มประเทศไทยซ้ำ</td></tr>
+            <tr><td><span class="st st-4xx">412</span></td><td>Precondition Failed</td><td>เงื่อนไขใน header ที่บังคับไม่ผ่าน</td><td>ไม่ได้ส่ง header ที่ API กำหนดให้ต้องมี</td></tr>
+            <tr><td><span class="st st-5xx">500</span></td><td>Internal Server Error</td><td>server ผิดพลาดแบบไม่คาดคิด</td><td>bug ในโค้ด หรือ SQL ผิด</td></tr>
+            <tr><td><span class="st st-5xx">503</span></td><td>Service Unavailable</td><td>บริการใช้ไม่ได้ชั่วคราว</td><td>ฐานข้อมูลล่ม หรือปิดปรับปรุง</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="dl-flashcard" data-flashcard aria-live="polite">
+        <div class="dl-card-inner">
+          <div class="dl-card-face dl-card-front">
+            <span class="dl-card-fold" aria-hidden="true"></span>
+            <div class="dl-card-eyebrow">คำถาม 3</div>
+            <p class="dl-card-q">ถ้าย้าย error middleware ไปไว้<strong>ก่อน</strong> <code>app.use('/countries', countryRouter)</code> แล้วเรียก <code>GET /countries/999</code> จะได้อะไร?</p>
+            <div class="dl-card-choices">
+              <button class="dl-choice" data-correct="false"><span class="dl-choice-k">a.</span>JSON 404 เหมือนเดิม เพราะลำดับไม่มีผล</button>
+              <button class="dl-choice" data-correct="true"><span class="dl-choice-k">b.</span>หน้า HTML ของ Express เพราะ error เกิดหลังจากผ่าน error middleware ไปแล้ว</button>
+              <button class="dl-choice" data-correct="false"><span class="dl-choice-k">c.</span>แอปรันไม่ขึ้น</button>
+            </div>
+          </div>
+          <div class="dl-card-face dl-card-back">
+            <span class="dl-card-fold" aria-hidden="true"></span>
+            <span class="dl-card-stamp"></span>
+            <p class="dl-card-picked"></p>
+            <p class="dl-card-expl"
+               data-correct-text="ถูกต้อง — Express ส่ง error ไปหา error middleware ที่อยู่หลังจุดเกิด error เท่านั้น ถ้าวางไว้ก่อน router จะไม่มีตัวไหนรับ จึงตกไปที่หน้า HTML ของ Express"
+               data-wrong-text="ยังไม่ใช่ — ลำดับมีผล error middleware ต้องอยู่หลัง route ถ้าวางไว้ก่อน error จาก router จะไม่มีตัวรับ แล้วได้หน้า HTML ของ Express"></p>
+            <button class="dl-card-retry" type="button">← ลองอีกครั้ง</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="dl-checkpoint">
+        <div class="dl-checkpoint-title"><span class="k">Checkpoint</span><span class="t">สรุปสั้น ๆ</span></div>
+        <ul>
+          <li>error ที่ไม่มีใครดักจะทำให้ Node หยุดทั้งโปรแกรม (exit code 1)</li>
+          <li>Error object มี <code>message</code>, <code>name</code>, <code>stack</code> (+ <code>code</code> จาก Node/MySQL) เพิ่ม field เองได้</li>
+          <li>error middleware = 4 พารามิเตอร์ วางหลังสุด ตอบ JSON + status code และไม่ส่ง stack trace</li>
+          <li>Express 5 ส่ง error จาก async route ไป error middleware ให้เอง</li>
+        </ul>
+      </div>
+
+      <div class="self-check">
+        <div class="self-check-title">✓ Self-Check</div>
+        <label><input type="checkbox" data-key="int161-express-sakila:p3:1"> รัน test-exception-handling.js ครบ 3 ขั้น (ไม่ดัก / try-catch / AppError)</label>
+        <label><input type="checkbox" data-key="int161-express-sakila:p3:2"> เห็นความต่างระหว่างหน้า HTML กับ JSON เมื่อปิด-เปิด error middleware</label>
+        <label><input type="checkbox" data-key="int161-express-sakila:p3:3"> ทำ unique key แล้ว POST ชื่อซ้ำได้ 409</label>
+        <label><input type="checkbox" data-key="int161-express-sakila:p3:4"> บอกได้ว่า 400, 404, 409, 500 ต่างกันอย่างไร</label>
+      </div>
+
+      <nav class="dl-progress-footer" aria-label="ระหว่างบท">
+        <a class="dl-pf-prev" href="#part-2">← บทที่แล้ว</a>
+        <a class="dl-pf-next" href="#part-4">
+          <span class="dl-pf-eyebrow">บทถัดไป</span>
+          <span class="dl-pf-title">ทดสอบ API ด้วย Postman →</span>
+        </a>
+      </nav>
+    </article>
+
+    <!-- ============================================================
+         Part 04 · ทดสอบ API ด้วย Postman
+         ============================================================ -->
+    <article class="part" id="part-4">
+      <div class="dl-ghost" aria-hidden="true">4</div>
+      <div class="dl-stamp">บทที่ 04 <span class="sep">·</span> ~30 นาที <span class="sep">·</span> ลงมือ</div>
+      <h2 class="part-title">ทดสอบ API ด้วย Postman</h2>
+      <p class="part-lede">สร้าง Collection เก็บ request ทดสอบครบทั้ง 5 endpoint พร้อมกรณี error และอ่าน status code กับ response ให้เป็น</p>
+
+      <div class="objectives">
+        <div class="objectives-title">🎯 Learning Objectives</div>
+        <ul>
+          <li>สร้าง Collection และ request ใน Postman ได้ (ต้อง Sign in)</li>
+          <li>ส่ง body แบบ JSON ได้ถูกวิธี</li>
+          <li>ทดสอบ CRUD ครบ 5 เส้น และอ่าน status code ได้ว่าผ่านหรือไม่</li>
+        </ul>
+      </div>
+
+      <p>ก่อนเริ่มบทนี้ แอปต้องรันอยู่ (บทที่ 2 ขั้นที่ 8) และหน้าต่าง Run ต้องขึ้น <code>Example app listening on port 3000</code></p>
+
+      <h3>4.1 สร้าง Collection และ request แรก</h3>
+      <p><strong>Collection</strong> คือโฟลเดอร์เก็บ request ใน Postman เก็บไว้แล้วเปิดมากด Send ซ้ำได้ทุกครั้งที่แก้โค้ด ไม่ต้องพิมพ์ URL และ body ใหม่ <strong>ต้อง Sign in Postman ก่อน</strong> (สมัครบัญชีฟรี) ถ้าไม่ Sign in Postman จะเปิดเป็น Lightweight API Client ส่ง request ได้ครบทุก method เหมือนกัน แต่สร้างหรือบันทึก Collection ไม่ได้</p>
+      <ol>
+        <li>เปิด Postman แล้ว Sign in</li>
+        <li>กดปุ่ม <strong>+</strong> เหนือแถบซ้าย → เลือก <strong>Collection</strong> แล้วตั้งชื่อ <code>INT161 Countries</code></li>
+      </ol>
+      <figure class="dl-shot dl-shot--narrow">
+        <a href="img/30a-postman-new-menu.png"><img src="img/30a-postman-new-menu.png" alt="เมนูของปุ่มบวกใน Postman มีรายการ HTTP GraphQL AI MCP gRPC WebSocket และกลุ่มล่างมี Collection Environment Document" loading="lazy"></a>
+        <figcaption><b>ปุ่ม + → Collection</b> — เมนูนี้ใช้สร้างทั้ง request (HTTP) และ Collection</figcaption>
+      </figure>
+      <figure class="dl-shot dl-shot--narrow">
+        <a href="img/30-postman-new-request.png"><img src="img/30-postman-new-request.png" alt="แถบ Collections ของ Postman มี INT161 Countries ที่ยังว่าง ข้อความ Collection is empty พร้อมปุ่ม Add request และ Add folder" loading="lazy"></a>
+        <figcaption><b>Collection ใหม่</b> — ยังว่าง กด <b>Add request</b> เพื่อเพิ่ม request แรก</figcaption>
+      </figure>
+      <ol start="3">
+        <li>กด <strong>Add request</strong> ใต้ชื่อ Collection (หรือคลิกขวาที่ชื่อ Collection → <strong>Add request</strong>) จะได้แท็บ request ใหม่</li>
+        <li>ตั้งชื่อ request ที่ breadcrumb ด้านบน (<code>INT161 Countries › ชื่อ request</code>) เช่น <code>Get all countries</code> แล้วใส่ method กับ URL ตามข้อถัดไป</li>
+        <li>ส่งผ่านแล้วกด <strong>Save</strong> (<kbd class="dl-kbd">Ctrl</kbd>+<kbd class="dl-kbd">S</kbd> · <kbd class="dl-kbd">⌘</kbd><kbd class="dl-kbd">S</kbd>) ถ้ายังไม่ Save แท็บจะมีจุดสีส้ม และแถบซ้ายยังแสดง method เดิม (GET)</li>
+      </ol>
+      <p>หน้าจอ request มีส่วนที่ต้องใช้ 4 จุด ได้แก่ ช่อง <strong>method</strong> (GET, POST, PUT, DELETE) ช่อง <strong>URL</strong> แท็บ <strong>Body</strong> (ใช้กับ POST, PUT) และปุ่ม <strong>Send</strong> (<kbd class="dl-kbd">Ctrl</kbd>+<kbd class="dl-kbd">Enter</kbd> · <kbd class="dl-kbd">⌘</kbd><kbd class="dl-kbd">↩</kbd>) ผลลัพธ์ขึ้นครึ่งล่าง ด้านขวาของแถบผลลัพธ์บอก <strong>Status</strong> เวลา และขนาด ช่อง URL จะพิมพ์ <code>http://localhost:3000/...</code> หรือ <code>localhost:3000/...</code> เฉย ๆ ก็ได้</p>
+
+      <h3>4.2 GET — ดูทุกประเทศ</h3>
+      <ol>
+        <li>method = <code>GET</code> · URL = <code>localhost:3000/countries</code></li>
+        <li>กด <strong>Send</strong></li>
+      </ol>
+      <div class="dl-out-label">ผลที่ได้จริง — status 200 OK (แสดงแค่ต้น ๆ จากทั้งหมด 109 รายการ)</div>
+      <pre class="code-block">[
+    {
+        <span class="str">"country_id"</span>: <span class="num">1</span>,
+        <span class="str">"country"</span>: <span class="str">"Afghanistan"</span>,
+        <span class="str">"last_update"</span>: <span class="str">"2006-02-14T21:44:00.000Z"</span>
+    },
+    {
+        <span class="str">"country_id"</span>: <span class="num">2</span>,
+        <span class="str">"country"</span>: <span class="str">"Algeria"</span>,
+        <span class="str">"last_update"</span>: <span class="str">"2006-02-14T21:44:00.000Z"</span>
+    },
+    ...
+    {
+        <span class="str">"country_id"</span>: <span class="num">109</span>,
+        <span class="str">"country"</span>: <span class="str">"Zambia"</span>,
+        <span class="str">"last_update"</span>: <span class="str">"2006-02-14T21:44:00.000Z"</span>
+    }
+]</pre>
+      <figure class="dl-shot">
+        <a href="img/31-postman-get-all.png"><img src="img/31-postman-get-all.png" alt="Postman ส่ง GET localhost:3000/countries ได้ Status 200 OK ขนาด 8.85 KB และ JSON array เริ่มที่ Afghanistan กับ Algeria" loading="lazy"></a>
+        <figcaption><b>GET /countries</b> — ได้ 200 OK พร้อม array ของประเทศทั้งหมด</figcaption>
+      </figure>
+      <aside class="dl-margin-note">
+        <div class="dl-margin-note-label">จดไว้ตรงนี้</div>
+        ในฐานข้อมูล <code>last_update</code> คือ <code>2006-02-15 04:44:00</code> แต่ใน JSON ขึ้น <code>2006-02-14T21:44:00.000Z</code> ห่างกัน 7 ชั่วโมง เพราะ mysql2 ตีความเวลาเป็นเวลาไทยแล้วแปลงเป็น UTC ไม่กระทบงานในเล่มนี้
+      </aside>
+
+      <h3>4.3 GET — ดูประเทศเดียว</h3>
+      <ol>
+        <li>เปิดแท็บ request ใหม่ method = <code>GET</code> · URL = <code>localhost:3000/countries/1</code> แล้ว Send</li>
+        <li>ลองเปลี่ยนเป็น <code>/countries/999</code> จะได้ 404 แบบในบทที่ 3 (ส่ง <code>/countries/abc</code> ก็ได้ 404 เช่นกัน เพราะ template ไม่ได้ตรวจว่า id เป็นตัวเลข)</li>
+      </ol>
+      <div class="dl-out-label">ผลที่ได้จริง — status 200 OK</div>
+      <pre class="code-block">{
+    <span class="str">"country_id"</span>: <span class="num">1</span>,
+    <span class="str">"country"</span>: <span class="str">"Afghanistan"</span>,
+    <span class="str">"last_update"</span>: <span class="str">"2006-02-14T21:44:00.000Z"</span>
+}</pre>
+      <figure class="dl-shot">
+        <a href="img/32-postman-get-one.png"><img src="img/32-postman-get-one.png" alt="Postman ส่ง GET localhost:3000/countries/1 ได้ Status 200 OK และ JSON object ของ Afghanistan" loading="lazy"></a>
+        <figcaption><b>GET /countries/1</b> — ได้ object เดียว ไม่ใช่ array</figcaption>
+      </figure>
+
+      <h3>4.4 POST — เพิ่มประเทศ</h3>
+      <ol>
+        <li>เปิดแท็บใหม่ method = <code>POST</code> · URL = <code>localhost:3000/countries</code></li>
+        <li>ไปที่แท็บ <strong>Body</strong> → เลือก <strong>raw</strong> แล้วดู dropdown ด้านขวา ถ้า Sign in แล้วมักตั้งเป็น <strong>JSON</strong> ให้เลย แต่ถ้าไม่ได้ Sign in (โหมด Lightweight) ค่าเริ่มต้นเป็น <strong>Text</strong> ต้องตรวจทุกครั้ง</li>
+      </ol>
+      <figure class="dl-shot">
+        <a href="img/33a-postman-raw-text-default.png"><img src="img/33a-postman-raw-text-default.png" alt="Postman แท็บ Body เลือก raw แล้ว dropdown ด้านขวาเป็น Text ซึ่งเป็นค่าเริ่มต้น" loading="lazy"></a>
+        <figcaption><b>raw เป็น Text</b> (ค่าเริ่มต้นตอนไม่ได้ Sign in) — ถ้าส่งแบบนี้จะได้ 500</figcaption>
+      </figure>
+      <ol start="3">
+        <li>ถ้ายังเป็น <strong>Text</strong> ให้กด dropdown แล้วเปลี่ยนเป็น <strong>JSON</strong></li>
+      </ol>
+      <figure class="dl-shot">
+        <a href="img/33b-postman-choose-json.png"><img src="img/33b-postman-choose-json.png" alt="กด dropdown Text แล้วมีรายการ Text JavaScript JSON HTML XML ให้เลือก" loading="lazy"></a>
+        <figcaption><b>เลือก JSON</b> — Postman จะส่ง header <code>Content-Type: application/json</code> ให้เอง</figcaption>
+      </figure>
+      <ol start="4">
+        <li>พิมพ์ body แล้ว Send</li>
+      </ol>
+      <pre class="code-block">{
+    <span class="str">"country"</span>: <span class="str">"Wakanda"</span>
+}</pre>
+      <div class="dl-out-label">ผลที่ได้จริง — status 201 Created</div>
+      <pre class="code-block">{
+    <span class="str">"result"</span>: {
+        <span class="str">"country_id"</span>: <span class="num">110</span>,
+        <span class="str">"country"</span>: <span class="str">"Wakanda"</span>,
+        <span class="str">"last_update"</span>: <span class="str">"2026-09-25T23:20:47.000Z"</span>
+    }
+}</pre>
+      <figure class="dl-shot">
+        <a href="img/33-postman-post-body.png"><img src="img/33-postman-post-body.png" alt="Postman ส่ง POST localhost:3000/countries body raw JSON country Wakanda ได้ Status 201 Created และ JSON result ที่มี country_id 110" loading="lazy"></a>
+        <figcaption><b>POST /countries</b> — Body → raw → JSON แล้วได้ 201 Created พร้อมข้อมูลที่เพิ่ง insert</figcaption>
+      </figure>
+      <p>ไม่ต้องส่ง <code>country_id</code> กับ <code>last_update</code> เพราะฐานข้อมูลใส่ให้เอง <strong>จด <code>country_id</code> ที่ได้ไว้</strong> ใช้ต่อในข้อ PUT และ DELETE (sakila ที่เพิ่งติดตั้งจะได้ 110 ถ้าเคยเพิ่ม/ลบมาก่อนจะได้เลขอื่น ให้ใช้เลขของตัวเอง) สังเกตว่า POST ตอบกลับเป็น <code>{"result": {...}}</code> ไม่ใช่ object ตรง ๆ แบบ GET/PUT เพราะใน router เขียนว่า <code>res.status(201).json({result})</code></p>
+
+      <h3>4.5 PUT — แก้ประเทศ</h3>
+      <ol>
+        <li>เปิดแท็บใหม่ method = <code>PUT</code> · URL = <code>localhost:3000/countries/110</code></li>
+        <li>Body → raw → <strong>JSON</strong> ใส่ข้อมูลใหม่ แล้ว Send</li>
+      </ol>
+      <pre class="code-block">{
+    <span class="str">"country"</span>: <span class="str">"Wakanda Forever"</span>
+}</pre>
+      <div class="dl-out-label">ผลที่ได้จริง — status 200 OK</div>
+      <pre class="code-block">{
+    <span class="str">"country_id"</span>: <span class="num">110</span>,
+    <span class="str">"country"</span>: <span class="str">"Wakanda Forever"</span>,
+    <span class="str">"last_update"</span>: <span class="str">"2026-09-25T23:21:24.000Z"</span>
+}</pre>
+      <figure class="dl-shot">
+        <a href="img/34-postman-put.png"><img src="img/34-postman-put.png" alt="Postman ส่ง PUT localhost:3000/countries/110 body JSON country Wakanda Forever ได้ Status 200 OK และข้อมูลหลังแก้" loading="lazy"></a>
+        <figcaption><b>PUT /countries/110</b> — ได้ข้อมูลหลังแก้กลับมา <code>last_update</code> เปลี่ยนเป็นเวลาที่แก้</figcaption>
+      </figure>
+      <p>repository ของ template เรียก <code>findOne</code> ก่อนแก้ ถ้า id ไม่มีอยู่จะได้ 404 และหลังแก้เสร็จจะเรียก <code>findOne</code> อีกครั้งเพื่อส่งข้อมูลล่าสุดกลับมา</p>
+
+      <h3>4.6 DELETE — ลบประเทศ</h3>
+      <ol>
+        <li>เปิดแท็บใหม่ method = <code>DELETE</code> · URL = <code>localhost:3000/countries/110</code> แท็บ Body เลือก <strong>none</strong> แล้ว Send (ถ้าเปลี่ยน method จากแท็บเดิม Postman จะจำ body เก่าไว้ ไม่กระทบผล แต่เลือก none ให้เรียบร้อยดีกว่า)</li>
+        <li>ได้ <strong>204 No Content</strong> ส่วน Body ว่าง ถือว่าถูกต้อง</li>
+        <li>ส่ง <code>GET /countries/110</code> อีกครั้ง ต้องได้ 404 แปลว่าลบจริงแล้ว (ส่ง DELETE ซ้ำก็ได้ 404 เช่นกัน)</li>
+      </ol>
+      <figure class="dl-shot">
+        <a href="img/35-postman-delete.png"><img src="img/35-postman-delete.png" alt="Postman ส่ง DELETE localhost:3000/countries/110 Body เป็น none ได้ Status 204 No Content และ body ว่าง" loading="lazy"></a>
+        <figcaption><b>DELETE /countries/110</b> — 204 No Content ไม่มี body ส่งกลับ</figcaption>
+      </figure>
+
+      <div class="dl-pitfall">
+        <div class="dl-pitfall-label">พลาดกันบ่อย</div>
+        <div class="dl-pitfall-title">ลบประเทศเดิมของ sakila แล้วได้ 500</div>
+        <p>ถ้าลองลบ <code>/countries/1</code> จะได้ 500 เพราะตาราง <code>city</code> ยังมีเมืองที่อ้างถึงประเทศนี้ด้วย foreign key (<code>ON DELETE RESTRICT</code>) MySQL จึงไม่ยอมให้ลบ ประเทศเดิมทั้ง 109 ประเทศมีเมืองผูกอยู่ทุกประเทศ error middleware ของ template ยังไม่ได้แปลงรหัสนี้ จึงตกไปเป็น 500 ให้ทดลองลบเฉพาะประเทศที่เพิ่มเอง</p>
+      </div>
+      <div class="dl-out-label">ผลที่ได้จริงของ DELETE /countries/1 — status 500</div>
+      <pre class="code-block">{
+    <span class="str">"status"</span>: <span class="num">500</span>,
+    <span class="str">"error"</span>: <span class="str">"ER_ROW_IS_REFERENCED_2"</span>,
+    <span class="str">"message"</span>: <span class="str">"Cannot delete or update a parent row: a foreign key constraint fails (`sakila`.`city`, CONSTRAINT `fk_city_country` FOREIGN KEY (`country_id`) REFERENCES `country` (`country_id`) ON DELETE RESTRICT ON UPDATE CASCADE)"</span>,
+    <span class="str">"resource"</span>: <span class="str">"/countries/1"</span>,
+    <span class="str">"timestamp"</span>: <span class="str">"9/26/2026, 12:34:56 PM"</span>
+}</pre>
+
+      <h3>4.7 บันทึก request ลง Collection</h3>
+      <p>request ที่สร้างจาก Add request อยู่ใน Collection อยู่แล้ว แก้แล้วกด <strong>Save</strong> มุมขวาบน (<kbd class="dl-kbd">Ctrl</kbd>+<kbd class="dl-kbd">S</kbd> · <kbd class="dl-kbd">⌘</kbd><kbd class="dl-kbd">S</kbd>) ได้เลย ถ้าเปิดเป็นแท็บใหม่ลอย ๆ (หรือเลือก <strong>Save as</strong>) จะมีหน้าต่าง <strong>SAVE REQUEST</strong> ให้ตั้งชื่อ request และเลือก <strong>Save to</strong> = <code>INT161 Countries</code> ทำให้ครบทั้ง 5 เส้น (ใส่กรณี error เพิ่มก็ได้) ระวังอย่าใช้ Save as กับ request ที่อยู่ใน Collection แล้ว จะได้ request ซ้ำ</p>
+      <figure class="dl-shot dl-shot--narrow">
+        <a href="img/37-postman-save-request.png"><img src="img/37-postman-save-request.png" alt="หน้าต่าง SAVE REQUEST ของ Postman ช่อง Request name เป็น Create country ช่อง Save to เป็น INT161 Countries ซึ่งมี Get all countries และ Get country by id อยู่แล้ว" loading="lazy"></a>
+        <figcaption><b>SAVE REQUEST</b> — ตั้งชื่อ request แล้วเลือก Save to = <code>INT161 Countries</code></figcaption>
+      </figure>
+      <figure class="dl-shot dl-shot--narrow">
+        <a href="img/36-postman-collection.png"><img src="img/36-postman-collection.png" alt="แถบ Collections ของ Postman แสดง INT161 Countries ที่มี GET Get all countries, GET Get country by id, POST Create country, PUT Update country และ DEL Delete country" loading="lazy"></a>
+        <figcaption><b>Collection ที่ครบแล้ว</b> — มี request ครบ 5 เส้นของ resource country</figcaption>
+      </figure>
+      <p>ครั้งต่อไปที่แก้โค้ด คลิกชื่อ request ในแถบซ้ายแล้วกด Send ได้ทันที URL และ body ที่บันทึกไว้ยังอยู่ครบ</p>
+      <figure class="dl-shot">
+        <a href="img/36b-postman-collection-request.png"><img src="img/36b-postman-collection-request.png" alt="Postman เปิด request Create country จาก Collection INT161 Countries ส่ง POST localhost:3000/countries body JSON country Wakanda ได้ 201 Created และ country_id 112" loading="lazy"></a>
+        <figcaption><b>ส่งซ้ำจาก Collection</b> — เปิด <b>Create country</b> แล้วกด Send ได้ 201 Created (id เป็น 112 ไม่ใช่ 111 เพราะเลข 111 ถูกใช้ไปตอน POST Thailand ที่ล้มด้วย 409)</figcaption>
+      </figure>
+      <p>ถ้าไม่ได้ Sign in จะบันทึกลง Collection ไม่ได้ ให้ใช้ตารางสรุปด้านล่างเป็น checklist แล้วพิมพ์ส่งใหม่แทน</p>
+
+      <h3>ตารางสรุปการทดสอบ</h3>
+      <p>ผลทุกแถวในตารางนี้ได้จากการรันจริงกับโปรเจกต์ในเล่ม</p>
+      <div class="table-wrap">
+        <table class="compare">
+          <thead><tr><th>#</th><th>Method + URL</th><th>Body (raw JSON)</th><th>ควรได้</th></tr></thead>
+          <tbody>
+            <tr><td>1</td><td><code>GET /countries</code></td><td>—</td><td><span class="st st-ok">200</span> array 109 ประเทศ</td></tr>
+            <tr><td>2</td><td><code>GET /countries/1</code></td><td>—</td><td><span class="st st-ok">200</span> Afghanistan</td></tr>
+            <tr><td>3</td><td><code>GET /countries/999</code></td><td>—</td><td><span class="st st-4xx">404</span> JSON NOT FOUND</td></tr>
+            <tr><td>4</td><td><code>POST /countries</code></td><td><code>{"country": "Wakanda"}</code></td><td><span class="st st-ok">201</span> <code>{"result": {...}}</code></td></tr>
+            <tr><td>5</td><td><code>POST /countries</code></td><td><code>{"country": "Thailand"}</code> (หลังทำ unique key)</td><td><span class="st st-4xx">409</span> CONFLICT</td></tr>
+            <tr><td>6</td><td><code>PUT /countries/110</code></td><td><code>{"country": "Wakanda Forever"}</code></td><td><span class="st st-ok">200</span> ข้อมูลหลังแก้</td></tr>
+            <tr><td>7</td><td><code>PUT /countries/999</code></td><td><code>{"country": "X"}</code></td><td><span class="st st-4xx">404</span> NOT FOUND</td></tr>
+            <tr><td>8</td><td><code>DELETE /countries/110</code></td><td>—</td><td><span class="st st-ok">204</span> ไม่มี body</td></tr>
+            <tr><td>9</td><td><code>DELETE /countries/110</code> (ซ้ำ)</td><td>—</td><td><span class="st st-4xx">404</span> NOT FOUND</td></tr>
+            <tr><td>10</td><td><code>DELETE /countries/1</code></td><td>—</td><td><span class="st st-5xx">500</span> ER_ROW_IS_REFERENCED_2</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="mistakes">
+        <div class="mistakes-title">⚠ ถ้าเจอแบบนี้</div>
+        <div class="mistake">
+          <div class="mistake-head">POST / PUT แล้วได้ 500 <code>ER_PARSE_ERROR</code> "You have an error in your SQL syntax"</div>
+          <p>เกือบทุกครั้งเป็นเพราะ Body → raw ยังเป็น <strong>Text</strong> (ค่าเริ่มต้น) ไม่ใช่ <strong>JSON</strong> Postman จึงไม่ส่ง header <code>Content-Type: application/json</code> <code>express.json()</code> ไม่แปลง body ให้ <code>req.body</code> เป็น <code>undefined</code> แล้ว SQL ที่สร้างออกมากลายเป็น <code>INSERT INTO country SET NULL</code> ส่ง body ว่าง <code>{}</code> ก็ได้ error เดียวกัน ให้เปลี่ยน dropdown เป็น JSON แล้วใส่ field ให้ครบ</p>
+        </div>
+        <div class="mistake">
+          <div class="mistake-head">ได้หน้า HTML <code>Cannot GET /country</code> ทั้งที่มี error middleware แล้ว</div>
+          <p>URL ไม่ตรงกับ route ไหนเลย (เช่นพิมพ์ <code>/country</code> ขาด s หรือ PUT ไปที่ <code>/countries</code> โดยไม่มี id) กรณีนี้ไม่ใช่ error ในโค้ด แต่เป็น "ไม่มี route นี้" Express จึงตอบ 404 แบบ HTML ของตัวเอง error middleware ไม่ได้ทำงาน (ถ้าอยากให้เป็น JSON ต้องเขียน middleware จัดการ 404 แยกอีกตัว) ให้ตรวจ method กับ URL</p>
+        </div>
+        <div class="mistake">
+          <div class="mistake-head">POST แล้วได้ 404 ทั้งที่ body ถูก</div>
+          <p>ดู URL ให้ดี ในคาบเคยเจอกรณีใช้แท็บเก่าที่ยังเป็น <code>/subjects</code> อยู่ จึงได้ 404 เพราะไม่มี route นั้น แก้ URL เป็น <code>/countries</code> แล้วส่งใหม่ได้ 201</p>
+        </div>
+        <figure class="dl-shot">
+          <a href="img/lab-postman-post-wrong-path.png"><img src="img/lab-postman-post-wrong-path.png" alt="Postman บนเครื่องแล็บ ส่ง POST ไปที่ http://localhost:3000/subjects พร้อม body JSON country Thailand Express แล้วได้ 404 Not Found" loading="lazy"></a>
+          <figcaption><b>POST ผิด path</b> — URL ยังเป็น <code>/subjects</code> จากแท็บเก่า จึงได้ 404 (ภาพจากเครื่องแล็บ)</figcaption>
+        </figure>
+        <div class="mistake">
+          <div class="mistake-head">เพิ่ม resource ใหม่แล้วได้ <code>Cannot GET /actors</code></div>
+          <p>แก้ <code>app.js</code> แล้วแต่ server ตัวเก่ายังรันอยู่ (โค้ดเก่ายังไม่มี route <code>/actors</code>) ให้หยุดตัวเก่า (ปุ่มสี่เหลี่ยมแดง หรือ <kbd class="dl-kbd">Ctrl</kbd>+<kbd class="dl-kbd">C</kbd> ใน Terminal ที่รันไว้) แล้วรันใหม่ ในคาบก็เจอกรณีนี้</p>
+        </div>
+        <figure class="dl-shot">
+          <a href="img/lab-postman-cannot-get-actors.png"><img src="img/lab-postman-cannot-get-actors.png" alt="Postman บนเครื่องแล็บ ส่ง GET http://localhost:3000/actors ได้ 404 Not Found และ body HTML ที่มี Cannot GET /actors" loading="lazy"></a>
+          <figcaption><b>Cannot GET /actors</b> — server ตัวเก่ายังรันอยู่ หยุดแล้วรันใหม่ก็หาย (ภาพจากเครื่องแล็บ)</figcaption>
+        </figure>
+        <div class="mistake">
+          <div class="mistake-head"><code>Unknown column 'name' in 'field list'</code></div>
+          <p>ใน body ใช้ชื่อ field ที่ไม่มีในตาราง template ส่ง body ทั้งก้อนเข้า SQL (<code>SET ?</code>) ชื่อ key ใน JSON จึงต้องตรงกับชื่อคอลัมน์ ของตาราง <code>country</code> คือ <code>"country"</code></p>
+        </div>
+        <div class="mistake">
+          <div class="mistake-head">ได้ 400 พร้อม <code>"error": "Server Error"</code> และ message <code>Expected double-quoted property name in JSON ...</code></div>
+          <p>JSON ใน body พิมพ์ผิด เช่นมี comma เกินท้าย <code>{"country": "Wakanda",}</code> <code>express.json()</code> อ่านไม่ออกจึงตอบ 400 ส่วนคำว่า "Server Error" มาจาก error middleware ที่ใช้ค่านี้เมื่อ error ไม่มี <code>code</code> ไม่ได้แปลว่า server พัง ใช้ปุ่ม <strong>Beautify</strong> ใน Postman ช่วยจัดรูปแบบและดูจุดที่ผิด</p>
+        </div>
+        <div class="mistake">
+          <div class="mistake-head">Postman ขึ้น <code>Could not send request</code> · <code>Error: connect ECONNREFUSED 127.0.0.1:3000</code></div>
+          <p>แอปยังไม่ได้รัน หรือหยุดไปแล้ว จึงไม่มีใครรับ request ที่ port 3000 (ไม่มี status code และไม่มี body) กลับไปดูหน้าต่าง Run ใน WebStorm ต้องขึ้น <code>Example app listening on port 3000</code> และปุ่มหยุดสีแดงยังสว่างอยู่ แล้วส่งใหม่ ถ้าใช้ Postman บนเว็บ ให้เปลี่ยนมาใช้แอป desktop</p>
+        </div>
+        <figure class="dl-shot">
+          <a href="img/40-postman-app-not-running.png"><img src="img/40-postman-app-not-running.png" alt="Postman ส่ง GET localhost:3000/countries/1 แล้วส่วน Response ขึ้นภาพประกอบ Could not send request และกล่องแดง Error: connect ECONNREFUSED 127.0.0.1:3000" loading="lazy"></a>
+          <figcaption><b>แอปไม่ได้รัน</b> — Could not send request และ ECONNREFUSED ที่ port 3000</figcaption>
+        </figure>
+        <div class="dl-concept">
+          <div class="dl-concept-label">แยกให้ออก</div>
+          <div class="dl-concept-title">ECONNREFUSED สองแบบ</div>
+          <p><strong>ไม่มี JSON · เห็น port 3000</strong> (Could not send request) = แอป Express ไม่ได้รัน · <strong>อยู่ใน JSON status 500</strong> (<code>"error": "ECONNREFUSED"</code>) = แอปรันอยู่ แต่ต่อ MySQL ที่ port 3306 ไม่ได้ (ดูกล่อง "ถ้าเจอแบบนี้" ของบทที่ 2)</p>
+        </div>
+        <div class="mistake">
+          <div class="mistake-head">แก้โค้ดแล้วผลใน Postman ไม่เปลี่ยน</div>
+          <p>ลืม Rerun แอปหลังแก้โค้ด หรือมีแอปตัวเก่ารันค้างอยู่อีกตัว (ดูกล่อง "ถ้าเจอแบบนี้" ของบทที่ 2)</p>
+        </div>
+      </div>
+
+      <div class="dl-flashcard" data-flashcard aria-live="polite">
+        <div class="dl-card-inner">
+          <div class="dl-card-face dl-card-front">
+            <span class="dl-card-fold" aria-hidden="true"></span>
+            <div class="dl-card-eyebrow">คำถาม 4</div>
+            <p class="dl-card-q">DELETE สำเร็จแล้วได้ <code>204 No Content</code> ส่วน Body ใน Postman ว่างเปล่า แปลว่าอะไร?</p>
+            <div class="dl-card-choices">
+              <button class="dl-choice" data-correct="false"><span class="dl-choice-k">a.</span>server พัง ไม่ส่งอะไรกลับมา</button>
+              <button class="dl-choice" data-correct="true"><span class="dl-choice-k">b.</span>ลบสำเร็จ และตั้งใจไม่ส่ง body กลับ</button>
+              <button class="dl-choice" data-correct="false"><span class="dl-choice-k">c.</span>ยังไม่ได้ลบ ต้องกด Send อีกครั้ง</button>
+            </div>
+          </div>
+          <div class="dl-card-face dl-card-back">
+            <span class="dl-card-fold" aria-hidden="true"></span>
+            <span class="dl-card-stamp"></span>
+            <p class="dl-card-picked"></p>
+            <p class="dl-card-expl"
+               data-correct-text="ถูกต้อง — 204 อยู่กลุ่ม 2xx คือสำเร็จ router เขียน res.status(204).end() จึงไม่มี body ตรวจซ้ำได้ด้วย GET id เดิมแล้วต้องได้ 404"
+               data-wrong-text="ยังไม่ใช่ — 204 อยู่ในกลุ่ม 2xx แปลว่าสำเร็จ แค่ไม่มีเนื้อหาส่งกลับ (router ใช้ res.status(204).end())"></p>
+            <button class="dl-card-retry" type="button">← ลองอีกครั้ง</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="self-check">
+        <div class="self-check-title">✓ Self-Check</div>
+        <label><input type="checkbox" data-key="int161-express-sakila:p4:1"> มี Collection <code>INT161 Countries</code> ที่เก็บ request ครบทุกเส้น (หรือส่ง request ได้ครบถ้าไม่ได้ Sign in)</label>
+        <label><input type="checkbox" data-key="int161-express-sakila:p4:2"> ส่ง POST และ PUT ด้วย Body → raw → JSON ได้</label>
+        <label><input type="checkbox" data-key="int161-express-sakila:p4:3"> ทดสอบครบ 10 แถวในตารางสรุป ได้ status ตรงทุกแถว</label>
+      </div>
+
+      <nav class="dl-progress-footer" aria-label="ระหว่างบท">
+        <a class="dl-pf-prev" href="#part-3">← บทที่แล้ว</a>
+        <a class="dl-pf-next" href="#part-5">
+          <span class="dl-pf-eyebrow">บทถัดไป</span>
+          <span class="dl-pf-title">สรุป →</span>
+        </a>
+      </nav>
+    </article>
+
+    <!-- ============================================================
+         Part 05 · สรุป
+         ============================================================ -->
+    <article class="part" id="part-5">
+      <div class="dl-ghost" aria-hidden="true">5</div>
+      <div class="dl-stamp">บทที่ 05 <span class="sep">·</span> ~15 นาที <span class="sep">·</span> ทบทวน</div>
+      <h2 class="part-title">สรุป</h2>
+      <p class="part-lede">ทบทวนสิ่งที่ทำได้แล้วทั้งเล่ม สรุปว่าการใส่ error handler ต้องแก้หรือเพิ่มตรงไหนบ้าง แล้วลองทำ resource actor เองเป็นแบบฝึก</p>
+
+      <h3>ตอนนี้ทำอะไรได้แล้วบ้าง</h3>
+      <div class="dl-checkpoint">
+        <div class="dl-checkpoint-title"><span class="k">Checklist</span><span class="t">ทั้งเล่ม</span></div>
+        <ul>
+          <li><strong>Template</strong> — บันทึก <code>Node-Express-ESM</code> สร้างโปรเจกต์ใหม่ และรัน <code>npm install</code> (บทที่ 1)</li>
+          <li><strong>ต่อฐานข้อมูล</strong> — สร้าง Data Source ใน WebStorm แก้ <code>db-config.js</code> ให้ชี้ไปที่ sakila (บทที่ 2)</li>
+          <li><strong>Layer</strong> — คัดลอก <code>example-*</code> เป็น repo / service / route ของ resource แก้ import ชื่อตาราง และคอลัมน์ key ทดสอบทีละชั้นแล้วผูก path ใน <code>app.js</code> (บทที่ 2)</li>
+          <li><strong>Error handling</strong> — โยน error ที่มี <code>statusCode</code> ขึ้นไป แล้วให้ error middleware ตัวเดียวแปลงเป็น JSON + status code (บทที่ 3)</li>
+          <li><strong>Postman</strong> — ทดสอบครบ 5 endpoint ทั้งกรณีสำเร็จและกรณี error และเก็บไว้ใน Collection (บทที่ 4)</li>
+        </ul>
+      </div>
+
+      <hr class="dl-rule" />
+
+      <h3>ใส่ error handler ต้องแก้หรือเพิ่มตรงไหนบ้าง</h3>
+      <p>สรุปจากบทที่ 3 ว่าการจัดการ error แบบรวมศูนย์ต้องมีครบ 4 จุด แต่ละจุดมีลิงก์กลับไปบทที่อธิบายละเอียด</p>
+      <div class="table-wrap">
+        <table class="compare">
+          <thead><tr><th>#</th><th>ที่ไหน</th><th>ต้องทำอะไร</th><th>อ่านละเอียด</th></tr></thead>
+          <tbody>
+            <tr><td>1</td><td><code>app.js</code></td><td>error middleware 4 พารามิเตอร์ <code>(err, req, res, next)</code> วาง<strong>หลัง route ทุกตัว</strong> แปลง error code ของ MySQL เป็น status ที่ถูกความหมาย (เช่น <code>ER_DUP_ENTRY</code> → 409) และตอบ JSON โดยไม่ส่ง stack trace</td><td><a href="#part-3">บทที่ 3</a> ข้อ 3.7 · 3.8 · 3.9</td></tr>
+            <tr><td>2</td><td>repository / service</td><td>เมื่อผิดเงื่อนไขให้ <code>throw</code> error ที่มี <code>statusCode</code> (404 หาไม่เจอ · 400 ข้อมูลไม่ผ่าน) และ <code>code</code> ที่อ่านเข้าใจ หรือใช้ class <code>AppError</code> ให้ทุก error มีโครงเดียวกัน</td><td><a href="#part-3">บทที่ 3</a> ข้อ 3.4 · 3.5</td></tr>
+            <tr><td>3</td><td>route</td><td>Express 5 ส่ง error จาก async route ไปหา error middleware ให้เอง <strong>ไม่ต้องเขียน try/catch</strong> (ถ้าเป็น Express 4 ต้อง try/catch แล้วเรียก <code>next(err)</code>)</td><td><a href="#part-3">บทที่ 3</a> ข้อ 3.7</td></tr>
+            <tr><td>4</td><td>ฐานข้อมูล</td><td>ต้องมี constraint ถึงจะเกิด error ให้แปลง เช่น unique key (ข้อมูลซ้ำ → <code>ER_DUP_ENTRY</code>) หรือ foreign key (ลบแถวที่ยังถูกอ้างอิง → <code>ER_ROW_IS_REFERENCED_2</code>)</td><td><a href="#part-3">บทที่ 3</a> ข้อ 3.9 · <a href="#part-4">บทที่ 4</a> ข้อ 4.6</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h4>ตัวเลือกเสริม: ดัก path ที่ไม่มีอยู่ ให้ตอบเป็น JSON</h4>
+      <p>ในบทที่ 4 เห็นแล้วว่า URL ที่ไม่ตรงกับ route ไหนเลย (เช่น <code>/country</code>) ยังได้หน้า HTML <code>Cannot GET /country</code> เพราะไม่ใช่ error จึงไม่ผ่าน error middleware แก้ได้ด้วย middleware ธรรมดา (3 พารามิเตอร์) อีกตัว วาง<strong>หลัง route ทั้งหมด แต่ก่อน error middleware</strong> request ที่ตกมาถึงตัวนี้คือไม่มี route ไหนรับ จึงสร้าง error 404 แล้วส่งต่อด้วย <code>next(err)</code></p>
+      <pre class="code-block">app.<span class="fn">use</span>(<span class="str">'/countries'</span>, countryRouter)
+
+<span class="comm">// ดัก path ที่ไม่มี route รองรับ → ส่งต่อเป็น error 404 ให้ error middleware</span>
+app.<span class="fn">use</span>((req, res, next) =&gt; {
+    <span class="kw">const</span> err = <span class="kw">new</span> <span class="fn">Error</span>(<span class="str">`Not found: ${req.originalUrl}`</span>)
+    err.statusCode = <span class="num">404</span>
+    err.code = <span class="str">"NOT FOUND"</span>     <span class="comm">// ให้ช่อง error ตรงกับ 404 ของ repository</span>
+    <span class="fn">next</span>(err)
+})
+
+<span class="comm">// error middleware เดิม (4 พารามิเตอร์) อยู่ท้ายสุดเหมือนเดิม</span>
+app.<span class="fn">use</span>((err, req, res, next) =&gt; { <span class="comm">/* ... */</span> })</pre>
+      <div class="dl-out-label">ผลที่ได้จริงเมื่อ GET /country — status 404 Not Found เป็น JSON</div>
+      <pre class="code-block">{
+    <span class="str">"status"</span>: <span class="num">404</span>,
+    <span class="str">"error"</span>: <span class="str">"NOT FOUND"</span>,
+    <span class="str">"message"</span>: <span class="str">"Not found: /country"</span>,
+    <span class="str">"resource"</span>: <span class="str">"/country"</span>,
+    <span class="str">"timestamp"</span>: <span class="str">"9/26/2026, 4:21:28 PM"</span>
+}</pre>
+      <p>ถ้าไม่ใส่บรรทัด <code>err.code</code> ช่อง <code>error</code> จะขึ้นเป็น <code>"Server Error"</code> (ค่าสำรองใน error middleware) แม้ status จะเป็น 404 ถูกต้อง · <code>PUT /countries</code> ที่ไม่มี id ก็ได้ JSON 404 แบบเดียวกัน</p>
+
+      <hr class="dl-rule" />
+
+      <h3>HTTP status code ที่ใช้บ่อย (ย่อ)</h3>
+      <div class="table-wrap">
+        <table class="compare">
+          <thead><tr><th>code</th><th>ใช้เมื่อ</th><th>ตัวอย่างในเล่ม</th></tr></thead>
+          <tbody>
+            <tr><td><span class="st st-ok">200</span> · <span class="st st-ok">201</span> · <span class="st st-ok">204</span></td><td>สำเร็จ · สร้างใหม่สำเร็จ · สำเร็จแต่ไม่มี body</td><td>GET/PUT · POST · DELETE</td></tr>
+            <tr><td><span class="st st-4xx">400</span></td><td>ข้อมูลจาก client ไม่ตรงสเปก</td><td>JSON ใน body พิมพ์ผิด</td></tr>
+            <tr><td><span class="st st-4xx">401</span> · <span class="st st-4xx">403</span></td><td>ยังไม่ยืนยันตัวตน · รู้ว่าเป็นใครแต่ไม่มีสิทธิ์</td><td>—</td></tr>
+            <tr><td><span class="st st-4xx">404</span></td><td>หาสิ่งที่ขอไม่เจอ</td><td><code>GET /countries/999</code></td></tr>
+            <tr><td><span class="st st-4xx">409</span></td><td>ขัดกับข้อมูลที่มีอยู่</td><td>POST ชื่อประเทศซ้ำหลังตั้ง unique key</td></tr>
+            <tr><td><span class="st st-5xx">500</span> · <span class="st st-5xx">503</span></td><td>server ผิดพลาด · บริการใช้ไม่ได้ชั่วคราว</td><td>SQL ผิด · ต่อ MySQL ไม่ได้</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>ตารางเต็มพร้อมตัวอย่าง (รวม 412) อยู่ที่ <a href="#part-3">บทที่ 3</a> ข้อ 3.10</p>
+
+      <hr class="dl-rule" />
+
+      <h3>ลองทำเอง: CRUD ตาราง actor</h3>
+      <p>แบบฝึกต่อจาก country (เป็นงานที่ทำในคาบด้วย) ทำ resource <code>actor</code> ของ sakila ให้ครบ 3 ชั้นและ 5 endpoint (GET ทั้งหมด, GET ตาม id, POST, PUT, DELETE) ด้วยวิธีเดียวกับ country ตาราง <code>actor</code> มี 4 คอลัมน์ คือ <code>actor_id</code> (auto increment) <code>first_name</code> <code>last_name</code> และ <code>last_update</code> เวลา POST/PUT จึงส่งแค่ <code>first_name</code> กับ <code>last_name</code></p>
+      <p>ลองทำเองก่อนโดยใช้ checklist นี้ไล่ทีละขั้น ถ้าติดให้ย้อนดูขั้นเดียวกันของ country ในบทที่ 2</p>
+      <div class="table-wrap">
+        <table class="compare">
+          <thead><tr><th>ขั้น</th><th>ทำอะไร</th><th>เปลี่ยนจาก country เป็น</th></tr></thead>
+          <tbody>
+            <tr><td>1</td><td>คัดลอก <code>country-repo.js</code> (ตัวที่แก้เสร็จแล้ว) เป็น <code>actor-repo.js</code></td><td><code>TABLE_NAME</code> · <code>ENTITY_NAME</code> · คอลัมน์ key ใน <code>WHERE</code> ทั้ง 3 จุด (ดูชื่อ PK จริงของตาราง actor ในหน้าต่าง Database)</td></tr>
+            <tr><td>2</td><td>ทดสอบ repository ด้วย <code>test-repo.js</code></td><td>บรรทัด import ให้ชี้ไปที่ <code>actor-repo.js</code></td></tr>
+            <tr><td>3</td><td>คัดลอก <code>country-service.js</code> เป็น <code>actor-service.js</code> แล้วทดสอบด้วย <code>test-service.js</code></td><td>import ใน service และใน test-service · <code>data</code> ให้มีชื่อ field ตามคอลัมน์ของ actor</td></tr>
+            <tr><td>4</td><td>คัดลอก <code>country-route.js</code> เป็น <code>actor-route.js</code></td><td>import ให้ชี้ไปที่ <code>actor-service.js</code></td></tr>
+            <tr><td>5</td><td>ใน <code>app.js</code> import router ของ actor แล้วเพิ่ม <code>app.use</code> อีกบรรทัด</td><td>path <code>/actors</code> (ของ country ยังอยู่เหมือนเดิม)</td></tr>
+            <tr><td>6</td><td>หยุดแอปตัวเก่า รันใหม่ แล้วทดสอบใน Postman ครบ 5 เส้น</td><td><code>localhost:3000/actors</code></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="dl-pitfall">
+        <div class="dl-pitfall-label">พลาดกันบ่อย</div>
+        <div class="dl-pitfall-title">คัดลอกจาก country แล้วแก้ไม่ครบ</div>
+        <p>ถ้าคัดลอกจากไฟล์ของ country จะมี <code>Country</code> กับ <code>country_id</code> ติดมาด้วย ต้องไล่เปลี่ยนให้ครบทุกจุด และถ้า Postman ได้ <code>Cannot GET /actors</code> ทั้งที่แก้ app.js แล้ว ให้ดูว่าแอปตัวเก่ายังรันค้างอยู่หรือไม่ (บทที่ 4 กล่อง "ถ้าเจอแบบนี้")</p>
+      </div>
+      <p><strong>ทดสอบใน Postman</strong> ให้ครบ 5 เส้นแบบเดียวกับบทที่ 4: <code>GET /actors</code> · <code>GET /actors/1</code> · <code>POST /actors</code> body <code>{"first_name": "…", "last_name": "…"}</code> ต้องได้ 201 · <code>PUT /actors/&lt;id ที่เพิ่ง POST&gt;</code> ต้องได้ 200 · <code>DELETE /actors/&lt;id เดิม&gt;</code> ต้องได้ 204 แล้ว GET id เดิมซ้ำต้องได้ 404 ลบเฉพาะแถวที่เพิ่มเอง นักแสดงเดิมมีหนังอ้างถึงอยู่ ลบไม่ได้</p>
+
+      <hr class="dl-rule" />
+
+      <h3>คำถามทบทวน (กดดูคำตอบ)</h3>
+      <p>ลองตอบในใจก่อน แล้วค่อยกดดูคำตอบ</p>
+
+      <details class="dl-answer">
+        <summary>1. error middleware ต่างจาก middleware ปกติตรงไหน</summary>
+        <p>error middleware รับ 4 พารามิเตอร์ <code>(err, req, res, next)</code> ส่วน middleware ปกติรับ 3 ตัว <code>(req, res, next)</code> Express เรียก error middleware เฉพาะตอนมี error เท่านั้น และต้องวางไว้หลัง route ทั้งหมด</p>
+      </details>
+      <details class="dl-answer">
+        <summary>2. ทำไมไม่ส่ง stack trace ให้ frontend</summary>
+        <p>stack trace มีข้อมูลภายใน เช่น path ไฟล์บนเครื่อง ชื่อฟังก์ชัน และโครงสร้างโค้ด ผู้ไม่หวังดีเอาไปใช้หาช่องโหว่ได้ และผู้ใช้ทั่วไปก็อ่านไม่เข้าใจ ส่งแค่ <code>code</code> กับ <code>message</code> ที่อ่านเข้าใจก็พอ stack trace ไว้ดูใน log ฝั่ง server</p>
+      </details>
+      <details class="dl-answer">
+        <summary>3. ทำไม route ใน template ไม่ต้องมี try/catch</summary>
+        <p>template ใช้ Express 5 ซึ่งถ้า async route handler โยน error หรือ Promise ถูก reject จะส่ง error ต่อให้ error middleware ให้เอง ใน Express 4 ต้อง try/catch แล้วเรียก <code>next(err)</code> เอง</p>
+      </details>
+      <details class="dl-answer">
+        <summary>4. ถ้าไม่มี <code>if (err.code == "ER_DUP_ENTRY")</code> ใน error middleware การ POST ชื่อซ้ำจะได้ status อะไร และทำไมถึงผิดความหมาย</summary>
+        <p>ได้ 500 เพราะ error จาก MySQL ไม่มี <code>statusCode</code> จึงตกไปที่ค่าเริ่มต้น <code>|| 500</code> ซึ่งผิดความหมาย 500 แปลว่า server พัง แต่ความจริงคือ client ส่งข้อมูลที่ซ้ำกับของเดิม ควรเป็น 409 Conflict</p>
+      </details>
+      <details class="dl-answer">
+        <summary>5. <code>GET /countries/1</code> ได้ 500 พร้อม <code>Unknown column 'id' in 'where clause'</code> ต้องแก้ที่ไฟล์ไหน</summary>
+        <p><code>src/repositories/country-repo.js</code> เปลี่ยน <code>WHERE id = ?</code> เป็น <code>WHERE country_id = ?</code> ให้ครบทั้ง 3 บรรทัด (FIND_ONE, UPDATE, REMOVE) แล้ว Rerun</p>
+      </details>
+      <details class="dl-answer">
+        <summary>6. 401 กับ 403 ต่างกันอย่างไร</summary>
+        <p>401 Unauthorized = ยังไม่รู้ว่าเป็นใคร (ไม่ได้ล็อกอิน / ไม่มี token) · 403 Forbidden = รู้แล้วว่าเป็นใคร แต่คนนี้ไม่มีสิทธิ์ทำสิ่งนั้น เช่นล็อกอินแล้วแต่ไม่ใช่ admin</p>
+      </details>
+      <details class="dl-answer">
+        <summary>7. ทำไมรันแอปขึ้นข้อความ listening ได้ ทั้งที่รหัสผ่าน MySQL ผิด</summary>
+        <p>connection pool ของ <code>mysql2</code> ยังไม่ต่อฐานข้อมูลจริงตอนเริ่มแอป จะต่อตอนมี query แรก error เรื่องรหัสผ่านจึงโผล่ตอนเรียก endpoint ครั้งแรก ไม่ใช่ตอน Run</p>
+      </details>
+      <details class="dl-answer">
+        <summary>8. POST ใน Postman แล้ว <code>req.body</code> เป็น <code>undefined</code> ควรตรวจอะไรบ้าง</summary>
+        <p>(1) ใน Postman เลือก Body → raw → <strong>JSON</strong> แล้วหรือยัง (2) ใน <code>app.js</code> มี <code>app.use(express.json())</code> และอยู่<strong>ก่อน</strong> <code>app.use('/countries', ...)</code> หรือไม่</p>
+      </details>
+
+      <div class="self-check">
+        <div class="self-check-title">✓ Self-Check</div>
+        <label><input type="checkbox" data-key="int161-express-sakila:p5:1"> ตอบคำถามทบทวนได้อย่างน้อย 6 จาก 8 ข้อ</label>
+        <label><input type="checkbox" data-key="int161-express-sakila:p5:2"> บอกได้ว่าการใส่ error handler ต้องแก้หรือเพิ่ม 4 จุดไหนบ้าง</label>
+        <label><input type="checkbox" data-key="int161-express-sakila:p5:3"> ทำ CRUD ตาราง actor ครบ 5 endpoint และทดสอบใน Postman แล้ว</label>
+      </div>
+
+      <nav class="dl-progress-footer" aria-label="ระหว่างบท">
+        <a class="dl-pf-prev" href="#part-4">← บทที่แล้ว</a>
+      </nav>
+    </article>
+
+    <footer class="footer-note">
+      Express + sakila ทีละขั้น · Basic Backend Development · 2026-09-26
+    </footer>
+
+  </main>
+</div>
+
+<script src="interactive.js"></script>
+</body>
+</html>
