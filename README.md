@@ -10,6 +10,7 @@
 - [Exception / คีย์แบบอื่น](guides/04-errors-keys.md)
 - [ดัดแปลง teacher template](guides/05-template.md)
 - [แก้ปัญหา / เตรียมออฟไลน์ / ส่งงาน](guides/06-offline.md)
+- [วิธีใช้ recipes](recipes/README.md)
 - [ตัวอย่างเปลี่ยนโจทย์](practice/worked-example.md), [โจทย์ฝึกทำเอง](practice/independent-task.md)
 - [ผลตรวจจริงและข้อจำกัด](docs/VALIDATION.md)
 

@@ -1,5 +1,5 @@
 import {readFile,writeFile} from 'node:fs/promises';
-export const chapters=['README.md','START-HERE.th.md','guides/01-contract.md','guides/02-crud.md','guides/03-pagination-dto.md','guides/04-errors-keys.md','guides/05-template.md','guides/06-offline.md','practice/worked-example.md','practice/independent-task.md','docs/VALIDATION.md'];
+export const chapters=['README.md','START-HERE.th.md','guides/01-contract.md','guides/02-crud.md','guides/03-pagination-dto.md','guides/04-errors-keys.md','guides/05-template.md','guides/06-offline.md','recipes/README.md','practice/worked-example.md','practice/independent-task.md','docs/VALIDATION.md'];
 const esc=s=>s.replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;');
 const anchor=s=>'chapter-'+s.replace(/[^a-zA-Z0-9]/g,'-');
 function inline(s){return esc(s).replace(/`([^`]+)`/g,'<code>$1</code>').replace(/\[([^\]]+)\]\(([^)]+)\)/g,(_,label,url)=>{let target=url;if(!/^https?:/.test(url)){const normalized=url.replace(/^\.\.\//,'');target='#'+anchor(normalized==='docs/offline-guide.html'?'README.md':normalized);}return `<a href="${target}">${label}</a>`;});}

@@ -12,7 +12,7 @@ service throw AppError → Express 5 → errorHandler(err,req,res,next) → HTTP
 | UNIQUE ซ้ำ | 409 | DUPLICATE_KEY |
 | FK ปลายทางไม่มี | 400 | FOREIGN_KEY_NOT_FOUND |
 | ลบแถวที่ถูกอ้างอิง | 409 | RESOURCE_IN_USE |
-| ไม่คาดคิด | 500 | INTERNAL_ERROR |
+| ไม่คาดคิด | 500 | INTERNAL_SERVER_ERROR |
 
 อย่าส่ง stack, SQL, DB credentials หรือ err.sqlMessage กลับ client error handler ต้องเป็นฟังก์ชัน 4 arguments แม้ไม่ใช้ next
 

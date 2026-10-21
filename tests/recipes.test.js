@@ -14,3 +14,11 @@ test('optional pagination policy is explicit and still validates provided fields
  assert.deepEqual(parseOptionalPagination({page:'2'}),{page:2,limit:10,offset:10});
  assert.throws(()=>parseOptionalPagination({limit:''}));
 });
+test('string/composite SQL recipes run on actual marked MySQL with both keys',async()=>{
+ const {findTag,findProductTag}=await import('../recipes/string-composite-repository.js');
+ const {loadSettings}=await import('../reference-app/src/configs-$id/settings.js');
+ const {createDb}=await import('../reference-app/src/configs-$id/db-config.js');
+ const {initializePractice,assertPracticeDatabase}=await import('../scripts/db-lib.mjs');
+ const cfg=loadSettings();cfg.database=cfg.testDatabase;await initializePractice(cfg);const db=createDb(cfg);
+ try{await assertPracticeDatabase(db);assert.equal((await findTag(db,'NA')).code,'NA');assert.deepEqual(await findProductTag(db,1,'DEMO'),{product_id:1,tag_code:'DEMO'});assert.equal(await findProductTag(db,1,'NA'),null);assert.equal(await findTag(db,'MISSING_RECIPE_KEY'),null);}finally{await db.end();}
+});
