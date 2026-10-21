@@ -1,0 +1,1620 @@
+/* ============================================================
+   dia-learn · Design System
+   warm cream editorial · scholarly · no slop
+   Responsive: desktop (≥1024) · tablet (640–1023) · mobile (<640)
+   ============================================================ */
+
+/* Fonts bundled local (offline-safe) — index.html link ไฟล์ fonts.css ก่อนไฟล์นี้
+   woff2 อยู่ที่โฟลเดอร์ fonts/ (copy จาก templates/vendor/ ตอน scaffold) — ห้าม @import Google Fonts */
+
+/* ============================================================
+   THEME TOKENS — ทั้งบล็อกนี้สลับได้ด้วย apply-theme.py
+   default = cream · อีก 3 ตัว: paper-minimal · editorial-monocle · academic-navy (light ทั้งหมด)
+     python3 <skill>/references/apply-theme.py <doc-dir> paper-minimal
+   ⚠ ห้ามแก้/ลบบรรทัด marker >>> <<< (script ใช้หาขอบเขต)
+   ⚠ token ทุกตัวในบล็อกนี้ต้องมีครบทุก theme — เพิ่ม token ใหม่
+      = ต้องเติมใน templates/themes/*.css ทั้ง 3 ไฟล์ด้วย
+   ============================================================ */
+/* >>> DIA-LEARN THEME: paper-minimal >>> */
+/* light · ขาวสะอาด เกือบ monochrome — เนื้อหาเด่น สีถอยไปเป็นพื้นหลัง
+   ต่างจาก cream/academic-navy ตรง: neutral ไม่มี hue ในพื้น + accent desaturate
+   + code block เป็น "พื้นสว่าง" (theme เดียวที่ไม่ใช่แถบดำ) เหมาะ doc ที่โค้ดเยอะ
+   semantic 5 สียังแยกออกจากกันชัด แค่ลดความจัดลง ไม่ได้ทิ้งความหมาย */
+:root {
+  --bg: #fafafa;
+  --paper: #ffffff;
+  --paper-2: #f4f4f5;
+  --hover-tint: #f9f9fa;  /* พื้น hover ของ quiz-option */
+
+  --ink: #18181b;
+  --ink-2: #3f3f46;
+  --ink-muted: #5c5c66;
+  --ink-soft: #6b6b74;    /* softest text tier — ผ่าน AA บน --paper (caption) */
+
+  /* ตัวหนังสือ/ชิปบนพื้น accent ทึบ (หัว .dl-lab · .btn-teal · stamp) */
+  --on-accent: #ffffff;
+  --on-accent-soft: rgba(255, 255, 255, 0.85);
+  --on-accent-wash: rgba(255, 255, 255, 0.18);
+
+  --line: #e8e8ea;
+  --line-strong: #bbbbc2;
+
+  --teal: #2d6a63;        /* accent หลัก — เขียวอมเทา ไม่จัด */
+  --teal-soft: #eef2f1;
+  --teal-ink: #1d4a45;
+
+  --amber: #8a6a1f;
+  --amber-soft: #f5f2e9;
+  --amber-ink: #4f3c0d;
+
+  --rose: #97404a;
+  --rose-soft: #f6eeef;
+  --rose-ink: #5c2027;
+  --rose-line: rgba(151, 64, 74, 0.28);   /* เส้นประคั่นใน .mistake */
+
+  --purple: #58508a;
+  --purple-soft: #f0eff5;
+  --purple-ink: #332e56;
+
+  --green: #3a6b4a;
+  --green-soft: #eef3ef;
+  --green-ink: #22432c;
+
+  /* code block พื้นสว่าง — theme เดียวที่ไม่ใช่แถบดำ (ตั้งใจ: minimal + โค้ดเยอะ)
+     syntax remap ให้เข้มพอบนพื้นขาว ≥4.5:1 ทุกสี */
+  --code-bg: #f6f6f7;
+  --code-bg-2: #ecedee;    /* แถบ tab เหนือ code (เข้มกว่า panel 1 ขั้น) */
+  --code-ink: #27272c;
+  --code-line: #dcdce0;
+  --code-mute: #6c6c76;
+  --code-kw: #7c3f86;
+  --code-fn: #8a5a10;
+  --code-str: #2f6b3f;
+  --code-num: #a24a1e;
+  --code-tag: #275f8f;
+  --code-attr: #8a5a10;
+  --code-comm: #77777f;
+  --code-var: #3f5570;     /* .vr — ตัวแปร */
+  --code-prop: #a24a1e;    /* .pr — property */
+  --code-btn-bg: rgba(246, 246, 247, 0.92);  /* พื้นปุ่ม copy ที่ลอยทับ code */
+
+  --btn-hover-bg: #333338;  /* .btn:hover — ปุ่มทึบดำ สว่างขึ้น 1 ขั้น */
+
+  /* signature devices */
+  --star: #9a7b23;        /* gold หม่น — ไม่ฉูดบนพื้นขาว */
+  --ghost-opacity: 0.04;  /* .dl-ghost — minimal ให้จางกว่า theme อื่นนิด */
+  --r-stamp: 2px;
+  --r-chip: 6px;
+  --r-card: 10px;
+  --r-soft: 8px;
+  --shadow-flip: 0 12px 28px -8px rgba(0, 0, 0, 0.16);
+  --shadow-menu: 0 10px 28px rgba(0, 0, 0, 0.12);
+  --shadow-float: 0 4px 14px rgba(0, 0, 0, 0.10);
+}
+/* <<< DIA-LEARN THEME <<< */
+
+/* ============================================================
+   Typography + fluid sizes — ใช้ร่วมทุก theme (อยู่นอกบล็อก theme
+   โดยตั้งใจ: font stack bundle local ชุดเดียว แก้ที่นี่ที่เดียวพอ)
+   ============================================================ */
+:root {
+  --font-body: 'IBM Plex Sans Thai', system-ui, -apple-system, sans-serif;
+  --font-display: 'Fraunces', 'IBM Plex Sans Thai', Georgia, 'Times New Roman', serif; /* Fraunces=Latin serif · ไทยตกไป IBM Plex Sans Thai (ไม่มีหัว/loopless) ตัวเดียวกับ body — ห้ามตัดออก ไม่งั้นไทยหล่นไป serif มีหัว */
+  --font-mono: 'JetBrains Mono', 'IBM Plex Sans Thai', ui-monospace, 'SF Mono', Menlo, monospace; /* JetBrains=Latin/ตัวเลข · ไทยตกไป IBM Plex Sans Thai (ไม่มีหัว/loopless) — mono ไทยไม่ต้อง fixed-width · ห้ามตัด IBM Plex ออก ไม่งั้นไทยหล่นไป mono มีหัว */
+
+  /* Fluid sizes — clamp(min, preferred, max) */
+  --text-body: clamp(15px, 1.5vw, 16.5px);
+  --text-hero-title: clamp(28px, 4vw, 48px);
+  --text-part-title: clamp(24px, 3.5vw, 38px);
+  --text-h3: clamp(18px, 2.5vw, 23px);
+}
+
+* { box-sizing: border-box; }
+
+html {
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-body);
+  font-weight: 400;
+  font-size: var(--text-body);
+  line-height: 1.65;
+  color: var(--ink);
+  background: var(--bg);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* Text wrapping — กัน orphan คำเดียวท้ายบรรทัด (สำคัญกับหัวข้อไทยยาว) */
+h1, h2, h3, h4, .hero-title, .part-title, .demo-title { text-wrap: balance; }
+.part p, .part li, .hero-lede, .part-lede { text-wrap: pretty; }
+
+/* Keyboard focus ring — visible ≥2px ทุก interactive element
+   (.input มี box-shadow focus ของตัวเองอยู่แล้ว — คงไว้) */
+:where(button, a, [tabindex], input[type="checkbox"]):focus-visible {
+  outline: 2px solid var(--teal);
+  outline-offset: 2px;
+}
+
+/* Reduced motion — ทุก animation/transition ต้องมี fallback */
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ============================================
+   Layout — 3-column grid that collapses
+   ============================================ */
+
+.layout {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  min-height: 100vh;   /* fallback */
+  min-height: 100dvh;  /* dynamic viewport — mobile address bar ไม่บังเนื้อหา */
+}
+
+/* ============================================
+   Mobile nav toggle button (hidden on desktop)
+   ============================================ */
+
+.nav-toggle {
+  display: none;
+  appearance: none;
+  background: var(--paper);
+  border: 1px solid var(--line-strong);
+  color: var(--ink);
+  font: inherit;
+  font-size: 14px;
+  padding: 10px 16px;
+  cursor: pointer;
+  width: 100%;
+  text-align: left;
+}
+.nav-toggle-label {
+  font-weight: 600;
+  font-size: 13px;
+}
+.nav-toggle-arrow {
+  float: right;
+  font-size: 11px;
+  color: var(--ink-soft);
+  transition: transform 200ms ease;
+}
+.nav-toggle[aria-expanded="true"] .nav-toggle-arrow {
+  transform: rotate(180deg);
+}
+
+/* ============================================
+   Sidebar
+   ============================================ */
+
+.sidebar {
+  position: sticky;
+  top: 0;
+  height: 100vh;   /* fallback */
+  height: 100dvh;
+  border-right: 1px solid var(--line);
+  background: var(--paper);
+  padding: 28px 22px 32px;
+  overflow-y: auto;
+}
+
+.sidebar-body { display: block; }
+
+.brand {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 20px;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+  line-height: 1.1;
+}
+
+.brand-sub {
+  font-size: 10.5px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  margin-top: 4px;
+  font-weight: 500;
+}
+
+.progress-block {
+  margin: 22px 0 18px;
+  padding: 14px 14px 12px;
+  background: var(--paper-2);
+}
+
+.progress-label {
+  font-size: 10.5px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-muted);
+  margin-bottom: 8px;
+  font-weight: 600;
+}
+
+.progress-bar {
+  height: 4px;
+  background: var(--line-strong);
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: var(--teal);
+  width: 0%;
+  transition: width 220ms ease;
+}
+
+.progress-text {
+  margin-top: 8px;
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  color: var(--ink-muted);
+  letter-spacing: 0.04em;
+}
+
+.progress-reset {
+  appearance: none;
+  display: block;
+  margin-top: 8px;
+  padding: 3px 8px;
+  background: transparent;
+  border: 1px solid var(--line-strong);
+  color: var(--ink-soft);
+  font: inherit;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+  transition: border-color 120ms ease, color 120ms ease;
+}
+.progress-reset:hover { border-color: var(--rose); color: var(--rose-ink); }
+
+.toc { margin-top: 4px; }
+
+.toc-section {
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  margin: 18px 0 4px;
+  padding: 0 6px;
+  font-weight: 700;
+}
+.toc-section:first-child { margin-top: 6px; }
+
+.toc-link {
+  display: block;
+  padding: 5px 8px;
+  font-size: 13px;
+  color: var(--ink-2);
+  text-decoration: none;
+  line-height: 1.45;
+  border-left: 2px solid transparent;
+}
+.toc-link:hover { color: var(--ink); background: var(--paper-2); }
+.toc-link.active {
+  color: var(--teal-ink);
+  font-weight: 500;
+  border-left-color: var(--teal);
+  background: var(--teal-soft);
+}
+
+.toc-num {
+  display: inline-block;
+  width: 28px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--ink-soft);
+  font-weight: 500;
+}
+.toc-link.active .toc-num { color: var(--teal); }
+
+/* ============================================
+   Main column
+   ============================================ */
+
+.main {
+  padding: 56px 80px 140px;
+  max-width: 900px;
+  width: 100%;
+  margin: 0 auto;          /* center ในคอลัมน์ ไม่ชิดซ้าย */
+  min-width: 0;            /* grid item: min-width:auto ทำให้หดต่ำกว่า min-content ไม่ได้ → ทั้งหน้ามี scroll แนวนอนช่วง 640–1023px */
+}
+
+/* ============================================
+   Hero
+   ============================================ */
+
+.hero {
+  margin-bottom: 64px;
+  padding-bottom: 32px;
+  border-bottom: 1px solid var(--line);
+}
+
+.hero-eyebrow {
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--teal);
+  margin-bottom: 14px;
+  font-weight: 600;
+}
+
+.hero-title {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: var(--text-hero-title);
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  margin: 0 0 18px;
+  color: var(--ink);
+}
+
+.hero-lede {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: clamp(16px, 2vw, 19px);
+  line-height: 1.5;
+  color: var(--ink-2);
+  max-width: 700px;
+  margin: 0;
+  font-style: italic;
+}
+
+.hero-meta {
+  margin-top: 22px;
+  display: flex;
+  gap: 28px;
+  flex-wrap: wrap;
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  color: var(--ink-muted);
+  letter-spacing: 0.04em;
+}
+.hero-meta span strong {
+  font-family: var(--font-body);
+  font-weight: 600;
+  color: var(--ink);
+  font-size: 13px;
+}
+
+/* ============================================
+   Part block
+   ============================================ */
+
+.part {
+  margin-bottom: 96px;
+  scroll-margin-top: 24px;
+}
+
+.part-eyebrow {
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--teal);
+  margin-bottom: 14px;
+  font-weight: 600;
+}
+
+.part-title {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: var(--text-part-title);
+  line-height: 1.12;
+  letter-spacing: -0.015em;
+  margin: 0 0 16px;
+  color: var(--ink);
+}
+
+.part-lede {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: clamp(15px, 2vw, 18px);
+  line-height: 1.5;
+  color: var(--ink-2);
+  margin: 0 0 32px;
+  max-width: 720px;
+  font-style: italic;
+}
+
+.part h3 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: var(--text-h3);
+  margin: 36px 0 12px;
+  color: var(--ink);
+  letter-spacing: -0.005em;
+}
+
+.part h4 {
+  font-weight: 600;
+  font-size: 14px;
+  margin: 22px 0 8px;
+  color: var(--ink);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.part p { margin: 0 0 16px; }
+.part ul, .part ol { margin: 0 0 16px; padding-left: 22px; }
+.part li { margin: 4px 0; }
+.part strong { font-weight: 600; color: var(--ink); }
+.part em { font-style: italic; color: var(--ink-2); }
+
+.part code:not(pre code) {
+  font-family: var(--font-mono);
+  font-size: 0.86em;
+  padding: 2px 6px;
+  background: var(--paper-2);
+  border: 1px solid var(--line);
+  color: var(--rose-ink);
+  font-weight: 500;
+}
+
+/* code ที่แทรกกลางบรรทัด prose: token ยาวอย่าง require_parameters ต้องตัดบรรทัดได้ ไม่ดันกรอบ */
+p code, li code, td code, figcaption code { overflow-wrap: anywhere; }
+
+/* Responsive table wrapper */
+.table-wrap {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.compare {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 22px 0;
+  font-size: 14px;
+  min-width: 400px;
+}
+.compare th, .compare td {
+  text-align: left;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--line);
+  vertical-align: top;
+}
+.compare th {
+  background: var(--paper-2);
+  font-weight: 600;
+  font-size: 11.5px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink-muted);
+  border-bottom: 1px solid var(--line-strong);
+}
+.compare td code { font-size: 0.86em; padding: 1px 5px; }
+.compare .num {
+  font-family: var(--font-mono);
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ============================================
+   Objectives
+   ============================================ */
+
+.objectives {
+  margin: 24px 0 36px;
+  padding: 16px 22px 18px;
+  background: var(--teal-soft);
+  border-top: 2px solid var(--teal);
+}
+.objectives-title {
+  font-size: 10.5px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--teal-ink);
+  margin-bottom: 8px;
+  font-weight: 700;
+}
+.objectives ul { margin: 0; padding-left: 18px; color: var(--teal-ink); }
+.objectives li { margin: 4px 0; font-size: 14px; line-height: 1.55; overflow-wrap: anywhere; }
+
+/* ============================================
+   Code blocks & tabs
+   ============================================ */
+
+.code-tabs {
+  margin: 22px 0;
+  background: var(--code-bg);
+  overflow: hidden;
+}
+
+.code-tabs-bar {
+  display: flex;
+  background: var(--code-bg-2);
+  border-bottom: 1px solid var(--code-line);
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.code-tab {
+  appearance: none;
+  background: transparent;
+  border: 0;
+  padding: 10px 18px;
+  color: var(--code-mute);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.code-tab:hover { color: var(--code-ink); }
+.code-tab.active {
+  color: var(--code-ink);
+  border-bottom-color: var(--amber);
+}
+
+.code-panel, .code-block {
+  margin: 0;
+  padding: 18px 22px;
+  font-family: var(--font-mono);
+  font-size: clamp(11px, 1.5vw, 12.5px);
+  line-height: 1.7;
+  color: var(--code-ink);
+  background: var(--code-bg);
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  white-space: pre;
+}
+.code-block { margin: 18px 0; }
+
+.code-panel { display: none; }
+.code-panel.active { display: block; }
+
+/* Syntax highlight */
+.code-panel .kw, .code-block .kw { color: var(--code-kw); }
+.code-panel .fn, .code-block .fn { color: var(--code-fn); }
+.code-panel .str, .code-block .str { color: var(--code-str); }
+.code-panel .num, .code-block .num { color: var(--code-num); }
+.code-panel .tag, .code-block .tag { color: var(--code-tag); }
+.code-panel .attr, .code-block .attr { color: var(--code-attr); }
+.code-panel .comm, .code-block .comm { color: var(--code-comm); font-style: italic; }
+.code-panel .vr, .code-block .vr { color: var(--code-var); }
+.code-panel .pr, .code-block .pr { color: var(--code-prop); }
+
+/* ============================================
+   Copy code button (injected by interactive.js)
+   ============================================ */
+
+/* Standalone code-block wrapper */
+.code-block-wrap {
+  position: relative;
+  margin: 18px 0;
+}
+.code-block-wrap pre.code-block {
+  margin: 0;
+}
+
+.code-copy-btn {
+  appearance: none;
+  background: transparent;
+  border: 1px solid var(--code-line);
+  color: var(--code-mute);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  padding: 3px 9px;
+  cursor: pointer;
+  transition: color 120ms ease, border-color 120ms ease;
+  line-height: 1;
+}
+.code-copy-btn:hover { color: var(--code-ink); border-color: var(--amber); }
+.code-copy-btn.copied { color: var(--code-fn); border-color: var(--code-fn); }
+
+/* In .code-tabs-bar: pushed to far right via flex margin */
+.code-tabs-bar .code-copy-btn {
+  border: none;
+  border-left: 1px solid var(--code-line);
+  padding: 10px 16px;
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
+/* Standalone: absolute position top-right */
+.code-block-wrap .code-copy-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: var(--code-btn-bg);
+}
+
+/* ============================================
+   Live Demo
+   ============================================ */
+
+.demo-block {
+  margin: 28px 0;
+  background: var(--paper);
+  border: 1px solid var(--line-strong);
+  /* .dl-margin-note (ด้านบน) เป็น float:right — demo-block ที่เป็น grid/flex (สร้าง BFC
+     ของตัวเอง) ถ้าวางถัดจาก margin note ทันทีจะถูกบีบ shrink-to-fit เหลือพื้นที่ข้าง float
+     แทนที่จะกว้างเต็มปกติ (วัดจริง int151-dom: ~510px แทน ~800px) — clear:both บังคับให้
+     เริ่มใต้ float เสมอไม่ว่าจะมี float ค้างมาก่อนหน้าหรือไม่ */
+  clear: both;
+}
+
+.demo-head {
+  padding: 12px 18px;
+  background: var(--amber-soft);
+  border-bottom: 1px solid var(--line-strong);
+}
+
+.demo-eyebrow {
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--amber-ink);
+  font-weight: 700;
+}
+
+.demo-title {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: 18px;
+  margin: 4px 0 0;
+  color: var(--ink);
+  letter-spacing: -0.005em;
+}
+
+.demo-mount { padding: 22px; }
+
+/* Demo internals */
+.demo-row {
+  display: flex;
+  align-items: stretch;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.demo-card {
+  flex: 1;
+  min-width: min(240px, 100%);
+  padding: 16px;
+  background: var(--paper-2);
+  border: 1px solid var(--line);
+}
+
+.demo-card-title {
+  font-size: 10.5px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-muted);
+  margin-bottom: 10px;
+  font-weight: 700;
+}
+
+.demo-num {
+  font-family: var(--font-display);
+  font-size: 32px;
+  font-weight: 500;
+  display: inline-block;
+  min-width: 60px;
+  color: var(--ink);
+  letter-spacing: -0.02em;
+}
+
+.btn {
+  appearance: none;
+  padding: 8px 16px;
+  background: var(--ink);
+  color: var(--paper);
+  border: 1px solid var(--ink);
+  font: inherit;
+  font-size: 14px;
+  cursor: pointer;
+  margin-right: 4px;
+  touch-action: manipulation;
+}
+.btn:hover { background: var(--btn-hover-bg); }
+
+.btn-ghost {
+  background: var(--paper);
+  color: var(--ink);
+  border: 1px solid var(--line-strong);
+}
+.btn-ghost:hover { background: var(--paper-2); border-color: var(--ink-muted); }
+
+.btn-sm { padding: 6px 14px; font-size: 13px; }
+
+.btn-teal {
+  background: var(--teal);
+  border-color: var(--teal);
+  color: var(--on-accent);
+}
+.btn-teal:hover { background: var(--teal-ink); }
+
+.input {
+  appearance: none;
+  padding: 9px 12px;
+  background: var(--paper);
+  border: 1px solid var(--line-strong);
+  font: inherit;
+  font-size: 15px;
+  color: var(--ink);
+  width: 100%;
+  font-family: var(--font-body);
+  touch-action: manipulation;
+}
+.input:focus {
+  outline: 0;
+  border-color: var(--teal);
+  box-shadow: 0 0 0 2px var(--teal-soft);
+}
+
+.input-mono {
+  font-family: var(--font-mono);
+  font-size: 13px;
+}
+
+.demo-list {
+  list-style: none;
+  margin: 10px 0 0;
+  padding: 0;
+}
+.demo-list li {
+  display: flex;
+  flex-wrap: wrap;         /* label ยาว → ตกบรรทัดใหม่แทนดันแถวจนล้นการ์ด */
+  align-items: center;
+  gap: 10px;
+  padding: 7px 0;
+  border-bottom: 1px dashed var(--line);
+  font-size: 14px;
+  overflow-wrap: anywhere; /* ตาข่ายชั้นสุดท้าย — ลดขนาด min-content ของ item ที่เป็นข้อความ */
+}
+.demo-list li > * { min-width: 0; }              /* flex item: min-width:auto ทำให้หดไม่ได้ */
+.demo-list li > .demo-tag { flex-shrink: 0; }    /* ยกเว้นแท็ก — ต้องไม่ถูกบีบ */
+.demo-list li:last-child { border-bottom: 0; }
+
+.demo-tag {
+  display: inline-block;
+  padding: 1px 8px;
+  background: var(--paper);
+  border: 1px solid var(--line-strong);
+  font-size: 11px;
+  font-family: var(--font-mono);
+  color: var(--ink-muted);
+  margin-left: 8px;
+}
+
+.demo-log {
+  margin-top: 10px;
+  padding: 10px 12px;
+  background: var(--code-bg);
+  color: var(--code-ink);
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  line-height: 1.55;
+  max-height: 200px;
+  overflow-y: auto;
+  overflow-x: auto;
+}
+.demo-log-empty { color: var(--code-mute); font-style: italic; }
+.demo-log-line { padding: 1px 0; }
+.demo-log-line.fresh { color: var(--code-fn); }
+
+.demo-label {
+  display: block;
+  font-size: 11.5px;
+  color: var(--ink-muted);
+  margin-bottom: 4px;
+  letter-spacing: 0.04em;
+}
+
+.demo-stack { display: flex; flex-direction: column; gap: 12px; }
+
+.score-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 110px 52px;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 0;
+  font-size: 13px;
+  border-bottom: 1px dashed var(--line);
+}
+.score-row > span:first-child {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  word-break: normal;
+  line-height: 1.5;
+}
+.score-row:last-child { border-bottom: 0; }
+
+.score-rank {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--ink-soft);
+  width: 22px;
+  display: inline-block;
+}
+.score-bar {
+  height: 6px;
+  background: var(--line);
+  position: relative;
+  min-width: 40px;
+}
+.score-bar-fill {
+  height: 100%;
+  background: var(--teal);
+  transition: width 240ms ease;
+}
+.score-bar-fill.alt { background: var(--amber); }
+.score-bar-fill.gold { background: var(--green); }
+.score-bar-fill.dim { background: var(--ink-soft); }
+.score-num {
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  color: var(--ink-muted);
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  min-width: 52px;
+}
+
+/* ============================================
+   Common Mistakes
+   ============================================ */
+
+.mistakes {
+  margin: 28px 0;
+  padding: 18px 22px 20px;
+  background: var(--rose-soft);
+  border-top: 2px solid var(--rose);
+}
+.mistakes-title {
+  font-size: 10.5px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--rose-ink);
+  margin-bottom: 12px;
+  font-weight: 700;
+}
+.mistake {
+  margin-bottom: 14px;
+  padding-bottom: 14px;
+  border-bottom: 1px dashed var(--rose-line);
+}
+.mistake:last-child { margin-bottom: 0; padding-bottom: 0; border-bottom: 0; }
+.mistake-head {
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--rose-ink);
+  margin-bottom: 4px;
+}
+.mistake p { margin: 0; font-size: 14px; color: var(--ink-2); line-height: 1.55; overflow-wrap: anywhere; }
+
+/* ============================================
+   Quiz
+   ============================================ */
+
+.quiz {
+  margin: 28px 0;
+  padding: 20px 22px;
+  background: var(--purple-soft);
+  border-top: 2px solid var(--purple);
+}
+.quiz-eyebrow {
+  font-size: 10.5px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--purple-ink);
+  margin-bottom: 8px;
+  font-weight: 700;
+}
+.quiz-question {
+  font-size: 15px;
+  color: var(--ink);
+  margin: 0 0 14px;
+  font-weight: 500;
+  line-height: 1.5;
+}
+.quiz-options {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.quiz-option {
+  appearance: none;
+  text-align: left;
+  padding: 12px 16px;
+  background: var(--paper);
+  border: 1px solid var(--line-strong);
+  font: inherit;
+  font-size: 14px;
+  color: var(--ink);
+  cursor: pointer;
+  transition: border-color 100ms ease, background 100ms ease;
+  touch-action: manipulation;
+  line-height: 1.5;
+}
+.quiz-option:hover { border-color: var(--purple); background: var(--hover-tint); }
+/* หลังตอบแล้ว JS ใส่ disabled — ตัด hover affordance ที่หลอกว่ายังกดได้ */
+.quiz-option:disabled { cursor: default; }
+.quiz-option:disabled:not(.correct):not(.wrong):hover { border-color: var(--line-strong); background: var(--paper); }
+.quiz-option.correct {
+  background: var(--green-soft);
+  border-color: var(--green);
+  color: var(--green-ink);
+}
+.quiz-option.wrong {
+  background: var(--rose-soft);
+  border-color: var(--rose);
+  color: var(--rose-ink);
+}
+.quiz-explanation {
+  margin-top: 14px;
+  padding: 12px 14px;
+  background: var(--paper);
+  border: 1px solid var(--line-strong);
+  font-size: 13.5px;
+  color: var(--ink-2);
+  line-height: 1.6;
+}
+.quiz-explanation strong { color: var(--purple-ink); }
+
+/* ============================================
+   Self-Check
+   ============================================ */
+
+.self-check {
+  margin: 28px 0 0;
+  padding: 18px 22px 16px;
+  background: var(--green-soft);
+  border-top: 2px solid var(--green);
+}
+.self-check-title {
+  font-size: 10.5px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--green-ink);
+  margin-bottom: 10px;
+  font-weight: 700;
+}
+.self-check label {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  min-width: 0;
+  padding: 8px 0;
+  font-size: 14px;
+  color: var(--ink);
+  cursor: pointer;
+  line-height: 1.5;
+  touch-action: manipulation;
+  overflow-wrap: anywhere; /* ตาข่ายชั้นสุดท้าย: text node เป็น anonymous flex item ที่ตั้ง min-width ไม่ได้
+                              ลด min-content ของมันแทน เพื่อให้ flex-shrink ทำงานได้ — ห้ามใช้ flex-wrap เพราะจะดัน checkbox ตกไปคนละบรรทัด */
+}
+.self-check input[type="checkbox"] {
+  margin-top: 3px;
+  accent-color: var(--green);
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  cursor: pointer;
+}
+.self-check label:has(input:checked) {
+  color: var(--ink-soft);
+  text-decoration: line-through;
+}
+
+/* ============================================
+   Footer note
+   ============================================ */
+
+.footer-note {
+  margin-top: 80px;
+  padding-top: 24px;
+  border-top: 1px solid var(--line);
+  font-size: 13px;
+  color: var(--ink-soft);
+  font-family: var(--font-mono);
+  letter-spacing: 0.02em;
+}
+
+/* ============================================
+   Responsive — Tablet (640–1023px)
+   ============================================ */
+
+@media (max-width: 1023px) {
+  .layout { grid-template-columns: 240px 1fr; }
+  .main { padding: 40px 48px 100px; }
+  .brand { font-size: 18px; }
+}
+
+@media (max-width: 800px) {
+  .main { padding: 32px 32px 80px; }
+  .score-row {
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-rows: auto auto;
+    gap: 4px 10px;
+    padding: 10px 0;
+  }
+  .score-row > span:first-child { grid-column: 1 / -1; }
+  .score-bar { grid-column: 1 / 2; }
+  .score-num { grid-column: 2 / 3; text-align: right; }
+}
+
+/* ============================================
+   Responsive — Mobile (<640px)
+   Sidebar → collapsible top bar
+   ============================================ */
+
+@media (max-width: 639px) {
+  /* กัน phantom horizontal scroll ระดับหน้า — content กว้าง (ตาราง/code/demo)
+     ยัง scroll ในกล่องตัวเองได้ปกติ · ใช้ `clip` ไม่ใช่ `hidden`:
+     `clip` ตัด overflow แนวนอนได้เหมือนกัน แต่ไม่สร้าง scroll container
+     จึงไม่ทำลาย position:sticky ของ .sidebar (hidden ทำ sidebar ไม่ลอยตาม) */
+  html, body { overflow-x: clip; }
+
+  /* Reset grid to single column */
+  .layout {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;   /* fallback */
+    min-height: 100dvh;
+  }
+
+  /* Sidebar becomes collapsible top panel — sticky so the menu button
+     stays reachable while scrolling */
+  .sidebar {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    width: 100%;
+    height: auto;
+    border-right: none;
+    border-bottom: 1px solid var(--line);
+    padding: 0;
+    overflow: visible;
+  }
+
+  /* Show toggle button */
+  .nav-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 18px;
+  }
+
+  /* Collapsed state: body hidden. When open, cap height so a long TOC
+     scrolls inside the panel instead of pushing past the viewport */
+  .sidebar-body {
+    display: none;
+    padding: 16px 18px 20px;
+    border-top: 1px solid var(--line);
+    background: var(--paper);
+    overflow-x: hidden;
+    max-height: calc(100vh - 52px);   /* fallback */
+    max-height: calc(100dvh - 52px);  /* มือถือ: address bar หด/ขยาย ไม่ตัด TOC ท้าย */
+    overflow-y: auto;
+  }
+
+  /* Expanded state via JS: adds aria-expanded="true".
+     ลอยทับเนื้อหา (overlay) แทนการดัน main ลง — absolute เทียบกับ
+     .sidebar (sticky=positioned) จึงเกาะใต้ปุ่มแล้วลอยตามเวลา scroll */
+  .nav-toggle[aria-expanded="true"] + .sidebar-body {
+    display: block;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: min(92vw, 480px);
+    z-index: 49;
+    box-shadow: var(--shadow-menu);
+  }
+
+  .brand { font-size: 16px; }
+  .brand-sub { display: none; }
+  .progress-block { margin: 14px 0 12px; }
+  .toc-link { font-size: 14px; padding: 7px 8px; }
+
+  /* Main column: full width, tighter padding */
+  .main {
+    padding: 28px 18px 80px;
+    max-width: 100%;
+  }
+
+  /* Hero */
+  .hero { margin-bottom: 40px; }
+  .hero-meta { gap: 12px; flex-direction: column; }
+
+  /* Parts */
+  .part { margin-bottom: 64px; }
+
+  /* Tables: horizontal scroll */
+  .compare { min-width: 480px; font-size: 13px; }
+
+  /* Demo cards: single column on mobile */
+  .demo-row { flex-direction: column; }
+  .demo-card { min-width: 100%; flex: none; }
+
+  /* Demo mount: tighter padding + กัน demo (SVG/แถว flex กว้าง) ดันหน้าเกิน */
+  .demo-mount { padding: 14px; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .demo-mount svg { max-width: 100%; height: auto; }
+
+  /* Score rows: simpler layout */
+  .score-row { grid-template-columns: 1fr auto; }
+  .score-bar { display: none; }
+
+  /* Callout blocks: tighter */
+  .objectives,
+  .mistakes,
+  .quiz,
+  .self-check {
+    padding: 14px 16px 16px;
+  }
+
+  /* Quiz options: larger tap target */
+  .quiz-option { padding: 14px 16px; font-size: 15px; }
+
+  /* Self-check: larger tap */
+  .self-check label { padding: 10px 0; font-size: 15px; }
+  .self-check input[type="checkbox"] { width: 18px; height: 18px; }
+}
+
+/* ============================================
+   Large screens — bake "browser-zoom" feel เข้าไป
+   (จอใหญ่ default font/ภาพรวมจะตันที่ clamp max → ดูเล็ก
+    ผู้ใช้ต้องกด zoom เอง · ตั้ง default ให้โตพอดี)
+   - html{zoom} reflow เหมือน page-zoom → ไม่เกิด h-scroll
+   - media ใช้ viewport จริง (ไม่ใช่ค่า zoomed) → ไม่ toggle/กระพริบ
+   - zoom สูงสุดต่อช่วงจอ ≈ real / ~1100 (min content width) ไม่งั้น overflow
+   - ปรับ tier/ค่าได้ตามรสนิยม (verified ด้วย playwright: resize+measure ovf=0)
+   ============================================ */
+
+@media (min-width: 1800px) { html { zoom: 1.5; } }
+@media (min-width: 1550px) and (max-width: 1799.98px) { html { zoom: 1.4; } }
+@media (min-width: 1330px) and (max-width: 1549.98px) { html { zoom: 1.2; } }
+@media (min-width: 1180px) and (max-width: 1329.98px) { html { zoom: 1.08; } }
+
+/* จอกว้าง: balance การ center — เพิ่ม spacer ขวาเท่า sidebar
+   ให้ content รู้สึกอยู่กลางจอจริง ไม่เขยิบขวา (sidebar ดันซ้าย ~280px)
+   จอเล็กกว่า 1500 คง full-width track ไว้ (ไม่ให้ content แคบเกิน) */
+@media (min-width: 1500px) {
+  .layout { grid-template-columns: 280px 1fr 280px; }
+}
+
+/* sidebar scroll fix — align-self:start กัน grid stretch override height (2026-05-24) */
+.sidebar { align-self: start; max-height: 100vh; overscroll-behavior: contain; }
+/* ⚠ html{zoom} ทำให้ height:100vh ของ sidebar = 100vh×zoom (เกินจอ) → ก้นหลุดนอกจอ
+   scroll ดูเมนูล่างไม่ได้ + scroll-spy/navi เพี้ยน. ชดเชย = calc(100vh / zoom) ทุก tier
+   (sidebar ยัง zoom ใหญ่ตาม html ปกติ — แค่กล่องไม่เกินจอ). ต้องอยู่ "หลัง" บรรทัด max-height:100vh */
+@media (min-width: 1800px) { .sidebar { height: calc(100vh / 1.5); max-height: calc(100vh / 1.5); } }
+@media (min-width: 1550px) and (max-width: 1799.98px) { .sidebar { height: calc(100vh / 1.4); max-height: calc(100vh / 1.4); } }
+@media (min-width: 1330px) and (max-width: 1549.98px) { .sidebar { height: calc(100vh / 1.2); max-height: calc(100vh / 1.2); } }
+@media (min-width: 1180px) and (max-width: 1329.98px) { .sidebar { height: calc(100vh / 1.08); max-height: calc(100vh / 1.08); } }
+
+/* ============================================
+   Dia Learn — signature devices
+   merged 2026-07-04 จาก Dia Learn Design System
+   (claude.ai/design af0e2032 · spec: MyProject/dia-learn-design-system/)
+   ทุก class ใหม่ prefix dl- · additive — ของเดิมไม่แตะ
+   ============================================ */
+
+/* motion tokens — ไม่ผูก theme (สี/รูปทรงอยู่ในบล็อก THEME ด้านบนสุด) */
+:root {
+  --dur-flip: 400ms;
+  --ease-out2: cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+/* ---- 1) Chapter stamp — ตราประทับเปิดบท (แทน part-eyebrow ใน doc ใหม่) ---- */
+.dl-stamp {
+  display: inline-flex; align-items: center; gap: 10px;
+  font-family: var(--font-mono); font-size: 13px; font-weight: 500;
+  letter-spacing: 0.08em; color: var(--ink-2);
+  background: var(--paper); border: 1.5px solid var(--line-strong);
+  border-radius: var(--r-stamp); padding: 8px 14px;
+  white-space: nowrap; margin: 0 0 16px;
+}
+/* stamp ตั้งตรง (upright, no rotation) — refined 2026-07-04 ตาม Dia Learn DS
+   readme: "stamps sit upright" · นิ่ง/อ่านง่ายกว่าแบบเอียงเดิม */
+.dl-stamp .sep { color: var(--ink-soft); }
+
+/* ---- 2) Ghost numeral — เลขบทยักษ์จางหลังหัวบท ---- */
+.part { position: relative; }
+.dl-ghost {
+  position: absolute; top: -24px; right: 0;
+  font-family: var(--font-display); font-weight: 700;
+  font-size: clamp(120px, 18vw, 220px); line-height: 1;
+  color: var(--ink); opacity: var(--ghost-opacity);
+  pointer-events: none; user-select: none; z-index: 0;
+}
+/* เนื้อหาส่วนหัวลอยเหนือ ghost */
+.part-eyebrow, .part-title, .part-lede, .dl-stamp { position: relative; z-index: 1; }
+
+/* ---- 3) Margin note — โน้ตข้างกระดาษ (แม็กซ์ 1-2/บท) ---- */
+.dl-margin-note {
+  float: right; width: 240px; margin: 6px 0 18px 24px;
+  background: var(--paper-2); border: 1px solid var(--line);
+  border-radius: var(--r-card); padding: 14px 16px;
+  font-size: 14px; line-height: 1.65; color: var(--ink-2);
+}
+.dl-margin-note-label {
+  display: flex; align-items: center; gap: 7px;
+  font-family: var(--font-mono); font-size: 11px;
+  letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--ink-muted); margin-bottom: 8px;
+}
+.dl-margin-note-label::before { content: '★'; color: var(--star); font-size: 13px; line-height: 1; }
+.dl-margin-note code { font-family: var(--font-mono); font-size: 0.9em; }
+
+/* ---- 4) Star-trail TOC — เก็บดาวแทน progress ตัวเลข ---- */
+.toc-star {
+  width: 18px; display: inline-block; text-align: center; margin-right: 8px;
+  color: var(--line-strong); font-size: 13px; flex-shrink: 0;
+  transition: color 150ms ease;
+}
+.toc-link.done .toc-star, .toc-link.active .toc-star { color: var(--star); }
+.toc-star.pop { animation: dl-star-pop 200ms var(--ease-out2); }
+@keyframes dl-star-pop { 0% { transform: scale(0.6); } 60% { transform: scale(1.3); } 100% { transform: scale(1); } }
+
+/* ---- 5) Lab frame "การทดลอง" — กรอบ demo ขอบ dashed + แถบ teal ---- */
+.demo-block.dl-lab {
+  border: 1.5px dashed var(--line-strong);
+  border-radius: var(--r-card); background: var(--paper); overflow: hidden;
+}
+.demo-block.dl-lab .demo-head {
+  background: var(--teal); border-bottom: 0;
+  display: flex; align-items: center; gap: 10px; padding: 9px 16px;
+}
+.dl-lab-id {
+  font-family: var(--font-mono); font-size: 12px; font-weight: 600;
+  letter-spacing: 0.1em; color: var(--on-accent);
+  background: var(--on-accent-wash);
+  border-radius: var(--r-stamp); padding: 3px 8px; flex-shrink: 0;
+}
+.demo-block.dl-lab .demo-eyebrow { color: var(--on-accent-soft); margin: 0; }
+.demo-block.dl-lab .demo-title { color: var(--on-accent); font-size: 15px; margin: 0; }
+
+/* ---- 6) Flashcard quiz — การ์ดพลิกมีรอยพับมุม ---- */
+.dl-flashcard { perspective: 1200px; margin: 22px 0; }
+.dl-card-inner {
+  position: relative; min-height: 210px;
+  transform-style: preserve-3d; border-radius: var(--r-card);
+  transition: transform var(--dur-flip) var(--ease-out2);
+}
+.dl-flashcard.flipped .dl-card-inner { transform: rotateY(180deg); box-shadow: var(--shadow-flip); }
+.dl-card-face {
+  backface-visibility: hidden; -webkit-backface-visibility: hidden;
+  background: var(--paper); border: 2px solid var(--line-strong);
+  border-radius: var(--r-card); padding: 18px 20px;
+}
+.dl-card-front { position: relative; min-height: 210px; }
+.dl-card-back { position: absolute; inset: 0; transform: rotateY(180deg); overflow: auto; }
+.dl-card-eyebrow {
+  font-family: var(--font-mono); font-size: 11px;
+  letter-spacing: 0.14em; text-transform: uppercase; color: var(--teal);
+}
+.dl-card-q {
+  font-family: var(--font-display); font-size: 20px; font-weight: 600;
+  line-height: 1.35; color: var(--ink); margin: 8px 0 14px;
+  overflow-wrap: anywhere;
+}
+.dl-choice {
+  display: block; width: 100%; text-align: left;
+  font-family: var(--font-body); font-size: 15px; color: var(--ink-2);
+  background: var(--paper); border: 1px solid var(--line-strong);
+  border-radius: var(--r-soft); padding: 10px 13px; cursor: pointer; margin-bottom: 8px;
+  transition: border-color 150ms ease, background 150ms ease;
+}
+.dl-choice:hover { background: var(--paper-2); border-color: var(--ink-soft); }
+.dl-choice-k { font-family: var(--font-mono); color: var(--ink-soft); margin-right: 9px; }
+.dl-card-fold {
+  position: absolute; top: 0; right: 0; width: 0; height: 0;
+  border-top: 16px solid var(--line-strong); border-left: 16px solid transparent;
+  opacity: 0.5; border-top-right-radius: var(--r-card);
+}
+.dl-card-back[data-state="correct"] { background: var(--green-soft); border-color: var(--green); }
+.dl-card-back[data-state="wrong"]   { background: var(--rose-soft);  border-color: var(--rose); }
+.dl-card-back[data-state="correct"] .dl-card-fold { border-top-color: var(--green); }
+.dl-card-back[data-state="wrong"] .dl-card-fold { border-top-color: var(--rose); }
+.dl-card-stamp {
+  display: inline-block; font-family: var(--font-mono); font-size: 12.5px;
+  font-weight: 700; letter-spacing: 0.06em; color: var(--on-accent);
+  border-radius: var(--r-stamp); padding: 5px 11px;
+  margin-bottom: 10px;   /* upright — no rotation (refined 2026-07-04) */
+}
+.dl-card-back[data-state="correct"] .dl-card-stamp { background: var(--green); }
+.dl-card-back[data-state="wrong"] .dl-card-stamp { background: var(--rose); }
+.dl-card-picked { font-size: 15px; font-weight: 600; margin: 0 0 6px; }
+.dl-card-back[data-state="correct"] .dl-card-picked { color: var(--green-ink); }
+.dl-card-back[data-state="wrong"] .dl-card-picked { color: var(--rose-ink); }
+.dl-card-expl { font-size: 15px; line-height: 1.65; color: var(--ink-2); margin: 0; }
+.dl-card-retry {
+  margin-top: 12px; font-family: var(--font-mono); font-size: 13px;
+  color: var(--ink-muted); background: transparent; border: none;
+  cursor: pointer; padding: 0;
+}
+.dl-card-retry:hover { color: var(--ink); }
+
+/* ---- 7) Ink rule — เส้นคั่นสั้นแบบขีดสมุด (แทน hairline เต็มจอ) ---- */
+.dl-rule {
+  border: 0; width: 48px; height: 2px;
+  background: var(--ink); border-radius: 2px;
+  margin: 30px 0; opacity: 0.85;
+}
+
+/* ---- 8) Checkpoint — กล่องสรุปเขียว bullet ดาวทอง ---- */
+.dl-checkpoint {
+  background: var(--green-soft); border: 1px solid var(--line);
+  border-left: 3px solid var(--green); border-radius: var(--r-card);
+  padding: 18px 22px 20px; margin: 22px 0;
+}
+.dl-checkpoint-title { display: flex; align-items: baseline; gap: 10px; margin-bottom: 12px; }
+.dl-checkpoint-title .k {
+  font-family: var(--font-mono); font-size: 11px;
+  letter-spacing: 0.14em; text-transform: uppercase; color: var(--green-ink);
+}
+.dl-checkpoint-title .t {
+  font-family: var(--font-display); font-size: 20px; font-weight: 600; color: var(--green-ink);
+}
+/* track เป็น minmax(0,1fr) ไม่ใช่ auto — ไม่งั้น track ยืดตาม content ที่ไม่ยอมหดจนกล่องล้น */
+.dl-checkpoint ul {
+  list-style: none; margin: 0; padding: 0;
+  display: grid; grid-template-columns: minmax(0, 1fr); gap: 8px;
+}
+/* li เป็น block flow ไม่ใช่ flex — ถ้าเป็น flex ข้อความไทยกับ <code> จะกลายเป็น flex item คนละตัว
+   ที่ min-width:auto จึงไม่ยอมหดและไม่ตัดบรรทัด (ปัญหาอยู่ชั้น layout ใส่ overflow-wrap อย่างเดียวไม่ช่วย)
+   ★ แขวนด้วย absolute แทน · padding-left 23px = ความกว้างดาว ~13.14px + gap 10px เดิม ระยะเยื้องจึงเท่าเดิม */
+.dl-checkpoint li {
+  display: block; position: relative; padding-left: 23px;
+  font-size: 15px; line-height: 1.6; color: var(--ink-2);
+  overflow-wrap: anywhere;
+}
+.dl-checkpoint li::before {
+  content: '★'; position: absolute; left: 0; top: 2px;
+  color: var(--star); font-size: 13px;
+}
+
+/* ============================================================
+   Dia Learn — inline note primitives (added 2026-07-04)
+   port จาก Dia Learn DS: ConceptCard / PitfallCard / ProgressFooter / InlineKbd
+   ต่างจาก .objectives/.mistakes (บล็อกหลาย item หัวข้อตายตัว):
+   พวกนี้เป็น "การ์ดแทรกกลาง prose" 1 แนวคิด/1 หลุมพราง · label+title+เนื้อสั้น
+   สี semantic คงกฎเดิม: purple=แนวคิด · rose=พลาดบ่อย
+   ============================================================ */
+
+/* ---- 9) ConceptCard — กล่องนิยาม/แนวคิด (purple) แทรกกลางเนื้อหา ---- */
+.dl-concept {
+  margin: 24px 0; padding: 16px 20px 18px;
+  background: var(--purple-soft); border-top: 2px solid var(--purple);
+}
+.dl-concept-label {
+  font-family: var(--font-mono); font-size: 10.5px; font-weight: 700;
+  letter-spacing: 0.14em; text-transform: uppercase; color: var(--purple-ink);
+  margin-bottom: 6px;
+}
+.dl-concept-title {
+  font-family: var(--font-display); font-size: 20px; font-weight: 600;
+  line-height: 1.3; color: var(--purple-ink); margin: 0 0 8px;
+}
+.dl-concept p { margin: 0; font-size: 15px; line-height: 1.6; color: var(--ink-2); }
+.dl-concept code { color: var(--purple-ink); }
+
+/* ---- 10) PitfallCard — หลุมพราง 1 อัน (rose) แทรกกลาง prose ----
+   ใช้เมื่ออยากเตือนจุดเดียวตรงจุด · ถ้ามีหลายข้อรวมท้ายบท → ใช้ .mistakes เดิม */
+.dl-pitfall {
+  margin: 22px 0; padding: 16px 20px 18px;
+  background: var(--rose-soft); border-top: 2px solid var(--rose);
+}
+.dl-pitfall-label {
+  font-family: var(--font-mono); font-size: 10.5px; font-weight: 700;
+  letter-spacing: 0.14em; text-transform: uppercase; color: var(--rose-ink);
+  margin-bottom: 6px;
+}
+.dl-pitfall-title {
+  font-size: 15px; font-weight: 600; color: var(--rose-ink); margin: 0 0 6px;
+}
+.dl-pitfall p { margin: 0; font-size: 15px; line-height: 1.6; color: var(--ink-2); }
+.dl-pitfall code { color: var(--rose-ink); }
+
+/* ---- 11) ProgressFooter — แถบไป-ก่อนหน้า/ถัดไป ท้ายบท ---- */
+.dl-progress-footer {
+  display: flex; justify-content: space-between; align-items: flex-end; gap: 20px;
+  margin: 48px 0 0; padding-top: 22px; border-top: 1px solid var(--line);
+}
+.dl-pf-prev, .dl-pf-next {
+  text-decoration: none; color: var(--ink-muted);
+  transition: color 150ms ease; max-width: 46%;
+}
+.dl-pf-prev:hover, .dl-pf-next:hover { color: var(--ink); }
+.dl-pf-next { text-align: right; margin-left: auto; }
+.dl-pf-eyebrow {
+  font-family: var(--font-mono); font-size: 10px; font-weight: 600;
+  letter-spacing: 0.16em; text-transform: uppercase; color: var(--teal);
+  display: block; margin-bottom: 4px;
+}
+.dl-pf-title {
+  font-family: var(--font-display); font-size: 17px; font-weight: 600;
+  line-height: 1.25; color: inherit;
+}
+
+/* ---- 12) InlineKbd — ปุ่มคีย์บอร์ดในบรรทัด (depth มาจากขอบล่าง 2px ไม่ใช่เงา) ---- */
+.dl-kbd {
+  font-family: var(--font-mono); font-size: 0.82em; line-height: 1;
+  padding: 2px 7px 3px; color: var(--ink);
+  background: var(--paper); border: 1px solid var(--line-strong);
+  border-bottom-width: 2px; border-radius: var(--r-chip);
+  white-space: nowrap; vertical-align: baseline;
+}
+
+/* ---- Devices responsive ---- */
+@media (max-width: 800px) {
+  .dl-margin-note { float: none; width: auto; margin: 16px 0; }
+  .dl-ghost { font-size: clamp(90px, 26vw, 140px); top: -12px; }
+  .dl-stamp { white-space: normal; }
+  .dl-progress-footer { flex-direction: column; align-items: stretch; gap: 20px; }
+  .dl-pf-prev, .dl-pf-next { max-width: none; text-align: left; margin-left: 0; }
+}
+
+/* ============================================================
+   Sidebar collapse (desktop) — กดซ่อนสารบัญให้เนื้อหาเต็มจอ (2026-07-04)
+   มือถือ (<640) ใช้ .nav-toggle เดิม · ปุ่มชุดนี้ desktop-only
+   JS toggle .layout.sidebar-hidden + จำสถานะ localStorage
+   ============================================================ */
+.sidebar-collapse, .sidebar-show { display: none; }
+
+@media (min-width: 640px) {
+  /* ปุ่มซ่อน — มุมขวาบนของ sidebar (sidebar เป็น sticky = positioned อยู่แล้ว) */
+  .sidebar-collapse {
+    display: flex; align-items: center; justify-content: center;
+    position: absolute; top: 14px; right: 14px; z-index: 2;
+    appearance: none; width: 26px; height: 26px; padding: 0;
+    background: var(--paper); border: 1px solid var(--line-strong);
+    border-radius: var(--r-chip); color: var(--ink-muted);
+    font-size: 15px; line-height: 1; cursor: pointer;
+    transition: color 120ms ease, border-color 120ms ease;
+  }
+  .sidebar-collapse:hover { color: var(--ink); border-color: var(--ink-muted); }
+
+  /* สถานะซ่อน: sidebar หาย · main กินเต็มความกว้าง (override ทั้ง 2-col และ 3-col balanced) */
+  .layout.sidebar-hidden { grid-template-columns: 1fr; }
+  .layout.sidebar-hidden .sidebar { display: none; }
+
+  /* ปุ่มแสดง — ลอยมุมซ้ายบน โผล่เฉพาะตอนซ่อน (shadow = affordance ลอย เหมือน mobile overlay) */
+  .layout.sidebar-hidden .sidebar-show {
+    display: inline-flex; align-items: center; gap: 7px;
+    position: fixed; top: 16px; left: 16px; z-index: 60;
+    appearance: none; padding: 8px 13px;
+    background: var(--paper); border: 1px solid var(--line-strong);
+    border-radius: var(--r-soft); color: var(--ink-2);
+    font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.06em;
+    cursor: pointer; box-shadow: var(--shadow-float);
+    transition: color 120ms ease, border-color 120ms ease;
+  }
+  .layout.sidebar-hidden .sidebar-show:hover { color: var(--ink); border-color: var(--ink-muted); }
+}
+
+/* ============================================================
+   .dl-shot — figure สำหรับสกรีนช็อตประกอบ (คลิกเปิดภาพเต็มได้)
+   ============================================================ */
+.dl-shot { margin: 26px 0 30px; }
+.dl-shot a { display: block; border: 1px solid var(--line-strong); border-radius: var(--r-soft); overflow: hidden; background: var(--code-bg); }
+.dl-shot img { width: 100%; height: auto; display: block; }
+.dl-shot figcaption {
+  margin-top: 9px; font-family: var(--font-mono); font-size: 12.5px;
+  line-height: 1.55; color: var(--ink-soft);
+}
+.dl-shot figcaption b { color: var(--teal-ink); font-weight: 600; }
+@media (max-width: 639px) { .dl-shot { margin: 20px 0 24px; } }
+
+/* .dl-shot--narrow — สกรีนช็อตแคบ (เช่น dialog มือถือ) แสดงขนาดจริง กึ่งกลาง ไม่ยืดเต็มคอลัมน์ */
+.dl-shot--narrow a { display: table; margin: 0 auto; }
+.dl-shot--narrow img { width: auto; max-width: 100%; display: block; margin: 0 auto; }
+
+/* ============================================================
+   Lightbox — คลิกรูป .dl-shot เปิดขยายในหน้าเดิม (DOM สร้างครั้งเดียวใน interactive.js)
+   ============================================================ */
+.dl-shot img { cursor: zoom-in; }
+
+/* scroll lock ตอน lightbox เปิด — ล็อกทั้ง html และ body เพราะ <html> คือ scroller จริง
+   (body ไม่มี height/overflow ของตัวเอง) ล็อกด้วย class เฉยๆ ไม่แตะ scroll position
+   เลย จึงคืนค่าตำแหน่งเดิมได้เป๊ะโดยไม่ต้องใช้ scrollTo */
+html.dl-lightbox-lock, body.dl-lightbox-lock { overflow: hidden; }
+
+.dl-lightbox {
+  position: fixed; inset: 0; z-index: 1000;
+  display: flex; align-items: center; justify-content: center;
+  background: color-mix(in srgb, var(--ink) 92%, transparent);
+  padding: 64px 20px 76px;
+  opacity: 0; visibility: hidden; pointer-events: none;
+  transition: opacity 160ms ease;
+  /* clip เป็นตาข่ายกันเหตุ — content ที่ขยาย (โหมด zoom) ต้องไม่มีทางล้นออกจากกรอบ fixed
+     นี้ไปโผล่ใน document flow (fixed ที่ล้น viewport นับเข้า scrollable overflow ของหน้าได้) */
+  overflow: hidden;
+}
+.dl-lightbox.is-open { opacity: 1; visibility: visible; pointer-events: auto; }
+
+.dl-lightbox-close {
+  position: fixed; top: 14px; right: 14px; z-index: 1001;
+  width: 44px; height: 44px;
+  display: flex; align-items: center; justify-content: center;
+  background: transparent; border: 1px solid color-mix(in srgb, var(--paper) 55%, transparent);
+  border-radius: var(--r-soft); color: var(--paper); font-size: 24px; line-height: 1;
+  cursor: pointer;
+}
+.dl-lightbox-close:hover { background: color-mix(in srgb, var(--paper) 15%, transparent); }
+.dl-lightbox-close:focus-visible { outline: 2px solid var(--paper); outline-offset: 2px; }
+
+/* min-height/min-width:0 บังคับ — flex item ค่า default min-*:auto จะยึดตาม content
+   (รูปที่ขยายเต็ม) แล้วดันกล่องให้โตเกิน viewport แม้มี max-height/overflow:auto ก็ตาม */
+.dl-lightbox-figure {
+  margin: 0; display: flex; flex-direction: column; align-items: center; gap: 10px;
+  max-width: 100%; max-height: calc(100vh - 140px); min-height: 0; min-width: 0;
+}
+
+.dl-lightbox-img-wrap {
+  max-width: 96vw; max-height: 80vh; min-height: 0; min-width: 0;
+  overflow: auto; -webkit-overflow-scrolling: touch;
+  display: flex; align-items: flex-start; justify-content: center;
+}
+.dl-lightbox-img { display: block; max-width: 96vw; max-height: 80vh; object-fit: contain; cursor: zoom-in; }
+.dl-lightbox-img.is-zoomed { max-width: none; max-height: none; cursor: zoom-out; }
+
+/* position:fixed ดึง caption ออกจาก flex flow ของ figure ไปเป็นแถบเต็มความกว้างจอ
+   ปักไว้ล่างสุดเสมอ — แก้ปัญหาตัวหนังสือพื้นหลังทะลุ (พื้นเดิมโปร่งตามรูปแคบ .dl-shot--narrow
+   จนอ่านรก) ด้วยพื้นทึบของตัวเอง เข้มกว่า backdrop เพื่อให้ตัวอักษรอ่านชัดเสมอ */
+.dl-lightbox-caption {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 1001;
+  background: color-mix(in srgb, var(--ink) 96%, transparent);
+  color: var(--paper); font-family: var(--font-mono); font-size: 12.5px; line-height: 1.55;
+  text-align: center; padding: 12px 20px; box-sizing: border-box;
+}
+.dl-lightbox-caption:empty { display: none; }
+
+@media (max-width: 639px) {
+  .dl-lightbox { padding: 56px 12px 88px; }
+  .dl-lightbox-figure { max-height: calc(100vh - 144px); }
+  .dl-lightbox-caption { padding: 10px 14px; }
+}
+
+/* ============================================================
+   int161-express-sakila · ส่วนเสริมเฉพาะเล่มนี้
+   ============================================================ */
+
+/* แผนภาพเลเยอร์ (inline SVG) — สีมาจาก token ของ theme */
+.dl-diagram { margin: 28px 0; padding: 18px; background: var(--paper); border: 1px solid var(--line); border-radius: 10px; }
+.dl-diagram svg { display: block; width: 100%; max-width: 520px; height: auto; margin: 0 auto; }
+.dl-diagram figcaption { margin-top: 12px; font-size: 13.5px; color: var(--ink-muted); text-align: center; }
+.dg-box { fill: var(--paper-2); stroke: var(--line-strong); stroke-width: 1.2; }
+.dg-box-accent { fill: var(--teal-soft); stroke: var(--teal); stroke-width: 1.4; }
+.dg-box-err { fill: var(--rose-soft); stroke: var(--rose); stroke-width: 1.4; }
+.dg-box-db { fill: var(--amber-soft); stroke: var(--amber); stroke-width: 1.4; }
+.dg-t { fill: var(--ink); font-size: 14px; font-weight: 600; }
+.dg-s { fill: var(--ink-muted); font-size: 11.5px; font-family: var(--font-mono); }
+.dg-s-err { fill: var(--rose-ink); font-size: 11.5px; }
+.dg-arrow { stroke: var(--teal); stroke-width: 1.6; fill: none; }
+.dg-arrow-err { stroke: var(--rose); stroke-width: 1.6; fill: none; stroke-dasharray: 5 4; }
+.dg-head { fill: var(--teal); }
+.dg-head-err { fill: var(--rose); }
+.dg-lbl { fill: var(--teal-ink); font-size: 11px; }
+.dg-lbl-err { fill: var(--rose-ink); font-size: 11px; }
+
+/* คำถามทบทวนแบบกดดูคำตอบ */
+.dl-answer { margin: 12px 0; background: var(--paper); border: 1px solid var(--line); border-left: 3px solid var(--purple); border-radius: 8px; padding: 12px 16px; }
+.dl-answer summary { cursor: pointer; font-weight: 600; color: var(--ink); list-style-position: outside; }
+.dl-answer summary::marker { color: var(--purple); }
+.dl-answer[open] summary { margin-bottom: 8px; }
+.dl-answer p { margin: 6px 0 0; font-size: 15px; }
+
+/* ป้าย status code ในตาราง */
+.st { display: inline-block; font-family: var(--font-mono); font-size: 12.5px; font-weight: 600; padding: 1px 7px; border-radius: 4px; white-space: nowrap; }
+.st-ok { background: var(--green-soft); color: var(--green-ink); }
+.st-4xx { background: var(--amber-soft); color: var(--amber-ink); }
+.st-5xx { background: var(--rose-soft); color: var(--rose-ink); }
+
+/* ป้ายบอกว่าบล็อกนี้คือ "ผลที่ควรเห็น" ไม่ใช่โค้ดให้พิมพ์ */
+.dl-out-label { font-size: 12px; font-weight: 600; letter-spacing: .04em; color: var(--ink-soft); margin: 14px 0 -6px; text-transform: uppercase; }
