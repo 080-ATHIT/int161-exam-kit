@@ -9,3 +9,17 @@ test('mutation guard rejects arbitrary names and missing/mismatched marker',asyn
  await assert.rejects(()=>assertPracticeDatabase({query:async()=>{throw new Error('no table');}}));
  await assertPracticeDatabase(fake('int161_practice_tests','int161-exam-kit-v1'));
 });
+test('exam startup needs no practice marker, and fixture initialization refuses exam mode',async()=>{
+ const {loadSettings}=await import('../src/configs-$id/settings.js');
+ const {assertAppDatabase}=await import('../src/configs-$id/database-mode.js');
+ const {initializePractice}=await import('../scripts/db-lib.mjs');
+ assert.throws(()=>loadSettings({DB_MODE:'unknown'}));
+ assert.throws(()=>loadSettings({DB_MODE:'exam'}));
+ assert.throws(()=>loadSettings({DB_MODE:'exam',DB_NAME:'exam_db'}));
+ const config=loadSettings({DB_MODE:'exam',DB_NAME:'exam_db',STUDENT_ID:'my_id'});
+ let read=false;
+ const db={query:async sql=>{assert.equal(sql,'SELECT 1');read=true;return [[{ok:1}]];}};
+ await assertAppDatabase(db,config);assert.equal(read,true);
+ await assert.rejects(()=>assertAppDatabase(db,{dbMode:'unknown'}));
+ await assert.rejects(()=>initializePractice({...config,database:'int161_practice_tests'}),/DB_MODE=practice/);
+});

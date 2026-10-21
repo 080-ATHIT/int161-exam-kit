@@ -1,6 +1,6 @@
 # เลือก recipe ตาม Contract Sheet
 
-Prerequisite ทุกชิ้น: ESM, Express5, mysql2/promise pool, schema ที่อ่านแล้ว และ database ฝึกก่อนใช้กับงานจริง อย่าคัดลอก import ที่ชี้กลับ reference-app โดยไม่ปรับตำแหน่งไฟล์
+Prerequisite ทุกชิ้น: ESM, Express5, mysql2/promise pool, schema ที่อ่านแล้ว และ database ฝึกก่อนใช้กับงานจริง อย่าคัดลอก import ที่ชี้กลับ src โดยไม่ปรับตำแหน่งไฟล์
 
 ## Response W6
 
@@ -8,7 +8,7 @@ Prerequisite ทุกชิ้น: ESM, Express5, mysql2/promise pool, schema �
 
 1. วาง w6Success ใน mappers-$id/api-response.js และ w6ErrorHandler ใน middlewares-$id/error-handler.js
 2. ย้าย normalizeError ไปไฟล์กลาง หรือคงไว้เป็น export ใน error-handler เดิมแล้วปรับ import โดยหลีกเลี่ยง import ตัวเอง
-3. เปลี่ยน route ให้เรียก helper ใหม่ ติด error handler ใหม่หลัง router; ตัวอย่างประกอบครบอยู่ practice/worked-example/app.js
+3. เปลี่ยน route ให้เรียก helper ใหม่ ติด error handler ใหม่หลัง router; ปรับapp/routerและhelperในsrcให้เข้าคู่ ไม่มีprojectโจทย์ใหม่ที่ต้องทำเพิ่ม
 
 ```js
 // route context: service.removeTag ต้องคืนค่าหลังลบสำเร็จหรือ throw

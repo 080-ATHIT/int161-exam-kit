@@ -23,7 +23,7 @@ detail: id,sku,name,brandId,brandName,category,price,ramGb,storageGb,color,stock
 const dto = {id:entity.id, brandId:entity.brand_id, price:Number(entity.price)};
 ```
 
-โค้ดครบอยู่ [product-mapper.js](../reference-app/src/mappers-$id/product-mapper.js) ใช้ `items.map(summary)` สำหรับรายการและ `detail(entity)` สำหรับแถวเดียว
+โค้ดครบอยู่ [product-mapper.js](../src/mappers-$id/product-mapper.js) ใช้ `items.map(summary)` สำหรับรายการและ `detail(entity)` สำหรับแถวเดียว
 
 ## จุดที่มักพลาด
 
@@ -33,4 +33,4 @@ DBDATEเก็บวัน ไม่ใช่timestamp kitตั้งdateStrin
 
 Brandsในใบงานใช้snake_case ไม่ได้หมายความว่าทุกresourceต้องเปลี่ยนเป็นcamelCase ดูresponseของแต่ละendpointเสมอ
 
-ลอง [Read list](../questions/six-tasks/03-read-products.md) และ [Read detail](../questions/six-tasks/04-read-product-detail.md)
+ลอง [Read list](../guides/operations/03-read-products.md) และ [Read detail](../guides/operations/04-read-product-detail.md)

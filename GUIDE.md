@@ -1,63 +1,83 @@
-# Guide ใช้เอกสารและเฉลย INT161
+# Guide — เอา Template นี้ไปใช้กับข้อสอบอย่างไร
 
-## อ่านพื้นฐานเรียง9บท
+โค้ดในsrcทำงานครบแล้ว ให้แก้โครงตามสเปกที่ได้รับ จุดที่ควรเปลี่ยนมีคอมเมนต์ `ADAPT` ในJS ทุกหัวข้อด้านล่างเป็นขั้นตอนปรับโครง ไม่มีโจทย์ใหม่ให้ทำ
 
-1. [HTTP / REST / Status](INT161-MIDTERM/01-http-rest-status.md)
-2. [Express / ESM](INT161-MIDTERM/02-express-esm.md)
-3. [Controller / Service / Repository](INT161-MIDTERM/03-controller-service-repository.md)
-4. [CRUD / SQL](INT161-MIDTERM/04-crud-sql.md)
-5. [DTO / Mapper](INT161-MIDTERM/05-dto-mapper.md)
-6. [Pagination](INT161-MIDTERM/06-pagination.md)
-7. [Exception Handling](INT161-MIDTERM/07-exception-handling.md)
-8. [Complete Code Example](INT161-MIDTERM/08-complete-code-example.md)
-9. [Common Errors](INT161-MIDTERM/09-common-errors.md)
+## 1. จดเฉพาะค่าที่ต้องใช้จากโจทย์
 
-เอกสาร9บทเป็นสรุปที่ผู้ช่วยเรียบเรียงเพิ่มเพื่ออ่านประกอบโจทย์จริง แนวเฉลยที่รันได้ยังเป็นไฟล์ .js ปกติ
+method/path, ชื่อtable/columns, ชนิดPK/FK/UNIQUE, bodyที่รับ, DTOที่ส่ง, status/errorcode และpaginationpolicy ดู [Contract Sheet](guides/01-contract.md) หากต้องการตารางจด
 
-## 1. เริ่มจากโจทย์และกรอบสอบ
+ไม่ยึดproducts/brandsหรือ3Readของตัวอย่างเป็นชื่อข้อสอบจริง
 
-อ่าน [ประกาศสอบ](EXAM.md) และ [ต้นฉบับ Week08 ที่ตัดข้อมูลเฉพาะบุคคล](questions/week08-original.md) ก่อน ใบงาน Week08 มี8endpoints เมื่อนับ student-info, brands list/detail และ products5endpoints
+## 2. เลือกฐานและidentity
 
-ผู้ช่วยเลือก6endpointsให้เข้ากรอบฝึก 1C/3R/1U/1D: POST products, GET brands, GET products, GET products/:id, PUT products/:id, DELETE products/:id ส่วน GET student-info และ GET brands/:id ยังอยู่ในโค้ด/ใบงานเป็นส่วนประกอบที่ต้องอ่านเพิ่ม ไม่ถือว่าไม่ออกสอบ
+แก้ [.env.example](.env.example) โดยcopyเป็น.envส่วนตัว ดู [START-HERE](START-HERE.th.md)
 
-## 2. เปิดโจทย์คู่กับ JS ตามข้อ
+- ทดลองเปิดโครงเดิม: DB_MODE=practice + DB_NAME=int161_practice_catalog
+- ใช้ฐานโจทย์: DB_MODE=exam + DB_NAMEและSTUDENT_IDที่กำหนดเอง โค้ดไม่สร้าง/resetฐาน
+- basepathสร้างจากSTUDENT_IDคงที่เมื่อเริ่มapp ไม่ใช้/api/:studentId
 
-1. [Create](questions/six-tasks/01-create-product.md): validation → INSERT → SELECT →201
-2. [Read brands](questions/six-tasks/02-read-brands.md): SELECT list →200
-3. [Read products](questions/six-tasks/03-read-products.md): page/limit → COUNT/LIMIT/OFFSET → summary DTO
-4. [Read detail](questions/six-tasks/04-read-product-detail.md): JOIN →404เมื่อไม่พบ → detail DTO
-5. [Update](questions/six-tasks/05-update-product.md): ตรวจแถว/ซ้ำ → UPDATE →อ่านกลับ200 แม้ค่าเดิม
-6. [Delete](questions/six-tasks/06-delete-product.md): ตรวจแถว → DELETE →204ว่าง
+ดู [settings.js](src/configs-$id/settings.js), [db-config.js](src/configs-$id/db-config.js) และ [database-mode.js](src/configs-$id/database-mode.js)
 
-แต่ละ .md มีโจทย์, ลิงก์เฉลย .js, วิธีทำทีละชั้น, SQL หลัก, request และผลที่ต้องตรวจ เฉลย JS ไม่ได้อยู่ใน HTML และไม่ต้องใช้ skill เพื่อเปิดหรือแก้
+## 3. แก้ SQL ก่อน
 
-## 3. อ่านโค้ดเป็นลำดับ
+เปิด [catalog-repository.js](src/repositories-$id/catalog-repository.js) เทียบกับschemaจริง แล้วแก้table/column, SELECTfields, JOIN/alias, WHEREkey และINSERT/UPDATEdata
 
-[app.js](reference-app/src/app.js) → [routes](reference-app/src/routes-$id/catalog-route.js) → handlerใน solutions-$id → [service](reference-app/src/services-$id/catalog-service.js) → [repository](reference-app/src/repositories-$id/catalog-repository.js) → [mapper](reference-app/src/mappers-$id/product-mapper.js)
+- List: ORDER BYและLIMIT/OFFSET ถ้าแบ่งหน้า
+- Count: filterเดียวกับlist
+- Detail: SELECTตามPKและJOINข้อมูลที่DTOต้องใช้
+- Create: insertIdใช้เฉพาะauto increment; stringPKอ่านกลับด้วยkeyที่รับ
+- Update: WHEREครบและตรวจexistingก่อน ไม่ใช้changedRows0เป็นnot-found
+- Delete: WHEREครบ; compositekeyต้องทุกส่วน
 
-error จาก service/DB ส่งไป [error-handler.js](reference-app/src/middlewares-$id/error-handler.js) จุดเดียว ไม่ส่ง SQL/stack/password กลับ client
+ชื่อSQLidentifierเป็นsourcecodeที่คุณแก้เอง ไม่ดึงชื่อตารางจากrequestมาconcatenate Bindค่าผ่าน? ตัวอย่างSET?ของmysql2.queryต้องเป็นobjectที่ผ่านallowlistแล้ว
 
-## 4. เมื่อโจทย์เปลี่ยน ต้องแก้ตรงไหน
+## 4. แก้ input และ business rule
 
-จด method/path/key/body/DTO/status/pagination ก่อนเริ่ม ดู [Contract Sheet](guides/01-contract.md) แล้วแก้ตามลำดับ schema → SQL → validation/service → DTO → route/handler → request/assertions
+เปิด [catalog-service.js](src/services-$id/catalog-service.js) เปลี่ยนproductInput/validatorให้ตรงชื่อbody, required/optional/null/defaults และชนิดfieldจริง
 
-- SQL/table/PK/FK: repository
-- ฟิลด์รับเข้า/เงื่อนไข: service
-- ฟิลด์ออก/ชื่อcamelCase/number/date/null: mapper
-- path/status/body: route/handler/response helper
-- page/limit/default/cap: pagination middleware + SQL + metadata
-- DB error/404/409/400: AppError และ error middleware
+จากนั้นแก้ruleของcreate/update/remove: เช็กnot-found, uniquefieldชนกับแถวอื่น, FKที่โจทย์ต้องตรวจ และชื่อerrorcode ห้ามใช้numericIdกับstringPKเช่นNA
 
-ชื่อ folder `-$id` ในตัวอย่างเป็นชื่อตาม template ถ้าอาจารย์ให้เปลี่ยนเป็นรหัสตัวเอง ให้แก้ชื่อ folder และ import ทุกแห่งด้วย
+PUTตัวอย่างใช้fullbody หากโจทย์เป็นpartialต้องปรับvalidationและการรวมค่าเอง ไม่ทิ้งfieldเดิมโดยไม่ตั้งใจ
 
-[วิธีย้ายเข้า template และเปิด port](guides/05-template.md) — อย่าคัดลอก handlerเดี่ยวแล้วคิดว่ารันได้ ต้องมีทุก layer ที่ import และตั้ง entry/start ให้ครบ
+## 5. แก้ DTO/envelope
 
-## 5. ลองและเตรียมออฟไลน์
+เปิด [product-mapper.js](src/mappers-$id/product-mapper.js) เปลี่ยนsummary/detailallowlists, snake_case→ชื่อAPI, number/date/nullตามตัวอย่างresponse
 
-[ติดตั้งและเปิดโค้ด](START-HERE.th.md), [requests](requests/catalog.http), [ก่อนตัดเน็ตและส่ง LEB2](guides/06-offline.md)
+หากDTOต้องbrandNameหรือชื่อจากอีกตาราง ต้องแก้JOIN/aliasในrepositoryด้วย ไม่hardcodeชื่อ และไม่spreadentityทั้งก้อน
 
-เปิด .md/.js จากเครื่องได้ทันทีโดยไม่ใช้ server แต่การรัน API ต้องมี Node/dependencies/MySQL พร้อมแล้ว เตรียมทั้งหมดในช่วงที่อนุญาตให้ใช้เน็ต ใช้บัญชี LEB2 ของตัวเองรับส่งตามประกาศ
+เปิด [api-response.js](src/mappers-$id/api-response.js) ปรับenvelope/timestamp/pagination; ถ้าโจทย์ใช้status/dataดู [w6-response.js](recipes/w6-response.js) แล้วเปลี่ยนerrorhandlerให้เข้าคู่
 
-## 6. อะไรที่ผู้ช่วยเพิ่ม
+## 6. เลือก controller ให้ตรงแต่ละข้อ
 
-ดู [SOURCES.md](questions/SOURCES.md) และ [SUPPLEMENTS.md](SUPPLEMENTS.md) ทุกตัวอย่างแต่งเพิ่มแยกจากโจทย์อาจารย์ ชุดฝึกใช้ seedสมมติ ไม่ใช่ SQL/ข้อมูลข้อสอบเดิม ดังนั้นจำนวนข้อมูล/ชื่อสินค้า/brand จะแตกต่างจากใบงาน การผ่าน testไม่ใช่การรับรองว่าได้คะแนนข้อสอบจริง
+| งาน | Guideปรับโครง | จุดรับreq/ส่งres |
+| --- | --- | --- |
+| Create | [01](guides/operations/01-create-product.md) | [controller](src/controllers-$id/01-create-product.js) |
+| Read list | [02](guides/operations/02-read-brands.md) | [controller](src/controllers-$id/02-read-brands.js) |
+| Read + Pagination/DTO | [03](guides/operations/03-read-products.md) | [controller](src/controllers-$id/03-read-products.js) |
+| Read detail | [04](guides/operations/04-read-product-detail.md) | [controller](src/controllers-$id/04-read-product-detail.js) |
+| Update | [05](guides/operations/05-update-product.md) | [controller](src/controllers-$id/05-update-product.js) |
+| Delete | [06](guides/operations/06-delete-product.md) | [controller](src/controllers-$id/06-delete-product.js) |
+
+เปิด [catalog-route.js](src/routes-$id/catalog-route.js) เปลี่ยนmethod/path/paramsและmiddlewareให้ตรง ใส่queryParserเฉพาะrouteที่ต้องแบ่งหน้า controllerเรียกserviceไม่เขียนSQLซ้ำ
+
+ถ้าDELETE204ให้.end()ว่าง ถ้า200ให้JSONตามโจทย์ ไม่ส่งbodyกับ204
+
+## 7. แก้ Pagination และ Exception
+
+[pagination.js](src/middlewares-$id/pagination.js): defaultpage/limit/maxlimit/invalidpolicyตามโจทย์ คำนวณoffsetหลังnormalize ใช้limitเดียวกับSQLและmetadata ตัวอย่างdefault1/10,max100เป็นค่าของโครงที่แก้ได้
+
+[error-handler.js](src/middlewares-$id/error-handler.js): status/errorcode/message/envelopeต้องตรงโจทย์ จัดการ1062duplicate,1452FKไม่มี,1451resourceถูกอ้างอิง และไม่เผยSQL/stack/password
+
+## 8. ถ้าต้องส่งใน template อาจารย์
+
+ใช้ [แผนที่ย้ายไฟล์](guides/05-template.md) คงpackage/dependencies/ชื่อfolderและรูปแบบส่งที่อาจารย์กำหนด เอาเฉพาะsourceที่ใช้จริงไปประกอบ ไม่copyเอกสาร/tests/scriptsทั้งหมดใส่โดยอัตโนมัติ
+
+โครงนี้ใช้ExpressESM/mysql2ตามตระกูลtemplate ไม่เพิ่มframework การเปลี่ยนชื่อfolder -$id เป็นรหัสตัวเองต้องแก้importด้วย
+
+## 9. ตรวจงานที่แก้แล้ว
+
+แก้requestsให้ตรงbaseURL/body/fieldsของตัวเอง ลองCreate→Read→Update→Deleteกับแถวที่ตนสร้าง ตรวจHTTP/body/type/persistence/404/duplicate/FK/หน้าเกินตามสเปก
+
+`npm test` ใช้ตรวจโครงตัวอย่างในDB_MODE=practice ไม่ใช่runnerประเมินข้อสอบที่แก้schemaแล้ว ให้ใช้runnerที่อาจารย์แจกและassertionsตามโจทย์ใหม่
+
+ดู [errorและก่อนส่ง](guides/06-offline.md) และ[สรุป9บท](INT161-MIDTERM) เมื่อต้องทบทวน

@@ -1,6 +1,6 @@
 # CRUD ทีละชั้น
 
-เปิดไฟล์ตามเส้นทางนี้: `reference-app/src/app.js` → `routes-$id/catalog-route.js` → `services-$id/catalog-service.js` → `repositories-$id/catalog-repository.js` → `mappers-$id/product-mapper.js`
+เปิดไฟล์ตามเส้นทางนี้: `src/app.js` → `routes-$id/catalog-route.js` → `services-$id/catalog-service.js` → `repositories-$id/catalog-repository.js` → `mappers-$id/product-mapper.js`
 
 ## Route และ async
 

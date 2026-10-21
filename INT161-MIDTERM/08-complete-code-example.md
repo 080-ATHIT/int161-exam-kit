@@ -1,22 +1,14 @@
-# 08 — Complete Code Example
+# 08 — Complete Code Template
 
-บทนี้รวมโค้ดตัวอย่างที่ใช้งานจริงในrepoเพื่ออ่านตามrequestได้ครบ โค้ดเป็นแนวเฉลยผู้ช่วย ไม่ใช่เฉลยอาจารย์ ข้อมูลฝึกเป็นสมมติและนโยบายเพิ่มแสดงใน [SOURCES](../questions/SOURCES.md)
+โค้ดในบทนี้คือโครงที่รันได้ในsrc ไม่ใช่โจทย์ให้ทำเพิ่ม อ่านคอมเมนต์ADAPTแล้วเปลี่ยนตามสเปก ดู [GUIDE](../GUIDE.md) สำหรับลำดับแก้โครงและ [START-HERE](../START-HERE.th.md) เพื่อเปิดserver
 
-ไฟล์ .js/.mjs ที่ลิงก์ด้านล่างเป็นไฟล์รันจริง ส่วนcode blocksเป็นสำเนาเพื่ออ่าน ไม่ใช่ไฟล์ที่ต้องคัดลอกทั้งบทมารันเป็นไฟล์เดียว ต้องคงชื่อไฟล์/importและlayerให้ครบ
+ไฟล์.jsที่ลิงก์เป็นsourceรันจริง codeblocksเป็นสำเนาให้อ่านต่อเนื่อง ไม่คัดลอกทั้งบทมารวมเป็นไฟล์เดียว คงimportsและชื่อfolderให้ตรง
 
-## วิธีรันก่อนอ่าน
+ใช้DB_MODE=practiceเปิดโครงเดิม หรือDB_MODE=examพร้อมDB_NAME/STUDENT_IDที่กำหนดเองเพื่อเชื่อมฐานโจทย์โดยไม่สร้าง/resettable ใช้[schemaตัวอย่าง](../sql/schema.sql)เฉพาะโหมดpractice โหมดexamปรับSQL/requiredfields/DTOตามโจทย์ก่อน
 
-ใช้[START-HERE](../START-HERE.th.md): npm ci → ตั้ง.env → npm run db:init → npm run doctor → npm start จากนั้นใช้ [catalog.http](../requests/catalog.http) POST/GET/PUT/DELETE
+## src/configs-$id/settings.js
 
-schemaอยู่ที่ [schema.sql](../reference-app/sql/schema.sql) และdependencies/scriptsอยู่ใน [package.json](../package.json) serverตัวอย่างตรวจฐานฝึกprefix+markerก่อนเปิดport ห้ามนำserverนี้ไปชี้ฐานสอบโดยตรง ดู [วิธีใส่teacher template](../guides/05-template.md)
-
-## ตามเส้นทาง6ข้อ
-
-[Guideรายข้อและลิงก์ทุกlayer](../README.md) ครอบคลุมCreate/Readbrands/Readlist/ReadDetail/Update/Delete โค้ดยังมีidentity/branddetailจากWeek08 และtag/compositekeyที่ผู้ช่วยเพิ่มแยกไว้ใน [SUPPLEMENTS](../SUPPLEMENTS.md)
-
-## reference-app/src/configs-$id/settings.js
-
-[เปิดไฟล์ต้นฉบับ](../reference-app/src/configs-$id/settings.js)
+[เปิดJSและแก้ตรงไฟล์นี้](../src/configs-$id/settings.js)
 
 ```js
 function port(value, fallback) {
@@ -25,19 +17,23 @@ function port(value, fallback) {
   return Number(value);
 }
 export function loadSettings(env = process.env) {
+  // ADAPT 1: .env ระบุ DB ของโจทย์, mode และ identity ของตัวเอง ห้าม commit password
+  const dbMode = env.DB_MODE || 'practice';
+  if (!['practice','exam'].includes(dbMode)) throw new Error('DB_MODE must be practice or exam');
+  if (dbMode === 'exam' && (!env.DB_NAME || !env.STUDENT_ID)) throw new Error('Exam mode requires explicit DB_NAME and STUDENT_ID');
   const database = env.DB_NAME || 'int161_practice_catalog';
   const testDatabase = env.TEST_DB_NAME || 'int161_practice_tests';
   for (const name of [database,testDatabase]) if (!/^[A-Za-z][A-Za-z0-9_]{0,63}$/.test(name)) throw new Error('Invalid database identifier');
   const studentId = env.STUDENT_ID || 'demo001';
   if (!/^[A-Za-z0-9_-]{1,32}$/.test(studentId)) throw new Error('STUDENT_ID must be a static identifier, not a route parameter or path');
-  return {host:env.DB_HOST || '127.0.0.1',port:port(env.DB_PORT,3306),user:env.DB_USER || 'root',password:env.DB_PASSWORD || '',database,testDatabase,
+  return {dbMode,host:env.DB_HOST || '127.0.0.1',port:port(env.DB_PORT,3306),user:env.DB_USER || 'root',password:env.DB_PASSWORD || '',database,testDatabase,
     appPort:port(env.PORT,3000),studentId,name:env.STUDENT_NAME || 'Demo Student',key:env.STUDENT_KEY || 'fictional-key'};
 }
 ```
 
-## reference-app/src/configs-$id/db-config.js
+## src/configs-$id/db-config.js
 
-[เปิดไฟล์ต้นฉบับ](../reference-app/src/configs-$id/db-config.js)
+[เปิดJSและแก้ตรงไฟล์นี้](../src/configs-$id/db-config.js)
 
 ```js
 import mysql from 'mysql2/promise';
@@ -47,11 +43,37 @@ export function createDb(config) {
 }
 ```
 
-## reference-app/src/app.js
+## src/configs-$id/database-mode.js
 
-[เปิดไฟล์ต้นฉบับ](../reference-app/src/app.js)
+[เปิดJSและแก้ตรงไฟล์นี้](../src/configs-$id/database-mode.js)
 
 ```js
+// ADAPT: DB_MODE=practice ใช้ฐานตัวอย่าง; DB_MODE=exam ใช้ DB_NAME ตามโจทย์โดยไม่สร้าง/resetฐาน
+export const MARKER='int161-exam-kit-v1';
+export function assertPracticeName(name) {
+  if(typeof name!=='string'||name.length>64||!/^int161_practice_[A-Za-z0-9_]+$/.test(name)) throw new Error('Refusing writes: use a dedicated int161_practice_ database');
+}
+export async function assertPracticeDatabase(db) {
+  const [[{name}]]=await db.query('SELECT DATABASE() AS name');
+  assertPracticeName(name);
+  const [rows]=await db.query('SELECT value FROM _int161_kit_marker WHERE id=1');
+  if(rows[0]?.value!==MARKER) throw new Error('Refusing writes: database marker does not match this kit');
+}
+
+export async function assertAppDatabase(db, config) {
+  if (config.dbMode === 'practice') return assertPracticeDatabase(db);
+  if (config.dbMode !== 'exam') throw new Error('DB_MODE must be practice or exam');
+  // อ่านอย่างเดียว: การสร้าง/นำเข้า schema ข้อสอบทำตามไฟล์ SQL ของอาจารย์เอง
+  await db.query('SELECT 1');
+}
+```
+
+## src/app.js
+
+[เปิดJSและแก้ตรงไฟล์นี้](../src/app.js)
+
+```js
+// ADAPT: base path คงที่ตามรหัสใน .env; เปลี่ยน resource/router เมื่อโจทย์ใช้ตารางอื่น
 import express from 'express';
 import {createCatalogRepository} from './repositories-$id/catalog-repository.js';
 import {createCatalogService} from './services-$id/catalog-service.js';
@@ -69,39 +91,40 @@ export function createApp({db,studentId,name,key}) {
 }
 ```
 
-## reference-app/src/server.js
+## src/server.js
 
-[เปิดไฟล์ต้นฉบับ](../reference-app/src/server.js)
+[เปิดJSและแก้ตรงไฟล์นี้](../src/server.js)
 
 ```js
 import {loadSettings} from './configs-$id/settings.js';
 import {createDb} from './configs-$id/db-config.js';
 import {createApp} from './app.js';
-import {assertPracticeDatabase} from '../../scripts/db-lib.mjs';
+import {assertAppDatabase} from './configs-$id/database-mode.js';
 const config=loadSettings(),db=createDb(config);
 try {
- await assertPracticeDatabase(db);
- const server=createApp({db,...config}).listen(config.appPort,'127.0.0.1',()=>console.log(`Reference API: http://127.0.0.1:${config.appPort}/api/${config.studentId}`));
+ await assertAppDatabase(db,config);
+ const server=createApp({db,...config}).listen(config.appPort,'127.0.0.1',()=>console.log(`Template API: http://127.0.0.1:${config.appPort}/api/${config.studentId}`));
  server.on('error',async err=>{console.error('Start failed:',err.code||'SERVER_ERROR');await db.end();process.exitCode=1;});
  for(const signal of ['SIGINT','SIGTERM'])process.once(signal,()=>server.close(async()=>{await db.end();process.exit();}));
 } catch(err){console.error('Start failed:',err.code||err.message);await db.end();process.exitCode=1;}
 ```
 
-## reference-app/src/routes-$id/catalog-route.js
+## src/routes-$id/catalog-route.js
 
-[เปิดไฟล์ต้นฉบับ](../reference-app/src/routes-$id/catalog-route.js)
+[เปิดJSและแก้ตรงไฟล์นี้](../src/routes-$id/catalog-route.js)
 
 ```js
+// ADAPT: เปลี่ยน method/path ให้ตรงข้อสอบ; controllers รับreq/res, serviceถือbusinesslogic
 import express from 'express';
 import {numericId} from '../services-$id/catalog-service.js';
 import {queryParser} from '../middlewares-$id/pagination.js';
 import {success} from '../mappers-$id/api-response.js';
-import {createProductHandler} from '../solutions-$id/01-create-product.js';
-import {readBrandsHandler} from '../solutions-$id/02-read-brands.js';
-import {readProductsHandler} from '../solutions-$id/03-read-products.js';
-import {readProductDetailHandler} from '../solutions-$id/04-read-product-detail.js';
-import {updateProductHandler} from '../solutions-$id/05-update-product.js';
-import {deleteProductHandler} from '../solutions-$id/06-delete-product.js';
+import {createProductHandler} from '../controllers-$id/01-create-product.js';
+import {readBrandsHandler} from '../controllers-$id/02-read-brands.js';
+import {readProductsHandler} from '../controllers-$id/03-read-products.js';
+import {readProductDetailHandler} from '../controllers-$id/04-read-product-detail.js';
+import {updateProductHandler} from '../controllers-$id/05-update-product.js';
+import {deleteProductHandler} from '../controllers-$id/06-delete-product.js';
 // Express 5 ส่ง rejected Promise จาก async handler เข้า error middleware ได้
 export function createCatalogRouter(service,identity) {
  const router=express.Router();
@@ -128,12 +151,12 @@ export function createCatalogRouter(service,identity) {
 }
 ```
 
-## reference-app/src/solutions-$id/01-create-product.js
+## src/controllers-$id/01-create-product.js
 
-[เปิดไฟล์ต้นฉบับ](../reference-app/src/solutions-$id/01-create-product.js)
+[เปิดJSและแก้ตรงไฟล์นี้](../src/controllers-$id/01-create-product.js)
 
 ```js
-// แนวเฉลยที่ผู้ช่วยเขียนจากโจทย์ Week08 ไม่ใช่เฉลยอาจารย์
+// ADAPT: controller ที่ใช้ได้แล้ว เปลี่ยนparams/body/statusตามโจทย์ และแก้service/repo/mapperที่เกี่ยวข้อง
 // Create: validate/allowlist → INSERT → SELECT detail DTO → 201
 import {success} from '../mappers-$id/api-response.js';
 
@@ -144,12 +167,12 @@ export function createProductHandler(service) {
 }
 ```
 
-## reference-app/src/solutions-$id/02-read-brands.js
+## src/controllers-$id/02-read-brands.js
 
-[เปิดไฟล์ต้นฉบับ](../reference-app/src/solutions-$id/02-read-brands.js)
+[เปิดJSและแก้ตรงไฟล์นี้](../src/controllers-$id/02-read-brands.js)
 
 ```js
-// แนวเฉลยที่ผู้ช่วยเขียนจากโจทย์ Week08 ไม่ใช่เฉลยอาจารย์
+// ADAPT: controller ที่ใช้ได้แล้ว เปลี่ยนparams/body/statusตามโจทย์ และแก้service/repo/mapperที่เกี่ยวข้อง
 // Read 1: SELECT brands ORDER BY id → 200 array
 import {success} from '../mappers-$id/api-response.js';
 
@@ -160,12 +183,12 @@ export function readBrandsHandler(service) {
 }
 ```
 
-## reference-app/src/solutions-$id/03-read-products.js
+## src/controllers-$id/03-read-products.js
 
-[เปิดไฟล์ต้นฉบับ](../reference-app/src/solutions-$id/03-read-products.js)
+[เปิดJSและแก้ตรงไฟล์นี้](../src/controllers-$id/03-read-products.js)
 
 ```js
-// แนวเฉลยที่ผู้ช่วยเขียนจากโจทย์ Week08 ไม่ใช่เฉลยอาจารย์
+// ADAPT: controller ที่ใช้ได้แล้ว เปลี่ยนparams/body/statusตามโจทย์ และแก้service/repo/mapperที่เกี่ยวข้อง
 // Read 2: queryParser must run first; list + COUNT → summary DTO + pagination
 import {success, metadata} from '../mappers-$id/api-response.js';
 
@@ -177,12 +200,12 @@ export function readProductsHandler(service) {
 }
 ```
 
-## reference-app/src/solutions-$id/04-read-product-detail.js
+## src/controllers-$id/04-read-product-detail.js
 
-[เปิดไฟล์ต้นฉบับ](../reference-app/src/solutions-$id/04-read-product-detail.js)
+[เปิดJSและแก้ตรงไฟล์นี้](../src/controllers-$id/04-read-product-detail.js)
 
 ```js
-// แนวเฉลยที่ผู้ช่วยเขียนจากโจทย์ Week08 ไม่ใช่เฉลยอาจารย์
+// ADAPT: controller ที่ใช้ได้แล้ว เปลี่ยนparams/body/statusตามโจทย์ และแก้service/repo/mapperที่เกี่ยวข้อง
 // Read 3: validate id → SELECT JOIN → missing404 → detail DTO
 import {success} from '../mappers-$id/api-response.js';
 import {numericId} from '../services-$id/catalog-service.js';
@@ -194,12 +217,12 @@ export function readProductDetailHandler(service) {
 }
 ```
 
-## reference-app/src/solutions-$id/05-update-product.js
+## src/controllers-$id/05-update-product.js
 
-[เปิดไฟล์ต้นฉบับ](../reference-app/src/solutions-$id/05-update-product.js)
+[เปิดJSและแก้ตรงไฟล์นี้](../src/controllers-$id/05-update-product.js)
 
 ```js
-// แนวเฉลยที่ผู้ช่วยเขียนจากโจทย์ Week08 ไม่ใช่เฉลยอาจารย์
+// ADAPT: controller ที่ใช้ได้แล้ว เปลี่ยนparams/body/statusตามโจทย์ และแก้service/repo/mapperที่เกี่ยวข้อง
 // Update: find first, full-body validation, UPDATE then read back; unchanged values200
 import {success} from '../mappers-$id/api-response.js';
 import {numericId} from '../services-$id/catalog-service.js';
@@ -211,12 +234,12 @@ export function updateProductHandler(service) {
 }
 ```
 
-## reference-app/src/solutions-$id/06-delete-product.js
+## src/controllers-$id/06-delete-product.js
 
-[เปิดไฟล์ต้นฉบับ](../reference-app/src/solutions-$id/06-delete-product.js)
+[เปิดJSและแก้ตรงไฟล์นี้](../src/controllers-$id/06-delete-product.js)
 
 ```js
-// แนวเฉลยที่ผู้ช่วยเขียนจากโจทย์ Week08 ไม่ใช่เฉลยอาจารย์
+// ADAPT: controller ที่ใช้ได้แล้ว เปลี่ยนparams/body/statusตามโจทย์ และแก้service/repo/mapperที่เกี่ยวข้อง
 // Delete: find404 or DELETE; 204 has NO JSON body
 import {numericId} from '../services-$id/catalog-service.js';
 
@@ -228,11 +251,13 @@ export function deleteProductHandler(service) {
 }
 ```
 
-## reference-app/src/services-$id/catalog-service.js
+## src/services-$id/catalog-service.js
 
-[เปิดไฟล์ต้นฉบับ](../reference-app/src/services-$id/catalog-service.js)
+[เปิดJSและแก้ตรงไฟล์นี้](../src/services-$id/catalog-service.js)
 
 ```js
+// ADAPT: แก้productInputให้ตรงbody/required/defaultsของโจทย์; ไม่ส่งreq.bodyตรงลงSQL
+// ต่อไปแก้unique rule/not-found/ชื่อerror และเลือกsummary/detailให้ตรงแต่ละendpoint
 import {AppError} from '../middlewares-$id/app-error.js';
 import {summary,detail} from '../mappers-$id/product-mapper.js';
 const fail=message=>{throw new AppError(message);};
@@ -256,6 +281,7 @@ function dateOnly(value) {
   if(!Number.isFinite(date.getTime())||date.toISOString().slice(0,10)!==value)fail('release_date must be a valid calendar date');
   return value;
 }
+// ADAPT BODY: เปลี่ยนfield/type/nullability/maxตามschemaจริง (PUTนี้ใช้full body)
 export function productInput(body) {
   if(!body||typeof body!=='object'||Array.isArray(body))fail('JSON body must be an object');
   const sku=text(body.sku,'sku',50),name=text(body.name,'name',150),category=text(body.category,'category',50);
@@ -276,11 +302,41 @@ export function createCatalogService(repo) {
     listBrands:()=>repo.listBrands(),
     getBrand,
     async removeBrand(id){await getBrand(id);if(!await repo.removeBrand(id))throw new AppError('Brand not found',404,'BRAND_NOT_FOUND');},
-    async listProducts(pagination){const [items,total]=await Promise.all([repo.listProducts(pagination),repo.countProducts()]);return {items:items.map(summary),total};},
+    async listProducts(pagination) {
+      // ADAPT READ: เพิ่มfilterต้องส่งไปทั้งlistและcountด้วย
+      const [items, total] = await Promise.all([
+        repo.listProducts(pagination), repo.countProducts()
+      ]);
+      return {items: items.map(summary), total};
+    },
     async getProduct(id){return detail(await getProduct(id));},
-    async createProduct(body){const data=productInput(body);if(await repo.findBySku(data.sku))throw new AppError('SKU already exists',409,'DUPLICATE_KEY');const id=await repo.createProduct(data);return detail(await getProduct(id));},
-    async updateProduct(id,body){await getProduct(id);const data=productInput(body);const other=await repo.findBySku(data.sku);if(other&&other.id!==id)throw new AppError('SKU already exists',409,'DUPLICATE_KEY');await repo.updateProduct(id,data);return detail(await getProduct(id));},
-    async removeProduct(id){await getProduct(id);if(!await repo.removeProduct(id))throw new AppError('Product not found',404,'PRODUCT_NOT_FOUND');},
+    // CREATE: ใช้insertIdเฉพาะauto increment; string PKอ่านกลับด้วยkeyที่รับมา
+    async createProduct(body) {
+      const data = productInput(body);
+      if (await repo.findBySku(data.sku)) {
+        throw new AppError('SKU already exists', 409, 'DUPLICATE_KEY');
+      }
+      const id = await repo.createProduct(data);
+      return detail(await getProduct(id));
+    },
+    // UPDATE: ตรวจว่ามีแถวก่อน; ค่าเดิมยังสำเร็จ อย่าใช้changedRows0เป็น404
+    async updateProduct(id, body) {
+      await getProduct(id);
+      const data = productInput(body);
+      const other = await repo.findBySku(data.sku);
+      if (other && other.id !== id) {
+        throw new AppError('SKU already exists', 409, 'DUPLICATE_KEY');
+      }
+      await repo.updateProduct(id, data);
+      return detail(await getProduct(id));
+    },
+    // DELETE: repoคืนaffectedRows; FKerrorให้middlewareกลางแปลง
+    async removeProduct(id) {
+      await getProduct(id);
+      if (!await repo.removeProduct(id)) {
+        throw new AppError('Product not found', 404, 'PRODUCT_NOT_FOUND');
+      }
+    },
     listTags:()=>repo.listTags(),
     async getTag(code){return getTag(tagCode(code));},
     async createTag(body){const data={code:tagCode(body?.code),label:text(body?.label,'label',100)};await repo.createTag(data);return getTag(data.code);},
@@ -293,11 +349,13 @@ export function createCatalogService(repo) {
 }
 ```
 
-## reference-app/src/repositories-$id/catalog-repository.js
+## src/repositories-$id/catalog-repository.js
 
-[เปิดไฟล์ต้นฉบับ](../reference-app/src/repositories-$id/catalog-repository.js)
+[เปิดJSและแก้ตรงไฟล์นี้](../src/repositories-$id/catalog-repository.js)
 
 ```js
+// ADAPT: เปลี่ยนtable/column/PK/FK/WHERE/JOINตรงschemaโจทย์; bindค่าด้วย? เสมอ
+// list และ COUNT ต้องใช้filterเดียวกัน; string/composite keyอยู่ด้านล่างสำหรับหยิบใช้เมื่อจำเป็น
 // ตาราง/คอลัมน์เป็น source code ที่แก้ตาม schema; ? ใช้กับค่าข้อมูล
 const PRODUCT_SELECT = `SELECT p.id,p.sku,p.name,p.brand_id,b.name AS brand_name,
  p.category,p.price,p.ram_gb,p.storage_gb,p.color,p.stock_quantity,p.status,p.release_date
@@ -327,11 +385,13 @@ export function createCatalogRepository(db) {
 }
 ```
 
-## reference-app/src/mappers-$id/product-mapper.js
+## src/mappers-$id/product-mapper.js
 
-[เปิดไฟล์ต้นฉบับ](../reference-app/src/mappers-$id/product-mapper.js)
+[เปิดJSและแก้ตรงไฟล์นี้](../src/mappers-$id/product-mapper.js)
 
 ```js
+// ADAPT: แก้allowlist/ชื่อfield/typeตามresponseโจทย์; summaryกับdetailอาจต่างกัน
+// brandNameมาจากJOINalias brand_name; ถ้าเปลี่ยนSQLต้องแก้mapperให้ตรงกัน
 // Allowlist: ห้าม return {...entity} เพราะคอลัมน์ภายในอาจหลุดออกไป
 export function summary(entity) {
   return {id:entity.id, sku:entity.sku, name:entity.name, brandId:entity.brand_id,
@@ -347,11 +407,13 @@ export function detail(entity) {
 }
 ```
 
-## reference-app/src/mappers-$id/api-response.js
+## src/mappers-$id/api-response.js
 
-[เปิดไฟล์ต้นฉบับ](../reference-app/src/mappers-$id/api-response.js)
+[เปิดJSและแก้ตรงไฟล์นี้](../src/mappers-$id/api-response.js)
 
 ```js
+// ADAPT: เปลี่ยนenvelopeเฉพาะตามcontract: success/data/timestamp หรือ status/data
+// DELETE204ไม่ผ่านhelperนี้ ใช้end(); DELETE200จึงส่งJSONตามสเปก
 // ตัวอย่าง W8-like: ปรับชื่อ key/types/status ตามข้อสอบจริงเสมอ
 export function success(res, data, status = 200, pagination) {
   return res.status(status).json({success:true, data,
@@ -362,9 +424,9 @@ export function metadata(total, {page,limit}) {
 }
 ```
 
-## reference-app/src/middlewares-$id/app-error.js
+## src/middlewares-$id/app-error.js
 
-[เปิดไฟล์ต้นฉบับ](../reference-app/src/middlewares-$id/app-error.js)
+[เปิดJSและแก้ตรงไฟล์นี้](../src/middlewares-$id/app-error.js)
 
 ```js
 // Error ที่แอปตั้งใจให้ client เห็น: status และ code ต้องใช้ให้ตรงกับ handler
@@ -375,11 +437,12 @@ export class AppError extends Error {
 }
 ```
 
-## reference-app/src/middlewares-$id/pagination.js
+## src/middlewares-$id/pagination.js
 
-[เปิดไฟล์ต้นฉบับ](../reference-app/src/middlewares-$id/pagination.js)
+[เปิดJSและแก้ตรงไฟล์นี้](../src/middlewares-$id/pagination.js)
 
 ```js
+// ADAPT: default page/limit, maxlimit และinvalid-query policyตามโจทย์ ไม่ยึดค่าตัวอย่างเสมอ
 import { AppError } from './app-error.js';
 function positiveInteger(value, fallback) {
   if (value === undefined) return fallback;
@@ -400,11 +463,12 @@ export function queryParser(req, res, next) {
 }
 ```
 
-## reference-app/src/middlewares-$id/error-handler.js
+## src/middlewares-$id/error-handler.js
 
-[เปิดไฟล์ต้นฉบับ](../reference-app/src/middlewares-$id/error-handler.js)
+[เปิดJSและแก้ตรงไฟล์นี้](../src/middlewares-$id/error-handler.js)
 
 ```js
+// ADAPT: จับคู่HTTPstatus/errorcode/message/envelopeกับโจทย์จริง รวมMySQL1062/1452/1451
 import { AppError } from './app-error.js';
 const MYSQL_ERRORS = {
   ER_DUP_ENTRY: [409,'DUPLICATE_KEY','Resource already exists'],
@@ -423,49 +487,6 @@ export function errorHandler(err, req, res, next) {
   if (res.headersSent) return next(err);
   const result = normalizeError(err);
   return res.status(result.status).json(result.body);
-}
-```
-
-## scripts/db-lib.mjs
-
-[เปิดไฟล์ต้นฉบับ](../scripts/db-lib.mjs)
-
-```js
-import mysql from 'mysql2/promise';
-import {readFile} from 'node:fs/promises';
-export const MARKER='int161-exam-kit-v1';
-export function assertPracticeName(name) {
-  if(typeof name!=='string'||name.length>64||!/^int161_practice_[A-Za-z0-9_]+$/.test(name)) throw new Error('Refusing writes: use a dedicated int161_practice_ database');
-}
-export async function assertPracticeDatabase(db) {
-  const [[{name}]]=await db.query('SELECT DATABASE() AS name');
-  assertPracticeName(name);
-  const [rows]=await db.query('SELECT value FROM _int161_kit_marker WHERE id=1');
-  if(rows[0]?.value!==MARKER) throw new Error('Refusing writes: database marker does not match this kit');
-}
-export async function initializePractice(config) {
-  assertPracticeName(config.database);
-  const admin=await mysql.createConnection({host:config.host,port:config.port,user:config.user,password:config.password,timezone:'Z'});
-  try {
-    const [existing]=await admin.query('SELECT SCHEMA_NAME FROM information_schema.SCHEMATA WHERE SCHEMA_NAME=?',[config.database]);
-    if(existing.length) {
-      await admin.changeUser({database:config.database});
-      await assertPracticeDatabase(admin); // An existing unmarked DB is never adopted silently.
-    } else {
-      await admin.query(`CREATE DATABASE \`${config.database}\` CHARACTER SET utf8mb4`);
-      await admin.changeUser({database:config.database});
-      await admin.query('CREATE TABLE _int161_kit_marker (id INT PRIMARY KEY,value VARCHAR(80) NOT NULL)');
-      await admin.query('INSERT INTO _int161_kit_marker VALUES(1,?)',[MARKER]);
-    }
-    const schema=await readFile(new URL('../reference-app/sql/schema.sql',import.meta.url),'utf8');
-    for(const sql of schema.split(';').map(s=>s.trim()).filter(Boolean)) await admin.query(sql);
-    await admin.query("INSERT IGNORE INTO brands(id,name,country_of_origin,website) VALUES (1,'Example Devices','Thailand','https://example.invalid'),(2,'Sample Mobility','Japan','https://example.invalid')");
-    for(let id=1;id<=23;id++) await admin.query('INSERT IGNORE INTO products(id,sku,name,brand_id,category,price,ram_gb,storage_gb,color,stock_quantity,status,release_date,internal_cost) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?)',
-      [id,`DEMO-${String(id).padStart(3,'0')}`,`Demo Phone ${id}`,id%2?1:2,'PHONE',id*100,8,128,'Black',id,'AVAILABLE','2026-01-02',id*50]);
-    await admin.query("INSERT IGNORE INTO tags(code,label) VALUES ('NA','Not assigned'),('DEMO','Example tag')");
-    await admin.query("INSERT IGNORE INTO product_tags(product_id,tag_code) VALUES(1,'DEMO')");
-    return config.database;
-  } finally {await admin.end();}
 }
 ```
 

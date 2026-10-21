@@ -1,9 +1,9 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { parsePagination } from '../reference-app/src/middlewares-$id/pagination.js';
-import { summary, detail } from '../reference-app/src/mappers-$id/product-mapper.js';
-import { normalizeError } from '../reference-app/src/middlewares-$id/error-handler.js';
-import { loadSettings } from '../reference-app/src/configs-$id/settings.js';
+import { parsePagination } from '../src/middlewares-$id/pagination.js';
+import { summary, detail } from '../src/mappers-$id/product-mapper.js';
+import { normalizeError } from '../src/middlewares-$id/error-handler.js';
+import { loadSettings } from '../src/configs-$id/settings.js';
 
 test('pagination uses defaults, capped limit and correct offset', () => {
   assert.deepEqual(parsePagination({}), {page:1,limit:10,offset:0});

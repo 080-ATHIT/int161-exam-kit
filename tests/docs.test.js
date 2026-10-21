@@ -14,6 +14,6 @@ async function sourceFiles(dir='.'){
 test('Markdown guides resolve local links; six task solutions are ordinary JS; no HTML required',async()=>{
  const files=await sourceFiles();assert.ok(!files.some(p=>p.endsWith('.html')));
  for(const path of files.filter(p=>p.endsWith('.md'))){const source=await readFile(path,'utf8');for(const match of source.matchAll(/\[[^\]]+\]\(([^)]+)\)/g)){if(!/^(https?:|#)/.test(match[1]))await access(resolve(dirname(path),match[1].split('#')[0]));}}
- const solutions=files.filter(p=>p.startsWith('reference-app/src/solutions-$id/')&&p.endsWith('.js'));assert.equal(solutions.length,6);
- for(const path of solutions){assert.match(await readFile(path,'utf8'),/export function/);await access('questions/six-tasks/'+path.split('/').pop().replace('.js','.md'));}
+ const solutions=files.filter(p=>p.startsWith('src/controllers-$id/')&&p.endsWith('.js'));assert.equal(solutions.length,6);
+ for(const path of solutions){assert.match(await readFile(path,'utf8'),/export function/);await access('guides/operations/'+path.split('/').pop().replace('.js','.md'));}
 });

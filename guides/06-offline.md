@@ -35,4 +35,4 @@
 
 ## ข้อจำกัดการตรวจ
 
-ผลตรวจเทคนิคของ kit ดู docs/VALIDATION.md การผ่าน automated tests ไม่เท่ากับคุณทำโจทย์เองได้ ขั้นสุดท้ายให้ทำ independent-task โดยไม่อ่าน implementation แล้วแก้จาก error เองก่อนวันสอบ
+ผลตรวจเทคนิคของ kit ดู docs/VALIDATION.md การผ่าน automated tests ไม่เท่ากับคุณทำโจทย์เองได้ ตรวจendpointของโครงที่แก้ตามสเปกด้วยrequestและrunnerที่อาจารย์ให้ก่อนส่ง

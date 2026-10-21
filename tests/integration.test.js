@@ -1,9 +1,9 @@
 import test, {before,after} from 'node:test';
 import assert from 'node:assert/strict';
-import {loadSettings} from '../reference-app/src/configs-$id/settings.js';
-import {createDb} from '../reference-app/src/configs-$id/db-config.js';
+import {loadSettings} from '../src/configs-$id/settings.js';
+import {createDb} from '../src/configs-$id/db-config.js';
 import {initializePractice,assertPracticeDatabase} from '../scripts/db-lib.mjs';
-const {createApp}=await import(process.env.KIT_VERIFY_APP_URL || new URL('../reference-app/src/app.js',import.meta.url).href);
+const {createApp}=await import(process.env.KIT_VERIFY_APP_URL || new URL('../src/app.js',import.meta.url).href);
 
 let db,server,base; const made=[],tags=[];
 const prefix=`T${Date.now()}${process.pid}`;

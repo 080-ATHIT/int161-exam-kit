@@ -3,10 +3,10 @@ import assert from 'node:assert/strict';
 import {execFile} from 'node:child_process';
 import {promisify} from 'node:util';
 import {readFile} from 'node:fs/promises';
-import {loadSettings} from '../reference-app/src/configs-$id/settings.js';
-import {createDb} from '../reference-app/src/configs-$id/db-config.js';
+import {loadSettings} from '../src/configs-$id/settings.js';
+import {createDb} from '../src/configs-$id/db-config.js';
 import {initializePractice,assertPracticeDatabase} from '../scripts/db-lib.mjs';
-import {createApp} from '../reference-app/src/app.js';
+import {createApp} from '../src/app.js';
 test('curl sample executes against real DB and cleans up its own created row',async()=>{
  const cfg=loadSettings();cfg.database=cfg.testDatabase;await initializePractice(cfg);const db=createDb(cfg);let server;
  try{

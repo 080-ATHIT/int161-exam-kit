@@ -1,5 +1,5 @@
-import {loadSettings} from '../reference-app/src/configs-$id/settings.js';
-import {createDb} from '../reference-app/src/configs-$id/db-config.js';
+import {loadSettings} from '../src/configs-$id/settings.js';
+import {createDb} from '../src/configs-$id/db-config.js';
 let db;
 try {
   const config=loadSettings();
@@ -11,6 +11,6 @@ try {
   console.log('Read-only check passed. No tables or records were changed.');
 } catch(err) {
   console.error('Doctor failed:',err.code || 'CONFIG_ERROR');
-  console.error('ตรวจ .env, เปิด MySQL และใช้ npm run db:init เฉพาะฐานฝึกเมื่อพร้อม');
+  console.error('ตรวจ .env/MySQL; db:init ใช้ได้เฉพาะ DB_MODE=practice ไม่ใช้กับฐานสอบ');
   process.exitCode=1;
 } finally {if(db)await db.end();}

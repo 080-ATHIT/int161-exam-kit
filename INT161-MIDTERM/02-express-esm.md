@@ -46,6 +46,6 @@ Express5ที่ kitใช้ส่ง rejected Promiseจาก async handler�
 
 ## app กับ server ต่างกัน
 
-[app.js](../reference-app/src/app.js) ประกอบ routes และ export factory แต่ยังไม่เปิดport ส่วน [server.js](../reference-app/src/server.js) อ่าน config สร้าง pool ตรวจฐานฝึกและ listen การ `node app.js` อย่างเดียวจึงไม่เปิดAPIของkit
+[app.js](../src/app.js) ประกอบ routes และ export factory แต่ยังไม่เปิดport ส่วน [server.js](../src/server.js) อ่าน config สร้าง pool ตรวจฐานฝึกและ listen การ `node app.js` อย่างเดียวจึงไม่เปิดAPIของkit
 
 เริ่มด้วย [START-HERE](../START-HERE.th.md) และดู [การใส่ใน template](../guides/05-template.md)

@@ -53,4 +53,4 @@ W8 DELETE กำหนด204ว่าง แต่ W6 DELETE customer กำห�
 
 ทำไม GET detailไม่พบต้อง404แต่ GET listไม่มีรายการยัง200พร้อม[]? ทำไม POSTสำเร็จ201? ทำไม204ห้ามแนบJSON? ทำไม priceในbodyต้องตรวจชนิด แม้ clientเขียนมาว่าเป็นnumber?
 
-ดู [โจทย์จริง Week08](../questions/week08-original.md) และ [กรอบสอบ](../EXAM.md)
+ดู [วิธีใช้โครงกับข้อสอบ](../GUIDE.md) และเทียบstatusกับสเปกที่ได้รับจริง

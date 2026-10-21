@@ -40,4 +40,4 @@ AppErrorของkitใช้constructor(message,status,code) และproperty 
 
 GET idไม่มี→404; POSTskuซ้ำ→409; brand_idไม่มี→400; ลบแถวถูกFKอ้างอิง→409; ส่งJSONแตก→400 ทุกกรณีต้องเป็นJSONและstatusถูก ไม่ใช่200ที่มีข้อความerror
 
-ดู [AppError](../reference-app/src/middlewares-$id/app-error.js), [handler](../reference-app/src/middlewares-$id/error-handler.js), [โจทย์W6จริง](../questions/week06-original.md)
+ดู [AppError](../src/middlewares-$id/app-error.js), [handler](../src/middlewares-$id/error-handler.js), [วิธีเลือกresponse](../recipes/README.md)

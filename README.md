@@ -1,38 +1,43 @@
-# INT161 — Guide และโจทย์ฝึกปฏิบัติ
+# INT161 Exam Template
 
-เอกสารอ่านเป็น `.md` และแนวเฉลยเป็น `.js` ปกติ เปิดอ่านใน editor ได้ออฟไลน์
+ดาวน์โหลดแล้วใช้เป็นโครงช่วยทำข้อสอบ: มีโค้ด CRUD, DTO, Pagination และ Exception Handling ที่ประกอบและรันได้แล้ว พร้อมคอมเมนต์ `ADAPT` บอกจุดที่ต้องเปลี่ยนตามโจทย์
 
-อ่านสรุปเรียง9บทใน [INT161-MIDTERM](INT161-MIDTERM)
+เริ่มที่ [START-HERE.th.md](START-HERE.th.md) เพื่อเปิดโครง แล้วใช้ [GUIDE.md](GUIDE.md) ระหว่างแก้ข้อสอบ
 
-| บท | เนื้อหา |
-| --- | --- |
-| 01 | [HTTP / REST / Status](INT161-MIDTERM/01-http-rest-status.md) |
-| 02 | [Express / ESM](INT161-MIDTERM/02-express-esm.md) |
-| 03 | [Controller / Service / Repository](INT161-MIDTERM/03-controller-service-repository.md) |
-| 04 | [CRUD / SQL](INT161-MIDTERM/04-crud-sql.md) |
-| 05 | [DTO / Mapper](INT161-MIDTERM/05-dto-mapper.md) |
-| 06 | [Pagination](INT161-MIDTERM/06-pagination.md) |
-| 07 | [Exception Handling](INT161-MIDTERM/07-exception-handling.md) |
-| 08 | [Complete Code Example](INT161-MIDTERM/08-complete-code-example.md) |
-| 09 | [Common Errors](INT161-MIDTERM/09-common-errors.md) |
+```text
+src/
+  app.js / server.js       ประกอบ API และเปิด port
+  configs-$id/             DB, mode, identity
+  routes-$id/              method/path/middleware
+  controllers-$id/         req/res แยกตาม CRUD + 3 Read
+  services-$id/            validation และ business rules
+  repositories-$id/        SQL, PK/FK, JOIN, COUNT
+  mappers-$id/             DTO และ response envelope
+  middlewares-$id/         pagination/error handling
+sql/                       schema ของฐานตัวอย่าง
+requests/                  request สำหรับตรวจ API
+GUIDE.md                   วิธีปรับโครงให้ตรงโจทย์ที่ได้รับ
+INT161-MIDTERM/             สรุปอ่านประกอบ 9 บท
+```
 
-เริ่มฝึกที่ [GUIDE.md](GUIDE.md) → [ติดตั้ง/เปิดตัวอย่าง](START-HERE.th.md) → [โจทย์จริง Week08](questions/week08-original.md)
+## เลือกส่วนที่จะใช้
 
-| แบบ | Guide วิธีทำ | เฉลย JavaScript ที่ route ใช้จริง |
+| งาน | โค้ดเริ่มต้น | วิธีปรับ |
 | --- | --- | --- |
-| 1C เพิ่มสินค้า | [01 Create](questions/six-tasks/01-create-product.md) | [01-create-product.js](reference-app/src/solutions-$id/01-create-product.js) |
-| R1 รายการแบรนด์ | [02 Brands](questions/six-tasks/02-read-brands.md) | [02-read-brands.js](reference-app/src/solutions-$id/02-read-brands.js) |
-| R2 รายการสินค้า + Pagination/DTO | [03 Products](questions/six-tasks/03-read-products.md) | [03-read-products.js](reference-app/src/solutions-$id/03-read-products.js) |
-| R3 รายละเอียดสินค้า + JOIN/DTO | [04 Detail](questions/six-tasks/04-read-product-detail.md) | [04-read-product-detail.js](reference-app/src/solutions-$id/04-read-product-detail.js) |
-| 1U แก้ไขสินค้า | [05 Update](questions/six-tasks/05-update-product.md) | [05-update-product.js](reference-app/src/solutions-$id/05-update-product.js) |
-| 1D ลบสินค้า | [06 Delete](questions/six-tasks/06-delete-product.md) | [06-delete-product.js](reference-app/src/solutions-$id/06-delete-product.js) |
+| Create | [01-create-product.js](src/controllers-$id/01-create-product.js) | [Create guide](guides/operations/01-create-product.md) |
+| Read list แบรนด์ | [02-read-brands.js](src/controllers-$id/02-read-brands.js) | [List guide](guides/operations/02-read-brands.md) |
+| Read list + Pagination/DTO | [03-read-products.js](src/controllers-$id/03-read-products.js) | [Pagination guide](guides/operations/03-read-products.md) |
+| Read detail + JOIN/DTO | [04-read-product-detail.js](src/controllers-$id/04-read-product-detail.js) | [Detail guide](guides/operations/04-read-product-detail.md) |
+| Update | [05-update-product.js](src/controllers-$id/05-update-product.js) | [Update guide](guides/operations/05-update-product.md) |
+| Delete | [06-delete-product.js](src/controllers-$id/06-delete-product.js) | [Delete guide](guides/operations/06-delete-product.md) |
 
-handler ใช้ service/repository/mapper ร่วมกันเพื่อคงโครงสร้าง template ของอาจารย์ Guide แต่ละข้อลิงก์ไปทุกชั้นที่ต้องอ่าน/แก้
+controllerเรียก service/repository/mapper ที่มีครบในsrc ไม่ต้องประกอบจากโจทย์ฝึกใหม่ products/brands เป็นโครงที่ดัดแปลงจากงานที่เฉลยแล้ว เปลี่ยนชื่อtable/field/keyและcontractตามข้อสอบจริง ส่วนtags/composite key และrecipesเป็นโค้ดทางเลือกที่หยิบใช้หรือลบออกเมื่อไม่เกี่ยวข้อง
 
-โจทย์มาจากใบงานอาจารย์ ส่วนเฉลยและการจัดกลุ่ม6ข้อเขียนเพิ่มโดยผู้ช่วย ไม่ใช่เฉลยที่อาจารย์รับรอง และยังไม่ใช่ข้อสอบกลางภาคที่ไม่ได้แจก ดู [ที่มาและสิ่งที่เพิ่ม](questions/SOURCES.md)
+## สองโหมด
 
-- [กรอบสอบตามประกาศ](EXAM.md)
-- [เอกสารเสริมที่ติดป้ายชัดเจน](SUPPLEMENTS.md)
-- [ผลตรวจและข้อจำกัด](docs/VALIDATION.md)
+- `DB_MODE=practice`: เปิดโครงกับฐานตัวอย่างที่แยกไว้ ใช้ `npm run db:init` ได้
+- `DB_MODE=exam`: เชื่อม `DB_NAME` และ `STUDENT_ID` ที่ระบุเอง ไม่สร้าง/resetฐาน ต้องปรับSQL/schema/contractตามโจทย์และใช้SQLอาจารย์ตามคำสั่ง
 
-ไม่มีเว็บ/HTML และไม่ต้องเปิด server เพื่ออ่านเอกสาร ต้องเตรียม Node/MySQL และ `npm ci` ขณะมีอินเทอร์เน็ตเฉพาะเมื่อต้องการรันโค้ด `node_modules` ไม่รวมใน ZIP
+เตรียม Node/MySQL และ `npm ci` ก่อนตัดอินเทอร์เน็ต เอกสาร.mdและโค้ด.jsเปิดอ่านออฟไลน์ได้ ไม่ใช้เว็บหรือskill ไม่มีโฟลเดอร์โจทย์ให้ทำเพิ่ม
+
+[อ่านสรุป9บท](INT161-MIDTERM) · [ใส่ลงteacher template](guides/05-template.md) · [แก้error/ก่อนส่ง](guides/06-offline.md) · [ผลตรวจ](docs/VALIDATION.md)

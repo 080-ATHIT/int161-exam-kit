@@ -1,14 +1,14 @@
 {
   "name": "int161-exam-kit",
-  "version": "1.2.0",
+  "version": "2.0.0",
   "private": true,
   "type": "module",
-  "description": "Offline Thai study/reference kit for INT161 Express and MySQL exams",
+  "description": "INT161 ready-to-adapt Express ESM and MySQL exam template",
   "engines": {
     "node": ">=22.9.0"
   },
   "scripts": {
-    "start": "node --env-file-if-exists=.env reference-app/src/server.js",
+    "start": "node --env-file-if-exists=.env src/server.js",
     "doctor": "node --env-file-if-exists=.env scripts/doctor.mjs",
     "db:init": "node --env-file-if-exists=.env scripts/init-db.mjs",
     "test": "node --env-file-if-exists=.env --test --test-concurrency=1 tests/*.test.js",

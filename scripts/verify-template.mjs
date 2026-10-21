@@ -18,8 +18,8 @@ with zipfile.ZipFile(sys.argv[1]) as z:
  const target=join(temp,'node-express-esm-template');
  const pkg=JSON.parse(await readFile(join(target,'package.json'),'utf8'));
  if(pkg.type!=='module'||!pkg.dependencies?.express?.match(/^\^?5\./)||!pkg.dependencies?.mysql2?.match(/^\^?3\./)||!pkg.dependencies?.['http-status']?.match(/^\^?2\./))throw new Error('Unexpected teacher template dependencies; inspect before migrating');
- const source=join(root,'reference-app/src');
- const files=['app.js','configs-$id','routes-$id','services-$id','repositories-$id','mappers-$id','middlewares-$id','solutions-$id'];
+ const source=join(root,'src');
+ const files=['app.js','server.js','configs-$id','routes-$id','services-$id','repositories-$id','mappers-$id','middlewares-$id','controllers-$id'];
  for(const name of files)await cp(join(source,name),join(target,'src',name),{recursive:true});
  await symlink(join(root,'node_modules'),join(target,'node_modules'),'dir');
  const result=spawnSync(process.execPath,['--test','tests/integration.test.js'],{cwd:root,env:{...process.env,KIT_VERIFY_APP_URL:pathToFileURL(join(target,'src/app.js')).href},stdio:'inherit'});

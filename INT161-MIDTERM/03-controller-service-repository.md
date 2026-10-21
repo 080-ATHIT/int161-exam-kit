@@ -4,14 +4,14 @@
 
 | ชั้น | รับผิดชอบ | ไฟล์จริง |
 | --- | --- | --- |
-| app/router | base path, method, middleware, ประกอบ dependencies | [catalog-route.js](../reference-app/src/routes-$id/catalog-route.js) |
-| controller/handler | อ่าน req เรียกservice ส่ง HTTP status/body | [เฉลย6ข้อ](../reference-app/src/solutions-$id) |
-| service | validation, business rule, not-found, เลือกDTO | [catalog-service.js](../reference-app/src/services-$id/catalog-service.js) |
-| repository | querySQLและคืนข้อมูล/ผลกระทบจากDB | [catalog-repository.js](../reference-app/src/repositories-$id/catalog-repository.js) |
-| mapper | เลือกฟิลด์/แปลงชื่อและชนิดข้อมูล | [product-mapper.js](../reference-app/src/mappers-$id/product-mapper.js) |
-| error middleware | แปลงerrorเป็นHTTPและJSONที่ตรงcontract | [error-handler.js](../reference-app/src/middlewares-$id/error-handler.js) |
+| app/router | base path, method, middleware, ประกอบ dependencies | [catalog-route.js](../src/routes-$id/catalog-route.js) |
+| controller/handler | อ่าน req เรียกservice ส่ง HTTP status/body | [เฉลย6ข้อ](../src/controllers-$id) |
+| service | validation, business rule, not-found, เลือกDTO | [catalog-service.js](../src/services-$id/catalog-service.js) |
+| repository | querySQLและคืนข้อมูล/ผลกระทบจากDB | [catalog-repository.js](../src/repositories-$id/catalog-repository.js) |
+| mapper | เลือกฟิลด์/แปลงชื่อและชนิดข้อมูล | [product-mapper.js](../src/mappers-$id/product-mapper.js) |
+| error middleware | แปลงerrorเป็นHTTPและJSONที่ตรงcontract | [error-handler.js](../src/middlewares-$id/error-handler.js) |
 
-controllerไม่ได้จำเป็นต้องมีfolderชื่อcontroller ในkitใช้ solutions-$id เพื่อให้เปิดตามข้อได้ง่าย นี่เป็นการจัดไฟล์ของผู้ช่วย ไม่ใช่ข้อบังคับชื่อfolderใหม่จากอาจารย์
+controllerไม่ได้จำเป็นต้องมีfolderชื่อcontroller ในโครงนี้ใช้ controllers-$id เพื่อให้หาจุดรับreq/ส่งresได้ง่าย นี่เป็นการจัดไฟล์ของผู้ช่วย ไม่ใช่ข้อบังคับชื่อfolderใหม่จากอาจารย์
 
 ## ตามหนึ่ง request ให้ครบ
 
