@@ -52,7 +52,7 @@ test('CRUD persists, includes JOIN/date types, allows unchanged update and refus
  const id=c.json.data.id;assert.notEqual(id,999999);
  const [[stored]]=await db.query('SELECT sku,internal_cost FROM products WHERE id=?',[id]);assert.equal(stored.sku,data.sku);assert.equal(stored.internal_cost,null);
  let r=await request('/products/'+id);assert.equal(r.status,200);assert.equal(r.json.data.brandName,'Example Devices');assert.equal(r.json.data.releaseDate,'2026-02-28');assert.equal(r.json.data.price,1250.5);
- assert.equal(Object.keys(r.json.data).length,14);
+ assert.equal(Object.keys(r.json.data).length,13);
  assert.equal((await request('/products/'+id,'PUT',data)).status,200,'unchanged update');
  assert.equal((await request('/products','POST',data)).status,409);
  const other=await request('/products','POST',body('B'));assert.equal(other.status,201);made.push(other.json.data.id);
@@ -64,7 +64,7 @@ test('CRUD persists, includes JOIN/date types, allows unchanged update and refus
 });
 test('validation and database FK errors use exact status and public codes',async()=>{
  for(const bad of [{...body(),name:' '},{...body(),price:-1},{...body(),price:'12.00'},{...body(),price:1.234},{...body(),release_date:'2026-02-30'},{...body(),stock_quantity:-1},null,[]])assert.equal((await request('/products','POST',bad)).status,400);
- const r=await request('/products','POST',{...body(),brand_id:99999999});assert.equal(r.status,400);assert.equal(r.json.error.code,'FOREIGN_KEY_NOT_FOUND');
+ const r=await request('/products','POST',{...body('FK'),brand_id:99999999});assert.equal(r.status,400);assert.equal(r.json.error.code,'FOREIGN_KEY_NOT_FOUND');
  const fk=await request('/brands/1','DELETE');assert.equal(fk.status,409);assert.equal(fk.json.error.code,'RESOURCE_IN_USE');assert.ok(!fk.text.includes('DELETE FROM'));
 });
 test('string and composite keys preserve values and distinguish duplicate/not-found/FK',async()=>{
@@ -82,8 +82,19 @@ test('string and composite keys preserve values and distinguish duplicate/not-fo
  assert.equal((await request(`/products/${id}/tags/${code}`,'DELETE')).status,204);
  assert.equal((await request(`/products/${id}/tags/${code}`,'DELETE')).status,404);
 });
-test('zero-result metadata survives response serialization',async()=>{
- // Exercise the same helper with total=0 without deleting the seeded fixture.
- const {metadata}=await import('../reference-app/src/mappers-$id/api-response.js');
- const m=metadata(0,{page:1,limit:10});assert.deepEqual(m,{total:0,page:1,limit:10,totalPages:0,hasNextPage:false,hasPrevPage:false});
+test('zero-result metadata survives the real MySQL route and JSON serialization',async()=>{
+ const conn=await db.getConnection();let emptyServer;
+ try {
+  await assertPracticeDatabase(conn);await conn.beginTransaction();
+  await conn.query('DELETE FROM product_tags');await conn.query('DELETE FROM products');
+  emptyServer=createApp({db:conn,studentId:'empty',name:'Demo',key:'fake'}).listen(0,'127.0.0.1');
+  await new Promise(resolve=>emptyServer.once('listening',resolve));
+  const r=await fetch(`http://127.0.0.1:${emptyServer.address().port}/api/empty/products`);const data=await r.json();
+  assert.equal(r.status,200);assert.deepEqual(data.data,[]);
+  assert.deepEqual(data.pagination,{total:0,page:1,limit:10,totalPages:0,hasNextPage:false,hasPrevPage:false});
+ }finally{if(emptyServer)await new Promise(resolve=>emptyServer.close(resolve));await conn.rollback();conn.release();}
+});
+test('malformed JSON gets a JSON error without Express HTML or a stack',async()=>{
+ const r=await fetch(base+'/products',{method:'POST',headers:{'Content-Type':'application/json'},body:'{'});
+ assert.equal(r.status,400);const data=await r.json();assert.equal(data.error.code,'INVALID_JSON');assert.equal(data.success,false);
 });
