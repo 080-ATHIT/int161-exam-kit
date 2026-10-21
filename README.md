@@ -2,7 +2,21 @@
 
 เอกสารอ่านเป็น `.md` และแนวเฉลยเป็น `.js` ปกติ เปิดอ่านใน editor ได้ออฟไลน์
 
-เริ่มที่ [GUIDE.md](GUIDE.md) → [ติดตั้ง/เปิดตัวอย่าง](START-HERE.th.md) → [โจทย์จริง Week08](questions/week08-original.md)
+อ่านสรุปเรียง9บทใน [INT161-MIDTERM](INT161-MIDTERM)
+
+| บท | เนื้อหา |
+| --- | --- |
+| 01 | [HTTP / REST / Status](INT161-MIDTERM/01-http-rest-status.md) |
+| 02 | [Express / ESM](INT161-MIDTERM/02-express-esm.md) |
+| 03 | [Controller / Service / Repository](INT161-MIDTERM/03-controller-service-repository.md) |
+| 04 | [CRUD / SQL](INT161-MIDTERM/04-crud-sql.md) |
+| 05 | [DTO / Mapper](INT161-MIDTERM/05-dto-mapper.md) |
+| 06 | [Pagination](INT161-MIDTERM/06-pagination.md) |
+| 07 | [Exception Handling](INT161-MIDTERM/07-exception-handling.md) |
+| 08 | [Complete Code Example](INT161-MIDTERM/08-complete-code-example.md) |
+| 09 | [Common Errors](INT161-MIDTERM/09-common-errors.md) |
+
+เริ่มฝึกที่ [GUIDE.md](GUIDE.md) → [ติดตั้ง/เปิดตัวอย่าง](START-HERE.th.md) → [โจทย์จริง Week08](questions/week08-original.md)
 
 | แบบ | Guide วิธีทำ | เฉลย JavaScript ที่ route ใช้จริง |
 | --- | --- | --- |

@@ -1,6 +1,6 @@
 {
   "name": "int161-exam-kit",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "private": true,
   "type": "module",
   "description": "Offline Thai study/reference kit for INT161 Express and MySQL exams",

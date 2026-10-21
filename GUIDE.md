@@ -1,5 +1,19 @@
 # Guide ใช้เอกสารและเฉลย INT161
 
+## อ่านพื้นฐานเรียง9บท
+
+1. [HTTP / REST / Status](INT161-MIDTERM/01-http-rest-status.md)
+2. [Express / ESM](INT161-MIDTERM/02-express-esm.md)
+3. [Controller / Service / Repository](INT161-MIDTERM/03-controller-service-repository.md)
+4. [CRUD / SQL](INT161-MIDTERM/04-crud-sql.md)
+5. [DTO / Mapper](INT161-MIDTERM/05-dto-mapper.md)
+6. [Pagination](INT161-MIDTERM/06-pagination.md)
+7. [Exception Handling](INT161-MIDTERM/07-exception-handling.md)
+8. [Complete Code Example](INT161-MIDTERM/08-complete-code-example.md)
+9. [Common Errors](INT161-MIDTERM/09-common-errors.md)
+
+เอกสาร9บทเป็นสรุปที่ผู้ช่วยเรียบเรียงเพิ่มเพื่ออ่านประกอบโจทย์จริง แนวเฉลยที่รันได้ยังเป็นไฟล์ .js ปกติ
+
 ## 1. เริ่มจากโจทย์และกรอบสอบ
 
 อ่าน [ประกาศสอบ](EXAM.md) และ [ต้นฉบับ Week08 ที่ตัดข้อมูลเฉพาะบุคคล](questions/week08-original.md) ก่อน ใบงาน Week08 มี8endpoints เมื่อนับ student-info, brands list/detail และ products5endpoints
