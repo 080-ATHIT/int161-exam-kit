@@ -16,8 +16,8 @@ cp .env.example .env
 แก้ `.env` ให้ตรง MySQL ของเครื่อง: `DB_HOST`, `DB_PORT`, `DB_USER`, `DB_PASSWORD` ห้าม commit ไฟล์นี้ ชื่อฐานฝึกใช้ `int161_practice_catalog` และ `TEST_DB_NAME=int161_practice_tests` หากบัญชีไม่มีสิทธิ์ CREATE DATABASE ให้ผู้ดูแลสร้างฐานเฉพาะสำหรับฝึกก่อน และดูคำอธิบาย marker ในคู่มือออฟไลน์ อย่าใส่ฐานงานจริง
 
 ```sh
-npm run doctor
 npm run db:init
+npm run doctor
 npm start
 ```
 

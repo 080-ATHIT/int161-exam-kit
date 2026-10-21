@@ -19,7 +19,7 @@ with zipfile.ZipFile(sys.argv[1]) as z:
  const probe=`import net from 'node:net';await new Promise((resolve,reject)=>{const s=net.connect({host:'1.1.1.1',port:443});s.setTimeout(2000,()=>{s.destroy();reject(new Error('Unproven: timeout instead of policy denial'));});s.on('connect',()=>{s.destroy();reject(new Error('External network unexpectedly permitted'));});s.on('error',e=>{if(!['EPERM','EACCES'].includes(e.code))reject(e);else{console.log('External IP blocked by OS policy');resolve();}});});`;
  execFileSync('/usr/bin/sandbox-exec',['-p',profile,process.execPath,'--input-type=module','-e',probe],{cwd:target,stdio:'inherit'});
  const tests=(await readdir(join(target,'tests'))).filter(x=>x.endsWith('.test.js')).map(x=>'tests/'+x);
- const result=spawnSync('/usr/bin/sandbox-exec',['-p',profile,process.execPath,'--test',...tests],{cwd:target,env:process.env,stdio:'inherit'});
+ const result=spawnSync('/usr/bin/sandbox-exec',['-p',profile,process.execPath,'--test','--test-concurrency=1',...tests],{cwd:target,env:process.env,stdio:'inherit'});
  if(result.status!==0)throw new Error('Unpacked archive failed offline tests');
  console.log('PASS: unpacked source ZIP; prepared local dependencies; OS denies external network; local MySQL allowed');
 }finally{await rm(temp,{recursive:true,force:true});}

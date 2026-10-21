@@ -11,7 +11,7 @@
     "start": "node --env-file-if-exists=.env reference-app/src/server.js",
     "doctor": "node --env-file-if-exists=.env scripts/doctor.mjs",
     "db:init": "node --env-file-if-exists=.env scripts/init-db.mjs",
-    "test": "node --env-file-if-exists=.env --test tests/*.test.js",
+    "test": "node --env-file-if-exists=.env --test --test-concurrency=1 tests/*.test.js",
     "test:unit": "node --test tests/unit.test.js tests/db-guard.test.js",
     "guide": "node scripts/build-guide.mjs",
     "verify:template": "node --env-file-if-exists=.env scripts/verify-template.mjs",
