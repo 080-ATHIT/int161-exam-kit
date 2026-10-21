@@ -5,7 +5,11 @@
 - Unit/guard/API/recipes/worked example ใช้ node:test และ MySQL จริง ฐานเฉพาะ int161_practice_tests ที่มี marker
 - ตรวจ CRUD กับแถวในฐานจริง, DTO allowlist/types, JOIN, date-only, pagination default/cap/invalid/zero, duplicate/FK, unchanged update, malformed JSON และ string/composite key
 - Worked example เปลี่ยน resource/schema/key/base path/DTO/envelope และตรวจ persistence จริง
-- การตรวจ teacher template และ ZIP ออฟไลน์: รอขั้นตอนก่อน release บันทึกผลจริงที่นี่
+- `npm test`: 21/21 ผ่าน รวม curl smoke จริงและ recipes SQL บน MySQL
+- `npm run verify:template -- --template /path/to/midterm-exam-esm-template.zip`: 8/8 shared API contracts ผ่านบนสำเนา template ชั่วคราว รักษา package.json อาจารย์ไว้
+- `npm run package:kit` แล้ว `npm run verify:offline`: แตก ZIP ไป directory ใหม่ ใช้ dependency ที่ติดตั้งในเครื่องไว้แล้ว ผ่าน 21/21 โดย sandbox-exec บล็อก outbound ภายนอกแต่อนุญาต localhost; ตรวจ TCP ไป IP ภายนอกได้ EPERM/EACCES จริง ไม่ได้ปิดอินเทอร์เน็ตทั้งเครื่อง
+- Postman collection ตรวจโครงสร้างเท่านั้น ยังไม่ได้เปิดใน Postman GUI; curl และ .http เป็นตัวเลือกอ่าน/ส่ง request ในเครื่อง
+- คู่มือ HTML สร้างจาก Markdown ซ้ำได้ ตรวจ internal links และไม่มี script/CDN/remote assets
 
 ผู้เรียนยังไม่ได้ลอง independent-task ด้วยตัวเอง ผล automated tests ไม่ใช่การรับรองว่าทำข้อสอบได้หรือว่าจะผ่านโจทย์ใหม่
 

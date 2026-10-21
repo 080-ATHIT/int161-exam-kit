@@ -11,3 +11,5 @@ Task 3 complete: full suite 16/16 against actual MySQL. Task 4: Thai setup/contr
 
 Task 4 docs check RED exposed HTML self-link incorrectly targeting absent chapter; fixed to README chapter. Suite GREEN18/18. Task 5 template verification: original teacher ZIP extracted to temp, unchanged package retained, documented sources copied, shared API contract suite GREEN8/8 on MySQL. No exam files altered.
 Ruling: use macOS sandbox-exec child-process policy denying external outbound connections while allowing localhost; this verifies offline API/dependencies without changing machine network settings. It does not replace learner testing with Wi-Fi disconnected.
+
+Task 5 complete: source ZIP unpacked to temp, local prepared modules linked, OS sandbox denied direct external TCP; 21/21 tests passed with real local MySQL. First offline run RED exposed Node does not treat tests/ as a test-file glob; changed to explicit discovered test files and GREEN21/21. Postman GUI remains untested and labeled.
