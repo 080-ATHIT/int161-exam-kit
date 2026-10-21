@@ -16,7 +16,7 @@ test('exam startup needs no practice marker, and fixture initialization refuses 
  assert.throws(()=>loadSettings({DB_MODE:'unknown'}));
  assert.throws(()=>loadSettings({DB_MODE:'exam'}));
  assert.throws(()=>loadSettings({DB_MODE:'exam',DB_NAME:'exam_db'}));
- const config=loadSettings({DB_MODE:'exam',DB_NAME:'exam_db',STUDENT_ID:'my_id'});
+ const config=loadSettings({DB_MODE:'exam',DB_NAME:'exam_db',STUDENT_ID:'my_id',STUDENT_NAME:'Actual Student',STUDENT_KEY:'actual-assigned-key'});
  let read=false;
  const db={query:async sql=>{assert.equal(sql,'SELECT 1');read=true;return [[{ok:1}]];}};
  await assertAppDatabase(db,config);assert.equal(read,true);

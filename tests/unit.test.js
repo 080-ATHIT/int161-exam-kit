@@ -37,3 +37,12 @@ test('configuration rejects malformed identifiers, invalid ports, and route inje
   assert.equal(loadSettings({}).studentId,'demo001');
   for(const env of [{DB_NAME:'x; DROP DATABASE y'},{STUDENT_ID:':id'},{STUDENT_ID:'../x'},{DB_PORT:'abc'},{PORT:'-1'}]) assert.throws(()=>loadSettings(env));
 });
+test('exam identity rejects missing, blank and sample profile values',()=>{
+ const valid={DB_MODE:'exam',DB_NAME:'exam_db',STUDENT_ID:'my_id',STUDENT_NAME:'Actual Student',STUDENT_KEY:'actual-assigned-key'};
+ for(const field of ['DB_NAME','STUDENT_ID','STUDENT_NAME','STUDENT_KEY']){
+  for(const value of [undefined,'','   '])assert.throws(()=>loadSettings({...valid,[field]:value}),field);
+ }
+ for(const [field,value] of [['STUDENT_ID','demo001'],['STUDENT_ID','your_actual_id'],['STUDENT_NAME','Demo Student'],['STUDENT_NAME','Your Name'],['STUDENT_KEY','fictional-key'],['STUDENT_KEY','key_from_spec']])assert.throws(()=>loadSettings({...valid,[field]:value}),field);
+ const cfg=loadSettings(valid);assert.equal(cfg.name,valid.STUDENT_NAME);assert.equal(cfg.key,valid.STUDENT_KEY);
+ assert.equal(loadSettings({}).name,'Demo Student','practice defaults remain usable');
+});

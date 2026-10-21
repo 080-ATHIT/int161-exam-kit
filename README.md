@@ -36,7 +36,7 @@ controllerเรียก service/repository/mapper ที่มีครบใ�
 ## สองโหมด
 
 - `DB_MODE=practice`: เปิดโครงกับฐานตัวอย่างที่แยกไว้ ใช้ `npm run db:init` ได้
-- `DB_MODE=exam`: เชื่อม `DB_NAME` และ `STUDENT_ID` ที่ระบุเอง ไม่สร้าง/resetฐาน ต้องปรับSQL/schema/contractตามโจทย์และใช้SQLอาจารย์ตามคำสั่ง
+- `DB_MODE=exam`: เชื่อม `DB_NAME` ที่ระบุเอง และบังคับ `STUDENT_ID`/`STUDENT_NAME`/`STUDENT_KEY` ให้ครบเป็นค่าจริง ไม่สร้าง/resetฐาน ต้องปรับSQL/schema/contractตามโจทย์และใช้SQLอาจารย์ตามคำสั่ง
 
 เตรียม Node/MySQL และ `npm ci` ก่อนตัดอินเทอร์เน็ต เอกสาร.mdและโค้ด.jsเปิดอ่านออฟไลน์ได้ ไม่ใช้เว็บหรือskill ไม่มีโฟลเดอร์โจทย์ให้ทำเพิ่ม
 

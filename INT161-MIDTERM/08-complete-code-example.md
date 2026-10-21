@@ -4,7 +4,7 @@
 
 ไฟล์.jsที่ลิงก์เป็นsourceรันจริง codeblocksเป็นสำเนาให้อ่านต่อเนื่อง ไม่คัดลอกทั้งบทมารวมเป็นไฟล์เดียว คงimportsและชื่อfolderให้ตรง
 
-ใช้DB_MODE=practiceเปิดโครงเดิม หรือDB_MODE=examพร้อมDB_NAME/STUDENT_IDที่กำหนดเองเพื่อเชื่อมฐานโจทย์โดยไม่สร้าง/resettable ใช้[schemaตัวอย่าง](../sql/schema.sql)เฉพาะโหมดpractice โหมดexamปรับSQL/requiredfields/DTOตามโจทย์ก่อน
+ใช้DB_MODE=practiceเปิดโครงเดิม หรือDB_MODE=examพร้อมDB_NAME/STUDENT_ID/STUDENT_NAME/STUDENT_KEYเป็นค่าจริงครบเพื่อเชื่อมฐานโจทย์โดยไม่สร้าง/resettable ใช้[schemaตัวอย่าง](../sql/schema.sql)เฉพาะโหมดpractice โหมดexamปรับSQL/requiredfields/DTOตามโจทย์ก่อน
 
 ## src/configs-$id/settings.js
 
@@ -20,7 +20,16 @@ export function loadSettings(env = process.env) {
   // ADAPT 1: .env ระบุ DB ของโจทย์, mode และ identity ของตัวเอง ห้าม commit password
   const dbMode = env.DB_MODE || 'practice';
   if (!['practice','exam'].includes(dbMode)) throw new Error('DB_MODE must be practice or exam');
-  if (dbMode === 'exam' && (!env.DB_NAME || !env.STUDENT_ID)) throw new Error('Exam mode requires explicit DB_NAME and STUDENT_ID');
+  if (dbMode === 'exam') {
+    // ห้ามใช้fallbackหรือprofileตัวอย่างไปส่งสอบ ข้อความerrorระบุชื่อfieldเท่านั้น
+    const placeholders = new Set(['demo001','your_actual_id','demo student','your name','fictional-key','key_from_spec']);
+    for (const field of ['DB_NAME','STUDENT_ID','STUDENT_NAME','STUDENT_KEY']) {
+      const value = env[field];
+      if (typeof value !== 'string' || !value.trim() || placeholders.has(value.trim().toLowerCase())) {
+        throw new Error(`Exam mode requires an actual value for ${field}`);
+      }
+    }
+  }
   const database = env.DB_NAME || 'int161_practice_catalog';
   const testDatabase = env.TEST_DB_NAME || 'int161_practice_tests';
   for (const name of [database,testDatabase]) if (!/^[A-Za-z][A-Za-z0-9_]{0,63}$/.test(name)) throw new Error('Invalid database identifier');
@@ -288,8 +297,8 @@ export function productInput(body) {
   const brand_id=integer(body.brand_id,'brand_id');if(brand_id<1)fail('brand_id must be positive');
   const price=body.price;
   if(typeof price!=='number'||!Number.isFinite(price)||price<0||price>99999999.99||Number(price.toFixed(2))!==price)fail('price must be a number >= 0 with at most 2 decimal places');
-  return {sku,name,brand_id,category,price,ram_gb:integer(body.ram_gb,'ram_gb',{nullable:true}),storage_gb:integer(body.storage_gb,'storage_gb',{nullable:true}),
-    color:body.color==null?null:text(body.color,'color',50),stock_quantity:integer(body.stock_quantity ?? 0,'stock_quantity'),
+  return {sku,name,brand_id,category,price,ram_gb:integer(body.ram_gb,'ram_gb'),storage_gb:integer(body.storage_gb,'storage_gb'),
+    color:text(body.color,'color',50),stock_quantity:integer(body.stock_quantity ?? 0,'stock_quantity'),
     status:body.status===undefined?'AVAILABLE':text(body.status,'status',30),release_date:dateOnly(body.release_date)};
 }
 function tagCode(value){const code=text(value,'code',32);if(!/^[A-Za-z0-9_-]+$/.test(code))fail('tag code accepts letters, digits, underscore and hyphen');return code;}

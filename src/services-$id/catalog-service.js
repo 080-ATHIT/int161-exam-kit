@@ -30,8 +30,8 @@ export function productInput(body) {
   const brand_id=integer(body.brand_id,'brand_id');if(brand_id<1)fail('brand_id must be positive');
   const price=body.price;
   if(typeof price!=='number'||!Number.isFinite(price)||price<0||price>99999999.99||Number(price.toFixed(2))!==price)fail('price must be a number >= 0 with at most 2 decimal places');
-  return {sku,name,brand_id,category,price,ram_gb:integer(body.ram_gb,'ram_gb',{nullable:true}),storage_gb:integer(body.storage_gb,'storage_gb',{nullable:true}),
-    color:body.color==null?null:text(body.color,'color',50),stock_quantity:integer(body.stock_quantity ?? 0,'stock_quantity'),
+  return {sku,name,brand_id,category,price,ram_gb:integer(body.ram_gb,'ram_gb'),storage_gb:integer(body.storage_gb,'storage_gb'),
+    color:text(body.color,'color',50),stock_quantity:integer(body.stock_quantity ?? 0,'stock_quantity'),
     status:body.status===undefined?'AVAILABLE':text(body.status,'status',30),release_date:dateOnly(body.release_date)};
 }
 function tagCode(value){const code=text(value,'code',32);if(!/^[A-Za-z0-9_-]+$/.test(code))fail('tag code accepts letters, digits, underscore and hyphen');return code;}

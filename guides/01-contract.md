@@ -22,11 +22,11 @@
 
 ## นโยบาย input ของ kit
 
-POST/PUT products รับ snake_case: `sku,name,brand_id,category,price` บังคับ; `ram_gb,storage_gb,color,stock_quantity,status,release_date` เป็นตัวเลือก PUT ใช้ full body เช่น POST ฟิลด์ที่ไม่รู้จักถูกละทิ้ง ไม่อนุญาตเขียน `id` หรือ `internal_cost` ผ่าน API
+POST/PUT products รับ snake_case: `sku,name,brand_id,category,price,ram_gb,storage_gb,color` บังคับตามschemaตัวอย่าง; `stock_quantity,status,release_date` เป็นตัวเลือก PUT ใช้ full body เช่น POST ฟิลด์ที่ไม่รู้จักถูกละทิ้ง ไม่อนุญาตเขียน `id` หรือ `internal_cost` ผ่าน API
 
 price ต้องเป็น JSON number >=0 สูงสุด 99999999.99 ทศนิยมไม่เกินสองตำแหน่ง; brand_id เป็นจำนวนเต็มบวก; stock เป็นจำนวนเต็มไม่ติดลบ; release_date เป็นวันที่จริง YYYY-MM-DD หรือ null นโยบายนี้เป็นของชุดฝึก หากโจทย์อนุญาตค่าต่างกันต้องแก้ validation
 
-ชื่อ product/sku/category ห้ามว่างหลัง trim สถานะเริ่ม AVAILABLE stock เริ่ม 0 ฟิลด์ nullable เริ่ม null แยกกรณี missing/null/0 อย่าใช้ `value || default` เมื่อ 0 เป็นค่าที่ถูก
+ชื่อ product/sku/category ห้ามว่างหลัง trim สถานะเริ่ม AVAILABLE stock เริ่ม 0 release_dateที่nullableเริ่มnull ส่วนram_gb/storage_gb/colorห้ามnull แยกกรณี missing/null/0 อย่าใช้ `value || default` เมื่อ 0 เป็นค่าที่ถูก
 
 ## เช็กให้เข้มกว่าตัว runner
 

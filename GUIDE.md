@@ -13,7 +13,7 @@ method/path, ชื่อtable/columns, ชนิดPK/FK/UNIQUE, bodyที่�
 แก้ [.env.example](.env.example) โดยcopyเป็น.envส่วนตัว ดู [START-HERE](START-HERE.th.md)
 
 - ทดลองเปิดโครงเดิม: DB_MODE=practice + DB_NAME=int161_practice_catalog
-- ใช้ฐานโจทย์: DB_MODE=exam + DB_NAMEและSTUDENT_IDที่กำหนดเอง โค้ดไม่สร้าง/resetฐาน
+- ใช้ฐานโจทย์: DB_MODE=exam + DB_NAMEและSTUDENT_ID/STUDENT_NAME/STUDENT_KEYที่กำหนดเองครบ โค้ดไม่สร้าง/resetฐาน ไม่ยอมใช้identityตัวอย่าง
 - basepathสร้างจากSTUDENT_IDคงที่เมื่อเริ่มapp ไม่ใช้/api/:studentId
 
 ดู [settings.js](src/configs-$id/settings.js), [db-config.js](src/configs-$id/db-config.js) และ [database-mode.js](src/configs-$id/database-mode.js)

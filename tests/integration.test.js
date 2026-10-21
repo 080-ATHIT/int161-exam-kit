@@ -98,3 +98,29 @@ test('malformed JSON gets a JSON error without Express HTML or a stack',async()=
  const r=await fetch(base+'/products',{method:'POST',headers:{'Content-Type':'application/json'},body:'{'});
  assert.equal(r.status,400);const data=await r.json();assert.equal(data.error.code,'INVALID_JSON');assert.equal(data.success,false);
 });
+test('teacher NOT NULL schema accepts supplied request bodies and rejects missing specs with 400',async()=>{
+ const conn=await db.getConnection();let strictServer;
+ try{
+  await assertPracticeDatabase(conn);
+  await conn.query('CREATE TEMPORARY TABLE brands AS SELECT * FROM brands');
+  await conn.query(`CREATE TEMPORARY TABLE products (id INT PRIMARY KEY AUTO_INCREMENT,sku VARCHAR(50) UNIQUE,name VARCHAR(150),brand_id INT,category VARCHAR(50),price DECIMAL(10,2),ram_gb INT NOT NULL,storage_gb INT NOT NULL,color VARCHAR(50) NOT NULL,stock_quantity INT,status VARCHAR(30),release_date DATE)`);
+  strictServer=createApp({db:conn,studentId:'strict',name:'Demo',key:'fake'}).listen(0,'127.0.0.1');await new Promise(r=>strictServer.once('listening',r));
+  const url=`http://127.0.0.1:${strictServer.address().port}/api/strict/products`;
+  const send=(path,method,data)=>fetch(url+path,{method,headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});
+  const {readFile}=await import('node:fs/promises');
+  const http=await readFile('requests/catalog.http','utf8');const samples=http.split('\n').filter(x=>x.startsWith('{')).map(x=>JSON.parse(x));assert.equal(samples.length,2);
+  let created=await send('','POST',samples[0]);assert.equal(created.status,201,'provided .http POST must work with NOT NULL specs');const {data}=await created.json();
+  let updated=await send('/'+data.id,'PUT',samples[1]);assert.equal(updated.status,200);
+  const collection=JSON.parse(await readFile('requests/postman.json','utf8'));
+  for(const item of collection.item.filter(x=>['POST','PUT'].includes(x.request.method))){
+   const sample=JSON.parse(item.request.body.raw);sample.sku='STRICT-'+item.request.method;
+   const response=await send(item.request.method==='PUT'?'/'+data.id:'',item.request.method,sample);assert.equal(response.status,item.request.method==='POST'?201:200,'Postman body');
+  }
+  for(const field of ['ram_gb','storage_gb','color'])for(const value of [undefined,null]){
+   const input={...body('STRICT'),[field]:value};const r=await send('','POST',input);assert.equal(r.status,400,field);assert.equal((await r.json()).error.code,'VALIDATION_ERROR');
+  }
+ }finally{
+  if(strictServer)await new Promise(r=>strictServer.close(r));
+  await conn.query('DROP TEMPORARY TABLE IF EXISTS products');await conn.query('DROP TEMPORARY TABLE IF EXISTS brands');conn.release();
+ }
+});

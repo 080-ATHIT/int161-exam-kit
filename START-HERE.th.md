@@ -39,7 +39,7 @@ STUDENT_NAME=Your Name
 STUDENT_KEY=key_from_spec
 ```
 
-แก้host/port/user/passwordให้ถูก แล้ว `npm run doctor` และ `npm start` โหมดนี้ตรวจconnectivityอย่างเดียว ไม่สร้างตาราง/seed/reset/บังคับmarker ต้องนำเข้าSQLของอาจารย์เองตามคำสั่ง ห้ามใช้db:initหรือtestของชุดนี้กับฐานสอบ โหมดexamจะปฏิเสธหากไม่ระบุDB_NAME/STUDENT_IDเอง
+แก้host/port/user/passwordให้ถูก แล้ว `npm run doctor` และ `npm start` โหมดนี้ตรวจconnectivityอย่างเดียว ไม่สร้างตาราง/seed/reset/บังคับmarker ต้องนำเข้าSQLของอาจารย์เองตามคำสั่ง ห้ามใช้db:initหรือtestของชุดนี้กับฐานสอบ โหมดexamจะปฏิเสธหากDB_NAME/STUDENT_ID/STUDENT_NAME/STUDENT_KEYว่างหรือยังใช้ค่าตัวอย่าง ต้องเปลี่ยนYour Name/key_from_specในsnippetด้านบนเป็นค่าจริงก่อนรัน
 
 หากSQL/requiredfieldsยังเป็นproductsของตัวอย่าง ต้องแก้ให้ตรงก่อนยิงPOST/PUT/DELETE ไม่ถือว่าการเปลี่ยน.envอย่างเดียวทำให้รองรับทุกโจทย์
 

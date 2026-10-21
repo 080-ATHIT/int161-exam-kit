@@ -27,7 +27,7 @@ server.jsของรุ่นนี้พึ่งเฉพาะsrcและpa
 
 ## ต่อฐานโจทย์
 
-ตั้งDB_MODE=exam, DB_NAMEและSTUDENT_IDเอง โหมดนี้SELECT1ตรวจการเชื่อมต่อ ไม่ต้องมีmarkerและไม่สร้าง/seed/resettable ตรวจSQL/NOTNULL/FK/DTOและinputให้ตรงก่อนยิงrequestเขียนข้อมูล
+ตั้งDB_MODE=exam, DB_NAME/STUDENT_ID/STUDENT_NAME/STUDENT_KEYเป็นค่าจริงครบ โหมดนี้SELECT1ตรวจการเชื่อมต่อ ไม่ต้องมีmarkerและไม่สร้าง/seed/resettable ตรวจSQL/NOTNULL/FK/DTOและinputให้ตรงก่อนยิงrequestเขียนข้อมูล
 
 ใช้SQLอาจารย์ตามคำสั่ง ไม่ใช้sql/schema.sqlของตัวอย่างแทนโดยอัตโนมัติ ไม่ใช้db:initหรือtestของโครงกับฐานสอบ
 
@@ -37,4 +37,4 @@ server.jsของรุ่นนี้พึ่งเฉพาะsrcและpa
 npm run verify:template -- --template /absolute/path/midterm-exam-esm-template.zip
 ```
 
-คำสั่งนี้ใช้เฉพาะตอนตรวจโครงตัวอย่าง: แตกZIPเป็นสำเนาชั่วคราว คัดลอกsrc/app/server/configs/routes/controllers/services/repositories/mappers/middlewares และเปิดAPIกับฐานฝึก ไม่ทับprojectต้นฉบับ ไม่ตรวจว่าschema/สเปกที่แก้ใหม่ถูกทุกกรณี
+คำสั่งนี้ใช้เฉพาะตอนตรวจโครงตัวอย่าง: แตกZIPเป็นสำเนาชั่วคราว คัดลอกsrc/app/server/configs/routes/controllers/services/repositories/mappers/middlewares เพิ่มscripts.startเฉพาะในสำเนาโดยคงscripts/dependenciesอื่น แล้วตรวจAPIcontractsและรันnpm startจริงเพื่อGETstudent-info/productsกับฐานฝึก ไม่ทับprojectต้นฉบับ ไม่ตรวจว่าschema/สเปกที่แก้ใหม่ถูกทุกกรณี
