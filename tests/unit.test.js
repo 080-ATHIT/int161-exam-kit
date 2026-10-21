@@ -1,0 +1,39 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { parsePagination } from '../reference-app/src/middlewares-$id/pagination.js';
+import { summary, detail } from '../reference-app/src/mappers-$id/product-mapper.js';
+import { normalizeError } from '../reference-app/src/middlewares-$id/error-handler.js';
+import { loadSettings } from '../reference-app/src/configs-$id/settings.js';
+
+test('pagination uses defaults, capped limit and correct offset', () => {
+  assert.deepEqual(parsePagination({}), {page:1,limit:10,offset:0});
+  assert.deepEqual(parsePagination({page:'3',limit:'10'}), {page:3,limit:10,offset:20});
+  assert.deepEqual(parsePagination({page:'2',limit:'500'}), {page:2,limit:100,offset:100});
+});
+test('invalid and duplicate query values never become SQL limits', () => {
+  for (const v of ['', '0','-1','1.2','abc','2abc','1e2',[],['1','2'],{},'9007199254740992']) {
+    assert.throws(()=>parsePagination({page:v}), e=>e.status===400, String(v));
+    assert.throws(()=>parsePagination({limit:v}), e=>e.status===400, String(v));
+  }
+  assert.throws(()=>parsePagination({page:'9007199254740991',limit:'100'}),e=>e.status===400);
+});
+test('DTOs have exact fields and numeric decimal values; no raw secrets', () => {
+  const row={id:1,sku:'DEMO-A',name:'A',brand_id:2,brand_name:'Brand',category:'PHONE',price:'12.50',status:'AVAILABLE',stock_quantity:0,ram_gb:8,storage_gb:128,color:'Black',release_date:'2026-01-02',password_hash:'secret',internal_cost:'2'};
+  assert.deepEqual(summary(row),{id:1,sku:'DEMO-A',name:'A',brandId:2,category:'PHONE',price:12.5,status:'AVAILABLE'});
+  const d=detail(row);
+  assert.deepEqual(Object.keys(d),['id','sku','name','brandId','brandName','category','price','ramGb','storageGb','color','stockQuantity','status','releaseDate']);
+  assert.equal(d.releaseDate,'2026-01-02'); assert.equal(d.stockQuantity,0);
+  assert.equal(detail({...row,release_date:null}).releaseDate,null);
+});
+test('database errors map to public contracts; unexpected errors hide details', () => {
+  for (const [code,status,key] of [['ER_DUP_ENTRY',409,'DUPLICATE_KEY'],['ER_NO_REFERENCED_ROW_2',400,'FOREIGN_KEY_NOT_FOUND'],['ER_ROW_IS_REFERENCED_2',409,'RESOURCE_IN_USE']]) {
+    const result=normalizeError({code,message:'SQL with password-secret'});
+    assert.equal(result.status,status); assert.equal(result.body.error.code,key);
+    assert.ok(!JSON.stringify(result).includes('password-secret'));
+  }
+  assert.equal(normalizeError(new Error('private-stack')).body.error.message,'Internal server error');
+});
+test('configuration rejects malformed identifiers, invalid ports, and route injection',()=>{
+  assert.equal(loadSettings({}).studentId,'demo001');
+  for(const env of [{DB_NAME:'x; DROP DATABASE y'},{STUDENT_ID:':id'},{STUDENT_ID:'../x'},{DB_PORT:'abc'},{PORT:'-1'}]) assert.throws(()=>loadSettings(env));
+});
